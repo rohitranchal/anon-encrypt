@@ -83,4 +83,18 @@ public class AEParameters implements CipherParameters {
 		this.h3 = h3;
 	}
 	
+	public String serialize() {
+		String output = "<AEParameters>\n";
+		output += "<Curve>" + this.curveParams.toString() + "</Curve>\n";
+		output += "<G>" + this.g.toString() + "</G>\n";
+		output += "<G1>" + this.g1.toString() + "</G1>\n";
+		output += "<G2>" + this.g2.toString() + "</G2>\n";
+		output += "<G3>" + this.g3.toString() + "</G3>\n";
+		output += "<H1>" + this.h1.toString() + "</H1>\n";
+		output += "<H2>" + this.h2.toString() + "</H2>\n";
+		output += "<H3>" + this.h3.toString() + "</H3>\n";
+		output += "</AEParameters>";
+		return output;
+	}
+	
 }

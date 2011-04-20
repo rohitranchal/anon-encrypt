@@ -4,6 +4,14 @@ import java.util.ArrayList;
 
 import it.unisa.dia.gas.jpbc.Element;
 
+/**
+ * This class represents a private key of a contact.
+ * Also when a contact creates a temporary key to request data to be encrypted
+ * this class will hold the temporary private key as well.
+ * 
+ * @author Ruchith Fernando
+ *
+ */
 public class AEPrivateKey {
 
 	private Element c1;
@@ -28,5 +36,7 @@ public class AEPrivateKey {
 	public ArrayList<Element> getC3() {
 		return this.c3;
 	}
+	
+	
 
 }

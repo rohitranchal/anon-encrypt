@@ -13,7 +13,9 @@ public class TestAEParameterGenerator extends TestCase {
 
 		AEParameterGenerator paramGen = new AEParameterGenerator();
 		paramGen.init(curveParams);
-		paramGen.generateParameters();
+		AEParameters params = paramGen.generateParameters();
+		
+		System.out.println(params.serialize());
 
 	}
 }

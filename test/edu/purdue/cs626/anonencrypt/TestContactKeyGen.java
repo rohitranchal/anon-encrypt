@@ -24,10 +24,14 @@ public class TestContactKeyGen extends TestCase {
 		Element id1 = paramGen.getPairing().getZr().newRandomElement();
 		AEPrivateKey contactPriv = rkg.genKey(id1, paramGen.getMasterKey());
 
+		System.out.println(contactPriv.serialize());
+		
 		ContactKeyGen conKeyGen = new ContactKeyGen();
 		conKeyGen.init(id1, contactPriv, params);
 		Element id2 = conKeyGen.genRandomID();
 		AEPrivateKey tmpPriv = conKeyGen.genKey(id2);
+		
+		System.out.println(tmpPriv.serialize());
 
 	}
 }

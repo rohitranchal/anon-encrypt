@@ -7,6 +7,11 @@ import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
 import junit.framework.TestCase;
 
+/**
+ * Testing text encryption
+ * @author Ruchith Fernando
+ *
+ */
 public class TestTextEncryption extends TestCase {
 
 	public void testEncryption() throws Exception {

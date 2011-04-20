@@ -8,6 +8,12 @@ import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 
+/**
+ * Encodes and decode strings into Elements of GT.
+ * 
+ * @author Ruchith Fernando
+ *
+ */
 public class TextEncoder {
 	
 	private AEParameters params;
@@ -21,10 +27,19 @@ public class TextEncoder {
 		this.gt = this.pairing.getGT();
 	}
 	
+	/**
+	 * Returns the block size in bytes.
+	 * @return the block size in bytes.
+	 */
 	public int getBlockSize() {
 		return this.gt.getLengthInBytes();
 	}
 	
+	/**
+	 * Encode a string into an array of {@link Element}s
+	 * @param input {@link String} value to be encoded.
+	 * @return An array of {@link Element}s 
+	 */
 	public Element[] encode(String input) {
 		//Break input into blocks
 		int len = this.getBlockSize();
@@ -43,6 +58,15 @@ public class TextEncoder {
 		return this.encode(blocks.toArray(new byte[inputLen/len + 1][]));
 	}
 	
+	/**
+	 * Encode a given array of byte arrays into an array of {@link Element}s
+	 * This takes care of padding the final array and expects all other blocks
+	 * to have data of block size.
+	 * This is intended to be used by Element[] encode(String input) So use 
+	 * with care.
+	 * @param input The array of byte arrays
+	 * @return  An array of {@link Element}s
+	 */
 	public Element[] encode(byte[][] input) {
 		ArrayList<Element> output = new ArrayList<Element>();
 		
@@ -63,6 +87,11 @@ public class TextEncoder {
 		
 	}
 	
+	/**
+	 * Decodes a given array of encoded elements back to a byte array.
+	 * @param input An array of {@link Element}s
+	 * @return Single byte array with the decoded data.
+	 */
 	public byte[] decode(Element[] input) {
 		byte[][] outBlocks = new byte[input.length][];
 		int length = 0;

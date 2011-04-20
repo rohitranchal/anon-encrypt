@@ -20,4 +20,14 @@ public class Decrypt {
 		
 		return tmp1.div(tmp2);
 	}
+	
+	public Element[] doDecrypt(AECipherText[] cipherText, AEPrivateKey privateKey) {
+		
+		Element[] output = new Element[cipherText.length];
+		for(int i = 0; i < cipherText.length; i++) {
+			output[i] = this.doDecrypt(cipherText[i], privateKey);
+		}
+		
+		return output;
+	}
 }

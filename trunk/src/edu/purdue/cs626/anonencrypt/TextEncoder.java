@@ -103,7 +103,8 @@ public class TextEncoder {
 		byte[] output = new byte[length];
 		int copiedSoFar = 0;
 		for(int i = 0; i < outBlocks.length; i++) {
-			System.arraycopy(outBlocks[i], 0, output, copiedSoFar, outBlocks[i].length);
+			System.arraycopy(outBlocks[i], 0, output, copiedSoFar, 
+					outBlocks[i].length);
 			copiedSoFar += outBlocks[i].length;
 		}
 		

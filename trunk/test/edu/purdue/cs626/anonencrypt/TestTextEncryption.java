@@ -15,7 +15,8 @@ import junit.framework.TestCase;
 public class TestTextEncryption extends TestCase {
 
 	public void testEncryption() throws Exception {
-        CurveParams curveParams = (CurveParams) new TypeA1CurveGenerator(4, 32).generate();
+        CurveParams curveParams = (CurveParams) 
+        					new TypeA1CurveGenerator(4, 32).generate();
         
         AEParameterGenerator paramGen = new AEParameterGenerator();
 		paramGen.init(curveParams);

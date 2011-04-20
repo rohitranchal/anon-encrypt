@@ -18,10 +18,10 @@ public class TestTextEncoder extends TestCase {
 		encoder.init(params);
 		
 		String input = "The quick brown fox jumps over the lazy dog";
-		Element[] out = encoder.encode(input);
+		Element[] out = encoder.encode(input.trim());
 		String compareWith = new String(encoder.decode(out));
 		System.out.println(">>" + input + "<<");
 		System.out.println(">>" + compareWith.trim() + "<<");
-		assertEquals("decoding failure", input, compareWith.trim());
+		assertEquals("decoding failure", input.trim(), compareWith.trim());
 	}
 }

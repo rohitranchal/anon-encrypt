@@ -37,6 +37,13 @@ public class AEPrivateKey {
 		return this.c3;
 	}
 	
-	
+	public String serialize() {
+		String output = "<AEPrivateKey>\n";
+		output += "<C1>" + this.c1 + "</C1>";
+		output += "<C2>" + this.c2 + "</C2>";
+		output += "<C3>" + this.c3 + "</C3>";
+		output += "</AEPrivateKey>";
+		return output;
+	}
 
 }

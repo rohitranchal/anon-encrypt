@@ -38,13 +38,13 @@ public class Encrypt {
 		
 		Element s = this.pairing.getZr().newRandomElement();
 		
-		Element tmp1 = this.pairing.pairing(this.params.getG1(), this.params.getG2()).powZn(s);
+		Element tmp1 = this.pairing.pairing(this.params.getG1().getImmutable(), this.params.getG2().getImmutable()).powZn(s);
 		
 		Element a = tmp1.mul(plainText);
 		
-		Element b = this.params.getG().powZn(s);
+		Element b = this.params.getG().getImmutable().powZn(s);
 		
-		Element c = pubKey.mul(this.params.getG3()).powZn(s);
+		Element c = pubKey.getImmutable().mul(this.params.getG3().getImmutable()).powZn(s);
 		
 		return new AECipherText(a, b, c);
 		

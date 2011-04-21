@@ -24,7 +24,6 @@ public class RootKeyGen {
 		Pairing pairing = PairingFactory.getPairing(this.params.getCurveParams());
 		
 		Element r = pairing.getZr().newRandomElement();
-		System.out.println(r);
 		
 		Element g3 = this.params.getG3();
 		Element tmp1 = h1I1.mul(g3);

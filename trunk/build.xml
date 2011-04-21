@@ -32,7 +32,7 @@
 		<javac srcdir="${test}" destdir="${build}" classpathref="classpath.libraries" />
 	</target>
 
-	<target name="test" depends="clean,compile">
+	<target name="test" depends="clean, compile">
 		
 		<mkdir dir="${build}/reports"/>
 		<junit printsummary="yes" haltonfailure="yes" fork="yes" dir="${basedir}">

@@ -29,7 +29,7 @@ public class ContactPrivData {
 		this.id.setFromBytes(Base64.decode(idElem.getText()));
 		
 		OMElement privKeyElem = elem.getFirstChildWithName(new QName("AEPrivateKey"));
-		this.privKey = new AEPrivateKey(privKeyElem);
+		this.privKey = new AEPrivateKey(privKeyElem, pairing);
 	}
 	
 	public ContactPrivData(AEParameters params, Element id, AEPrivateKey privKey) {

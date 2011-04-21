@@ -1,12 +1,13 @@
 package edu.purdue.cs626.anonencrypt;
 
+import java.io.ByteArrayInputStream;
+
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
-
-import java.io.FileInputStream;
-import java.io.InputStream;
-
 import junit.framework.TestCase;
 
 public class TestContactKeyGen extends TestCase {
@@ -32,6 +33,16 @@ public class TestContactKeyGen extends TestCase {
 		AEPrivateKey tmpPriv = conKeyGen.genKey(id2);
 		
 		System.out.println(tmpPriv.serialize());
+		
+		
+		byte[] bytes = contactPriv.serialize().getBytes();
+		ByteArrayInputStream is = new ByteArrayInputStream(bytes);
+		OMElement elem = new StAXOMBuilder(is).getDocumentElement();
+		AEPrivateKey newContactPriv = new AEPrivateKey(elem, paramGen.getPairing());
 
+		
+		assertEquals(contactPriv.getC1(), newContactPriv.getC1());
+		assertEquals(contactPriv.getC2(), newContactPriv.getC2());
+		assertEquals(contactPriv.getC3(), newContactPriv.getC3());
 	}
 }

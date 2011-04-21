@@ -9,6 +9,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.Base64;
 
 import it.unisa.dia.gas.jpbc.Element;
+import it.unisa.dia.gas.jpbc.Field;
+import it.unisa.dia.gas.jpbc.Pairing;
 
 /**
  * This class represents a private key of a contact.
@@ -24,16 +26,42 @@ public class AEPrivateKey {
 	private Element c2;
 	private ArrayList<Element> c3;
 
-	public AEPrivateKey(OMElement elem) {
-		OMElement curveElem = elem.getFirstChildWithName(new QName("Curve"));
+	public AEPrivateKey(OMElement elem, Pairing pairing) {
+		
+		Field group1 = pairing.getG1();
+
+		OMElement c1Elem = elem.getFirstChildWithName(new QName("C1"));
+		OMElement c2Elem = elem.getFirstChildWithName(new QName("C2"));
+		OMElement c3Elem = elem.getFirstChildWithName(new QName("C3"));
+		
+		Element tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(c1Elem.getText()));
+		this.c1  = tmpElem.getImmutable();
+		
+		tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(c2Elem.getText()));
+		this.c2  = tmpElem.getImmutable();
+		
+		
+		Iterator<OMElement> c3Children = c3Elem.getChildrenWithLocalName("Elem");
+		this.c3 = new ArrayList<Element>();
+		while (c3Children.hasNext()) {
+			OMElement omElem = (OMElement) c3Children.next();
+			tmpElem = group1.newElement();
+			tmpElem.setFromBytes(Base64.decode(omElem.getText()));
+			this.c3.add(tmpElem.getImmutable());
+		}
 		
 	}
 	
 	public AEPrivateKey(Element c1, Element c2, ArrayList<Element> c3) {
-		this.c1 = c1;
-		this.c2 = c2;
-		this.c3 = c3;
-		
+		this.c1 = c1.getImmutable();
+		this.c2 = c2.getImmutable();
+		this.c3 = new ArrayList<Element>();
+		for (Iterator iterator = c3.iterator(); iterator.hasNext();) {
+			Element elem = (Element) iterator.next();
+			this.c3.add(elem.getImmutable());
+		}
 	}
 
 	public Element getC1() {

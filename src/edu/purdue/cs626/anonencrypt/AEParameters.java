@@ -1,8 +1,17 @@
 package edu.purdue.cs626.anonencrypt;
 
-import it.unisa.dia.gas.jpbc.Element;
-import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
+import java.io.ByteArrayInputStream;
 
+import javax.xml.namespace.QName;
+
+import it.unisa.dia.gas.jpbc.Element;
+import it.unisa.dia.gas.jpbc.Field;
+import it.unisa.dia.gas.jpbc.Pairing;
+import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
+import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
+
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.Base64;
 import org.bouncycastle.crypto.CipherParameters;
 
 public class AEParameters implements CipherParameters {
@@ -17,8 +26,52 @@ public class AEParameters implements CipherParameters {
 	private Element h2;
 	private Element h3;
 
-	
-	
+	public AEParameters(OMElement elem) {
+		OMElement curveElem = elem.getFirstChildWithName(new QName("Curve"));
+		this.curveParams = new CurveParams();
+		this.curveParams.load(new ByteArrayInputStream(curveElem.getText()
+				.getBytes()));
+
+		Pairing pairing = PairingFactory.getPairing(this.curveParams);
+		Field group1 = pairing.getG1();
+
+		OMElement gElem = elem.getFirstChildWithName(new QName("G"));
+		Element tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(gElem.getText()));
+		this.g = tmpElem.getImmutable();
+
+		OMElement g1Elem = elem.getFirstChildWithName(new QName("G1"));
+		tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(g1Elem.getText()));
+		this.g1 = tmpElem.getImmutable();
+
+		OMElement g2Elem = elem.getFirstChildWithName(new QName("G2"));
+		tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(g2Elem.getText()));
+		this.g2 = tmpElem.getImmutable();
+
+		OMElement g3Elem = elem.getFirstChildWithName(new QName("G3"));
+		tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(g3Elem.getText()));
+		this.g3 = tmpElem.getImmutable();
+
+		OMElement h1Elem = elem.getFirstChildWithName(new QName("H1"));
+		tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(h1Elem.getText()));
+		this.h1 = tmpElem.getImmutable();
+
+		OMElement h2Elem = elem.getFirstChildWithName(new QName("H2"));
+		tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(h2Elem.getText()));
+		this.h2 = tmpElem.getImmutable();
+
+		OMElement h3Elem = elem.getFirstChildWithName(new QName("H3"));
+		tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(h3Elem.getText()));
+		this.h3 = tmpElem.getImmutable();
+
+	}
+
 	public AEParameters(CurveParams curveParams) {
 		this.curveParams = curveParams;
 	}
@@ -82,19 +135,19 @@ public class AEParameters implements CipherParameters {
 	void setH3(Element h3) {
 		this.h3 = h3;
 	}
-	
+
 	public String serialize() {
 		String output = "<AEParameters>\n";
 		output += "<Curve>" + this.curveParams.toString() + "</Curve>\n";
-		output += "<G>" + this.g.toString() + "</G>\n";
-		output += "<G1>" + this.g1.toString() + "</G1>\n";
-		output += "<G2>" + this.g2.toString() + "</G2>\n";
-		output += "<G3>" + this.g3.toString() + "</G3>\n";
-		output += "<H1>" + this.h1.toString() + "</H1>\n";
-		output += "<H2>" + this.h2.toString() + "</H2>\n";
-		output += "<H3>" + this.h3.toString() + "</H3>\n";
+		output += "<G>" + Base64.encode(this.g.toBytes()) + "</G>\n";
+		output += "<G1>" + Base64.encode(this.g1.toBytes()) + "</G1>\n";
+		output += "<G2>" + Base64.encode(this.g2.toBytes()) + "</G2>\n";
+		output += "<G3>" + Base64.encode(this.g3.toBytes()) + "</G3>\n";
+		output += "<H1>" + Base64.encode(this.h1.toBytes()) + "</H1>\n";
+		output += "<H2>" + Base64.encode(this.h2.toBytes()) + "</H2>\n";
+		output += "<H3>" + Base64.encode(this.h3.toBytes()) + "</H3>\n";
 		output += "</AEParameters>";
 		return output;
 	}
-	
+
 }

@@ -1,5 +1,7 @@
 package edu.purdue.cs626.anonencrypt.app;
 
+import java.io.File;
+
 import edu.purdue.cs626.anonencrypt.AEParameters;
 import edu.purdue.cs626.anonencrypt.AEPrivateKey;
 import it.unisa.dia.gas.jpbc.Element;
@@ -33,7 +35,7 @@ public class Contact {
 	private AEPrivateKey privKey;
 	
 	
-	public Contact() {
+	public Contact(File privCert) {
 		//TODO
 	}
 

@@ -19,7 +19,7 @@ public class ContactKeyGen {
 	
 	public void init(Element id, AEPrivateKey privKey, AEParameters params) {
 		this.params = params;
-		this.id = this.params.getH1().powZn(id);
+		this.id = this.params.getH1().powZn(id).getImmutable();
 		this.privKey = privKey;
 	}
 	
@@ -27,7 +27,7 @@ public class ContactKeyGen {
 		return this.params.getPairing().getZr().newRandomElement();
 	}
 	
-	public AEPrivateKey genKey(Element rndId) {
+	public AEPrivateKey getTmpPrivKey(Element rndId) {
 		Element t = this.params.getPairing().getZr().newRandomElement();
 		
 		Element tmp1 = this.params.getH2().powZn(rndId);
@@ -47,6 +47,11 @@ public class ContactKeyGen {
 		c3.add(this.privKey.getC3().get(1).mul(this.params.getH3().powZn(t)));
 		
 		return new AEPrivateKey(c1, c2, c3);
+	}
+	
+	public Element getTmpPubKey(Element rndId) {
+		return this.id.mul(params.getH2().powZn(rndId));
+		
 	}
 
 }

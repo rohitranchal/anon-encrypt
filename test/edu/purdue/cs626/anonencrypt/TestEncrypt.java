@@ -37,15 +37,17 @@ public class TestEncrypt extends TestCase {
 		ContactKeyGen conKeyGen = new ContactKeyGen();
 		conKeyGen.init(id1, contactPriv, params);
 		Element id2 = conKeyGen.genRandomID();
-		AEPrivateKey tmpPriv = conKeyGen.genKey(id2);
+		AEPrivateKey tmpPriv = conKeyGen.getTmpPrivKey(id2);
 
 		Encrypt encrypt = new Encrypt();
 		encrypt.init(params);
 
 		Element plain = pairing.getGT().newRandomElement();
 
-		Element pubKey = params.getH1().powZn(id1)
-				.mul(params.getH2().powZn(id2));
+//		Element pubKey = params.getH1().powZn(id1)
+//				.mul(params.getH2().powZn(id2));
+
+		Element pubKey = conKeyGen.getTmpPubKey(id2);
 
 		AECipherTextBlock ct = encrypt.doEncrypt(plain, pubKey);
 

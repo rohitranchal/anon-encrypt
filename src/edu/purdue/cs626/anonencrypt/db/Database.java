@@ -49,39 +49,5 @@ public class Database {
 		}
 		return conn;
 	}
-	
-	public void create() throws Exception {
-		Properties props = new Properties(); 
-        props.put("user", USER);
-        props.put("password", PASSWORD);
-        String dbName = "derbyDB";
-        
-        Connection conn = DriverManager.getConnection(PROTOCOL + dbName
-                + ";create=true", props);
-//        Connection conn = DriverManager.getConnection(protocol + dbName , props);
-        
-        Statement s = conn.createStatement();
-        
-        s.execute("CREATE TABLE Contact(friendId varchar(100), " +
-        				"id varchar(512), random varchar(512), privData clob)");
-        
-        s.execute("INSERT INTO Contact " +
-        			"VALUES('Bob', '251789358979577744758182258194692528664', " +
-        			"'324683896779935702435841186478040627037', '')");
-        
-        conn.commit();
-        
-        ResultSet rs = s.executeQuery("SELECT * FROM Contact");
-        while(rs.next()) {
-        	System.out.println(rs.getString(1));
-        	System.out.println(rs.getString(2));
-        }
 
-	}
-	
-	public static void main(String[] args) throws Exception {
-		Database db = new Database();
-		db.create();
-
-	}
 }

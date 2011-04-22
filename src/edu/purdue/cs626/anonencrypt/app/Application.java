@@ -7,7 +7,10 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 
 import it.unisa.dia.gas.jpbc.Element;
+import it.unisa.dia.gas.jpbc.Field;
 import edu.purdue.cs626.anonencrypt.AEParameters;
+import edu.purdue.cs626.anonencrypt.AEPrivateKey;
+import edu.purdue.cs626.anonencrypt.RootKeyGen;
 
 /**
  * Main application API that depends on an installation. 
@@ -50,9 +53,24 @@ public class Application {
 		
 	}
 
-	public ContactPrivData createContactPrivData() {
-		// TODO
-		return null;
+	public ContactPrivData createContact() {
+		
+		//Generate a key with a random ID
+		RootKeyGen rkg = new RootKeyGen();
+		rkg.init(this.params);
+		Field zr = this.params.getPairing().getZr();
+		Element id1 = zr.newRandomElement().getImmutable();
+		Element r = zr.newRandomElement().getImmutable();
+		AEPrivateKey contactKey = rkg.genKey(id1, this.masterKey, r);
+		
+		
+//		String sql = "INSERT INTO Contact VALUES ("
+		
+		//Store in the database
+		
+		return new ContactPrivData(this.params, id1, contactKey);
 	}
+	
+	
 
 }

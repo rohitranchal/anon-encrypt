@@ -34,7 +34,7 @@ public class TestApplicationInstaller extends TestCase {
 
 		s.execute("INSERT INTO Contact "
 				+ "VALUES('Bob', '251789358979577744758182258194692528664', "
-				+ "'324683896779935702435841186478040627037', '')");
+				+ "'324683896779935702435841186478040627037', '', '')");
 
 		ResultSet rs = s.executeQuery("SELECT * FROM Contact");
 		while (rs.next()) {

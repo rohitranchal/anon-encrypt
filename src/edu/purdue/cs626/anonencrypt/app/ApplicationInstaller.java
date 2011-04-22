@@ -66,8 +66,12 @@ public class ApplicationInstaller {
 
 		Statement s = conn.createStatement();
 
-		s.execute("CREATE TABLE Contact(friendId varchar(100), "
-				+ "id varchar(512), random varchar(512), privData clob)");
+		s.execute("CREATE TABLE Contact(" +
+						"contactId varchar(100), "+ 
+						"id varchar(512), " +	//The id that I give him
+						"random varchar(512), " + //The r that I assign
+						"privDataFromContact clob," + //The priv data that he gives me
+						"myIDFromContact varchar(512))"); //The ID that he gives me 
 
 		conn.commit();
 		conn.close();

@@ -18,7 +18,7 @@ import edu.purdue.cs626.anonencrypt.db.Database;
 
 /**
  * Main application API that depends on an installation. (i.e. requires the
- * configuration to be in the user home dir)
+ * configuration to be in the user home directory)
  * 
  * @author Ruchith Fernando
  * 
@@ -86,6 +86,27 @@ public class Application {
 		Statement s = conn.createStatement();
 		s.execute(sql);
 		return new ContactPrivData(this.params, id1, contactKey);
+	}
+
+	/**
+	 * Register a remote contact with the private information he/she created for
+	 * me.
+	 * 
+	 * @param name
+	 *            Friendly name of the remote contact.
+	 * @param data
+	 *            {@link ContactPrivData} instance from the remote contact.
+	 */
+	public void registerContact(String name, ContactPrivData data)
+			throws Exception {
+		// Store in the database
+		String sql = "UPDATE Contact SET privDataFromContact='"
+				+ data.serialize() + "', myIDFromContact='"
+				+ Base64.encode(data.getId().toBytes())
+				+ "' WHERE contactId = '" + name + "'";
+		Connection conn = Database.getConnection();
+		Statement s = conn.createStatement();
+		s.execute(sql);
 	}
 
 }

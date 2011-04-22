@@ -202,9 +202,7 @@ public class Application {
 			
 			AECipherText cipherText = encrypt.doEncrypt(msgElems, idElem);
 			
-
-			
-			return null;
+			return cipherText.serialize();
 			
 		} else {
 			return null;

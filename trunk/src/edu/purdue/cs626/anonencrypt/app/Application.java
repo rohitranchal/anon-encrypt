@@ -13,6 +13,7 @@ import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import edu.purdue.cs626.anonencrypt.AEParameters;
 import edu.purdue.cs626.anonencrypt.AEPrivateKey;
+import edu.purdue.cs626.anonencrypt.ReKeyInformation;
 import edu.purdue.cs626.anonencrypt.RootKeyGen;
 import edu.purdue.cs626.anonencrypt.db.Database;
 
@@ -107,6 +108,11 @@ public class Application {
 		Connection conn = Database.getConnection();
 		Statement s = conn.createStatement();
 		s.execute(sql);
+	}
+	
+	public ReKeyInformation reKey() {
+		//TODO
+		return null;
 	}
 
 }

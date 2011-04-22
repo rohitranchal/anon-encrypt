@@ -76,19 +76,4 @@ public class TestApplication extends TestCase {
 		assertEquals(data.getParams().getCurveParams(), dataFromContact.getParams().getCurveParams());
 	}
 	
-	public void testReKey() throws Exception {
-		Application app = new Application();
-		
-		for(int i = 0; i < 20; i++) {
-			ContactPrivData data = app.createContact("Bob" + i);
-			// now register the contact using the same private information
-			app.registerContact("Bob" + i, data);
-			
-		}
-		
-		ReKeyInformation info = app.reKey();
-
-		System.out.println(info.serialize());
-	}
-
 }

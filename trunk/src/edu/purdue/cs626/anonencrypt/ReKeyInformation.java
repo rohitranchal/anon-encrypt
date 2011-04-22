@@ -1,9 +1,13 @@
 package edu.purdue.cs626.anonencrypt;
 
 import it.unisa.dia.gas.jpbc.Element;
+import it.unisa.dia.gas.jpbc.Field;
+import it.unisa.dia.gas.jpbc.Pairing;
 
 import java.util.HashMap;
 import java.util.Iterator;
+
+import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.Base64;
@@ -27,10 +31,47 @@ public class ReKeyInformation {
 	 */
 	private Element rnd;
 
-	private HashMap<Element, Element> newC1map = new HashMap<Element, Element>();
+	private HashMap<Element, Element> newC1map;
 
-	public ReKeyInformation(OMElement elem) {
-		// TODO
+	/**
+	 * Create {@link ReKeyInformation} object with published data.
+	 * 
+	 * @param elem
+	 *            The published re-key information as an {@link OMElement}.
+	 * @param pairing
+	 *            We need the {@link Pairing} to be able to recreate the
+	 *            elements. This must be from the {@link AEParameters} of the
+	 *            user that the published re-key information belongs to.
+	 */
+	public ReKeyInformation(OMElement elem, Pairing pairing) {
+		OMElement g1Elem = elem.getFirstChildWithName(new QName("G1"));
+		Field group1 = pairing.getG1();
+		this.g1 = group1.newElement();
+		this.g1.setFromBytes(Base64.decode(g1Elem.getText()));
+		
+		OMElement rndElem = elem.getFirstChildWithName(new QName("Random"));
+		Field zr = pairing.getZr();
+		this.rnd = zr.newElement();
+		this.rnd.setFromBytes(Base64.decode(rndElem.getText()));
+		
+		OMElement contactsElem = elem.getFirstChildWithName(new QName("Contacts"));
+		
+		Iterator<OMElement> contactElems = contactsElem.getChildrenWithLocalName("Contact");
+		this.newC1map = new HashMap<Element, Element>();
+		while (contactElems.hasNext()) {
+			OMElement contactElem = (OMElement) contactElems.next();
+			
+			OMElement idElem = contactElem.getFirstChildWithName(new QName("Id"));
+			Element id = zr.newElement();
+			id.setFromBytes(Base64.decode(idElem.getText()));
+			
+			OMElement c1Elem = contactElem.getFirstChildWithName(new QName("C1"));
+			Element c1 = group1.newElement();
+			c1.setFromBytes(Base64.decode(c1Elem.getText()));
+			
+			this.newC1map.put(id, c1);
+		}
+		
 	}
 
 	/**
@@ -59,25 +100,40 @@ public class ReKeyInformation {
 	 */
 	public String serialize() {
 		String output = "<ReKeyInformation>\n";
-		output += "<G1>" + Base64.encode(this.g1.toBytes()) + "</G1>";
-		output += "<Random>" + Base64.encode(this.rnd.toBytes()) + "</Random>";
-		output += "<Contacts>";
+		output += "<G1>" + Base64.encode(this.g1.toBytes()) + "</G1>\n";
+		output += "<Random>" + Base64.encode(this.rnd.toBytes())
+				+ "</Random>\n";
+		output += "<Contacts>\n";
 
 		Iterator<Element> ids = this.newC1map.keySet().iterator();
 		while (ids.hasNext()) {
-			output += "<Contact>";
+			output += "<Contact>\n";
 			Element id = (Element) ids.next();
 			output += "<Id>" + Base64.encode(id.toBytes()) + "</Id>";
 
 			Element c1 = this.newC1map.get(id);
-			output += "<C1>" + Base64.encode(c1.toBytes()) + "</C1>";
+			output += "<C1>" + Base64.encode(c1.toBytes()) + "</C1>\n";
 
-			output += "</Contact>";
+			output += "</Contact>\n";
 
 		}
-		output += "</Contacts>";
+		output += "</Contacts>\n";
 
 		output += "</ReKeyInformation>";
 		return output;
 	}
+
+	public Element getG1() {
+		return g1;
+	}
+
+	public Element getRnd() {
+		return rnd;
+	}
+
+	public HashMap<Element, Element> getNewC1map() {
+		return newC1map;
+	}
+	
+	
 }

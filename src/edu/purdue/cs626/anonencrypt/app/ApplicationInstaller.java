@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.Statement;
 
+import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
 import edu.purdue.cs626.anonencrypt.AEParameterGenerator;
@@ -24,6 +25,7 @@ public class ApplicationInstaller {
 	public static final String PARAM_FILE_NAME = "parameters.xml";
 	public static final String CONFIG_DIR = ".ae";
 	public static final String DB_NAME = "db";
+	public static final String MASTER_KEY_FILE_NAME = "mk";
 	
 	
 	public void install() throws Exception {
@@ -50,6 +52,19 @@ public class ApplicationInstaller {
 		paramFile.createNewFile();
 		FileOutputStream fos = new FileOutputStream(paramFile);
 		fos.write(params.serialize().getBytes());
+		fos.flush();
+		fos.close();
+		
+		//Save master key
+		Element mkElem = paramGen.getMasterKey();
+		String mkFilePath = configDirPath + File.separator + MASTER_KEY_FILE_NAME;
+		File mkFile = new File(mkFilePath);
+		mkFile.createNewFile();
+		fos = new FileOutputStream(paramFile);
+		fos.write(mkElem.toBytes());
+		fos.flush();
+		fos.close();
+
 		
 		// Create database
 		String dbPath = configDirPath + File.separator + DB_NAME;

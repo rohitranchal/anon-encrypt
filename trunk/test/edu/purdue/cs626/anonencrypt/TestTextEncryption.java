@@ -52,7 +52,7 @@ public class TestTextEncryption extends TestCase {
 		
 		String plainText = "The quick brown fox jumps over the lazy dog";
 		Element[] encoded = encoder.encode(plainText);
-		AECipherText[] ct = encrypt.doEncrypt(encoded, pubKey);
+		AECipherTextBlock[] ct = encrypt.doEncrypt(encoded, pubKey).getBlocks();
 		
 		
 		Decrypt decrypt = new Decrypt();

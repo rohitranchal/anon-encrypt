@@ -1,29 +1,24 @@
 package edu.purdue.cs626.anonencrypt;
 
-import it.unisa.dia.gas.jpbc.Element;
-
 public class AECipherText {
 	
-	private Element a;
-	private Element b;
-	private Element c;
-
-	public AECipherText(Element a, Element b, Element c) {
-		this.a = a;
-		this.b = b;
-		this.c = c;
+	private AECipherTextBlock[] blocks;
+	
+	public AECipherText(AECipherTextBlock[] blocks) {
+		this.blocks = blocks;
 	}
 
-	public Element getA() {
-		return a;
+	public String serialize() {
+		String ouput = "<CipherText>\n";
+		for(int i = 0; i < this.blocks.length; i ++) {
+			ouput = this.blocks[i].serialize() + "\n";
+		}
+		ouput += "</CipherText>";
+		return ouput;
 	}
 
-	public Element getB() {
-		return b;
+	public AECipherTextBlock[] getBlocks() {
+		return blocks;
 	}
-
-	public Element getC() {
-		return c;
-	}
-
+	
 }

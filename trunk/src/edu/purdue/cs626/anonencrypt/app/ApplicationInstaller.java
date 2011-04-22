@@ -64,8 +64,9 @@ public class ApplicationInstaller {
 				+ "id varchar(512), " + // The id that I give him
 				"random varchar(512), " + // The r that I assign
 				"privDataFromContact clob," + // The priv data that he gives me
-				"myIDFromContact varchar(512))"); // The ID that he gives me
-
+				"myIDFromContact varchar(512)," + // The ID that he gives me
+				"lastMsg varchar(512))");
+				
 		conn.commit();
 		conn.close();
 

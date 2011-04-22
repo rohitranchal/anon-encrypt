@@ -1,7 +1,9 @@
 package edu.purdue.cs626.anonencrypt.app;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Statement;
 
@@ -51,14 +53,7 @@ public class ApplicationInstaller {
 
 		// Save master key
 		Element mkElem = paramGen.getMasterKey();
-		String mkFilePath = configDirPath + File.separator
-				+ Constants.MASTER_KEY_FILE_NAME;
-		File mkFile = new File(mkFilePath);
-		mkFile.createNewFile();
-		fos = new FileOutputStream(mkFile);
-		fos.write(mkElem.toBytes());
-		fos.flush();
-		fos.close();
+		saveMasterKey(mkElem);
 
 		// Create database
 		Connection conn = Database.getCreateConnection();
@@ -74,6 +69,23 @@ public class ApplicationInstaller {
 		conn.commit();
 		conn.close();
 
+	}
+
+	public static void saveMasterKey(Element mkElem) throws Exception {
+		FileOutputStream fos;
+		String userHome = System.getProperty("user.home");
+		String configDirPath = userHome + File.separator + Constants.CONFIG_DIR;
+		String mkFilePath = configDirPath + File.separator
+				+ Constants.MASTER_KEY_FILE_NAME;
+		File mkFile = new File(mkFilePath);
+		if (mkFile.exists()) {
+			mkFile.delete();
+		}
+		mkFile.createNewFile();
+		fos = new FileOutputStream(mkFile);
+		fos.write(mkElem.toBytes());
+		fos.flush();
+		fos.close();
 	}
 
 	/**

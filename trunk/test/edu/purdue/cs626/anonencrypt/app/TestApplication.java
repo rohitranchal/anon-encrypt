@@ -74,6 +74,9 @@ public class TestApplication extends TestCase {
 		ContactPrivData dataFromContact = new ContactPrivData(builder.getDocumentElement());
 		assertEquals(data.getId(), dataFromContact.getId());
 		assertEquals(data.getParams().getCurveParams(), dataFromContact.getParams().getCurveParams());
+		
+		//test saving a msg from Bob
+		
 	}
 	
 }

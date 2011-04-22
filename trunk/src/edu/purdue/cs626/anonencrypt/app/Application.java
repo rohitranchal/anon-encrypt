@@ -17,6 +17,7 @@ import org.apache.axiom.om.util.Base64;
 import edu.purdue.cs626.anonencrypt.AECipherText;
 import edu.purdue.cs626.anonencrypt.AEParameters;
 import edu.purdue.cs626.anonencrypt.AEPrivateKey;
+import edu.purdue.cs626.anonencrypt.ContactKeyGen;
 import edu.purdue.cs626.anonencrypt.Encrypt;
 import edu.purdue.cs626.anonencrypt.ReKey;
 import edu.purdue.cs626.anonencrypt.ReKeyInformation;
@@ -204,9 +205,40 @@ public class Application {
 			
 			return cipherText.serialize();
 			
-		} else {
-			return null;
-		}
+		} 
+		
+		return null;
+		
+	}
+	
+	/**
+	 * Create an update request for a given user.
+	 * 
+	 * @param user The name of the user as a {@link String}.
+	 * 
+	 * @return An {@link UpdateRequest} object with the new random key.
+	 */
+	public UpdateRequest getUpdateRequest(String user) throws Exception {
+
+		Connection conn = Database.getConnection();
+		Statement s = conn.createStatement();
+		String sql = "SELECT privDataFromContact FROM Contact WHERE contactId='"
+				+ user + "'";
+		ResultSet rs = s.executeQuery(sql);
+		if(rs.next()) {
+			String privDataStr = rs.getString(1);
+
+			// Create priv data object
+			ContactPrivData cpd = new ContactPrivData(
+					Util.getOMElement(privDataStr));
+			
+			ContactKeyGen keyGen = new ContactKeyGen();
+			keyGen.init(cpd.getId(), cpd.getPrivKey(), cpd.getParams());
+			Element rndId = keyGen.genRandomID();
+			
+		} 
+		
+		return null;
 	}
 
 	AEParameters getParams() {

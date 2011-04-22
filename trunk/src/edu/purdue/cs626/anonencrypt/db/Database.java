@@ -30,6 +30,12 @@ public class Database {
 	
 	private Database() {}
 	
+	/**
+	 * Create a connection to create the database.
+	 * @param dbPath Path including the database directory.
+	 * @return A connection to the database.
+	 * @throws Exception
+	 */
 	public static Connection getCreateConnection(String dbPath) throws Exception {
 		Properties props = new Properties(); 
         props.put("user", USER);
@@ -39,8 +45,16 @@ public class Database {
                 + ";create=true", props);
 	}
 	
+	/**
+	 * Standard connection to the database.
+	 * This is a singleton connection that is returned.
+	 * @param dbPath Path including the database directory.
+	 * @return A connection to the database.
+	 * @throws Exception
+	 */
 	public static Connection getConnection(String dbPath) throws Exception {
-		if(conn == null) {
+		
+		if(conn == null || conn.isClosed()) {
 			Properties props = new Properties(); 
 	        props.put("user", USER);
 	        props.put("password", PASSWORD);

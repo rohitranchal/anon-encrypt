@@ -3,8 +3,10 @@ package edu.purdue.cs626.anonencrypt;
 import it.unisa.dia.gas.jpbc.Element;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.Base64;
 
 /**
  * Wrapper for re-key information. Serialization of this generates the public
@@ -50,8 +52,30 @@ public class ReKeyInformation {
 		this.newC1map = newC1Map;
 	}
 
+	/**
+	 * Output the XML data to publish as a {@link String}.
+	 * 
+	 * @return {@link String} of XML data.
+	 */
 	public String serialize() {
 		String output = "<ReKeyInformation>\n";
+		output += "<G1>" + Base64.encode(this.g1.toBytes()) + "</G1>";
+		output += "<Random>" + Base64.encode(this.rnd.toBytes()) + "</Random>";
+		output += "<Contacts>";
+
+		Iterator<Element> ids = this.newC1map.keySet().iterator();
+		while (ids.hasNext()) {
+			output += "<Contact>";
+			Element id = (Element) ids.next();
+			output += "<Id>" + Base64.encode(id.toBytes()) + "</Id>";
+
+			Element c1 = this.newC1map.get(id);
+			output += "<C1>" + Base64.encode(c1.toBytes()) + "</C1>";
+
+			output += "</Contact>";
+
+		}
+		output += "</Contacts>";
 
 		output += "</ReKeyInformation>";
 		return output;

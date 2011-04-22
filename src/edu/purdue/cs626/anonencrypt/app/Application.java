@@ -3,7 +3,9 @@ package edu.purdue.cs626.anonencrypt.app;
 import java.io.File;
 import java.io.FileInputStream;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.HashMap;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
@@ -13,6 +15,7 @@ import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import edu.purdue.cs626.anonencrypt.AEParameters;
 import edu.purdue.cs626.anonencrypt.AEPrivateKey;
+import edu.purdue.cs626.anonencrypt.ReKey;
 import edu.purdue.cs626.anonencrypt.ReKeyInformation;
 import edu.purdue.cs626.anonencrypt.RootKeyGen;
 import edu.purdue.cs626.anonencrypt.db.Database;
@@ -110,9 +113,36 @@ public class Application {
 		s.execute(sql);
 	}
 	
-	public ReKeyInformation reKey() {
-		//TODO
-		return null;
+	/**
+	 * Re-key parameters and return the information to publish.
+	 * @return Public information as a {@link ReKeyInformation} instance.
+	 * @throws Exception
+	 */
+	public ReKeyInformation reKey() throws Exception {
+		
+		ReKey reKey = new ReKey(this.params);
+		Element mk = reKey.update();
+		ApplicationInstaller.saveMasterKey(mk);
+		
+		//Get all contacts in the database and generate public information.
+		String sql = "SELECT id, random FROM Contact";
+		Connection conn = Database.getConnection();
+		Statement s = conn.createStatement();
+		
+		ResultSet rs = s.executeQuery(sql);
+		HashMap<Element, Element> idRndMap = new HashMap<Element, Element>();
+		while(rs.next()) {
+			Element id = this.params.getPairing().getZr().newElement();
+			Element rnd = this.params.getPairing().getZr().newElement();
+			
+			id.setFromBytes(Base64.decode(rs.getString(1)));
+			rnd.setFromBytes(Base64.decode(rs.getString(2)));
+			
+			idRndMap.put(id, rnd);
+		}
+		
+		return reKey.getPublicInfo(idRndMap);
+
 	}
 
 }

@@ -37,7 +37,7 @@ public class AEParameterGenerator {
 		params.setH2(group1.newRandomElement().getImmutable());
 		params.setH3(group1.newRandomElement().getImmutable());
 		
-		this.mk = g2.powZn(this.alpha);
+		this.mk = g2.powZn(this.alpha).getImmutable();
 		
 		return params;
 	}

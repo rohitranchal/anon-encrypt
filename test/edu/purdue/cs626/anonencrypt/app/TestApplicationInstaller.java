@@ -24,11 +24,8 @@ public class TestApplicationInstaller extends TestCase {
 		installer.install();
 
 		String userHome = System.getProperty("user.home");
-		String dbPath = userHome + File.separator
-				+ Constants.CONFIG_DIR + File.separator
-				+ Constants.DB_NAME;
 
-		Connection conn = Database.getConnection(dbPath);
+		Connection conn = Database.getConnection();
 
 		Statement s = conn.createStatement();
 
@@ -73,6 +70,5 @@ public class TestApplicationInstaller extends TestCase {
 		installer.unInstall();
 
 	}
-	
 	
 }

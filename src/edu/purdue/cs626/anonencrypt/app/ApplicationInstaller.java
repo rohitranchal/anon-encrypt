@@ -13,8 +13,8 @@ import edu.purdue.cs626.anonencrypt.AEParameters;
 import edu.purdue.cs626.anonencrypt.db.Database;
 
 /**
- * Installer in charge of setting up parameters and the database. The database and
- * parameters stored in the .ae directory in the user home directory.
+ * Installer in charge of setting up parameters and the database. The database
+ * and parameters stored in the .ae directory in the user home directory.
  * 
  * @author Ruchith Fernando
  * 
@@ -61,17 +61,15 @@ public class ApplicationInstaller {
 		fos.close();
 
 		// Create database
-		String dbPath = configDirPath + File.separator + Constants.DB_NAME;
-		Connection conn = Database.getCreateConnection(dbPath);
+		Connection conn = Database.getCreateConnection();
 
 		Statement s = conn.createStatement();
 
-		s.execute("CREATE TABLE Contact(" +
-						"contactId varchar(100), "+ 
-						"id varchar(512), " +	//The id that I give him
-						"random varchar(512), " + //The r that I assign
-						"privDataFromContact clob," + //The priv data that he gives me
-						"myIDFromContact varchar(512))"); //The ID that he gives me 
+		s.execute("CREATE TABLE Contact(" + "contactId varchar(100), "
+				+ "id varchar(512), " + // The id that I give him
+				"random varchar(512), " + // The r that I assign
+				"privDataFromContact clob," + // The priv data that he gives me
+				"myIDFromContact varchar(512))"); // The ID that he gives me
 
 		conn.commit();
 		conn.close();
@@ -90,7 +88,9 @@ public class ApplicationInstaller {
 
 	/**
 	 * Delete a directory and its content.
-	 * @param dir The directory to be deleted
+	 * 
+	 * @param dir
+	 *            The directory to be deleted
 	 */
 	private void rmDir(File dir) {
 		if (dir.exists()) {

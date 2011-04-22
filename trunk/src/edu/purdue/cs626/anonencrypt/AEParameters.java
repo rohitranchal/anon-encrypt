@@ -25,6 +25,8 @@ public class AEParameters implements CipherParameters {
 	private Element h1;
 	private Element h2;
 	private Element h3;
+	
+	private Pairing pairing;
 
 	public AEParameters(OMElement elem) {
 		OMElement curveElem = elem.getFirstChildWithName(new QName("Curve"));
@@ -32,8 +34,8 @@ public class AEParameters implements CipherParameters {
 		this.curveParams.load(new ByteArrayInputStream(curveElem.getText()
 				.getBytes()));
 
-		Pairing pairing = PairingFactory.getPairing(this.curveParams);
-		Field group1 = pairing.getG1();
+		this.pairing = PairingFactory.getPairing(this.curveParams);
+		Field group1 = this.pairing.getG1();
 
 		OMElement gElem = elem.getFirstChildWithName(new QName("G"));
 		Element tmpElem = group1.newElement();
@@ -74,6 +76,7 @@ public class AEParameters implements CipherParameters {
 
 	public AEParameters(CurveParams curveParams) {
 		this.curveParams = curveParams;
+		this.pairing = PairingFactory.getPairing(this.curveParams);
 	}
 
 	public CurveParams getCurveParams() {
@@ -134,6 +137,10 @@ public class AEParameters implements CipherParameters {
 
 	void setH3(Element h3) {
 		this.h3 = h3;
+	}
+
+	public Pairing getPairing() {
+		return pairing;
 	}
 
 	public String serialize() {

@@ -60,7 +60,7 @@ public class ApplicationInstaller {
 		String mkFilePath = configDirPath + File.separator + MASTER_KEY_FILE_NAME;
 		File mkFile = new File(mkFilePath);
 		mkFile.createNewFile();
-		fos = new FileOutputStream(paramFile);
+		fos = new FileOutputStream(mkFile);
 		fos.write(mkElem.toBytes());
 		fos.flush();
 		fos.close();

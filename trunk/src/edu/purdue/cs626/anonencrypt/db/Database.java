@@ -2,8 +2,6 @@ package edu.purdue.cs626.anonencrypt.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.Properties;
 
 public class Database {

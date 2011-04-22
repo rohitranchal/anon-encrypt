@@ -13,7 +13,7 @@ public class Decrypt {
 		this.pairing = PairingFactory.getPairing(this.params.getCurveParams());
 	}
 
-	public Element doDecrypt(AECipherText cipherText, AEPrivateKey privateKey) {
+	public Element doDecrypt(AECipherTextBlock cipherText, AEPrivateKey privateKey) {
 		
 		Element tmp1 = cipherText.getA().mul(this.pairing.pairing(privateKey.getC2(), cipherText.getC()));
 		Element tmp2 = this.pairing.pairing(cipherText.getB(), privateKey.getC1());
@@ -21,7 +21,7 @@ public class Decrypt {
 		return tmp1.div(tmp2);
 	}
 	
-	public Element[] doDecrypt(AECipherText[] cipherText, AEPrivateKey privateKey) {
+	public Element[] doDecrypt(AECipherTextBlock[] cipherText, AEPrivateKey privateKey) {
 		
 		Element[] output = new Element[cipherText.length];
 		for(int i = 0; i < cipherText.length; i++) {

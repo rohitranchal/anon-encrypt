@@ -1,5 +1,8 @@
 package edu.purdue.cs626.anonencrypt.app;
 
+import it.unisa.dia.gas.jpbc.Element;
+import it.unisa.dia.gas.jpbc.Field;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.sql.Connection;
@@ -11,13 +14,15 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.util.Base64;
 
-import it.unisa.dia.gas.jpbc.Element;
-import it.unisa.dia.gas.jpbc.Field;
+import edu.purdue.cs626.anonencrypt.AECipherText;
 import edu.purdue.cs626.anonencrypt.AEParameters;
 import edu.purdue.cs626.anonencrypt.AEPrivateKey;
+import edu.purdue.cs626.anonencrypt.Encrypt;
 import edu.purdue.cs626.anonencrypt.ReKey;
 import edu.purdue.cs626.anonencrypt.ReKeyInformation;
 import edu.purdue.cs626.anonencrypt.RootKeyGen;
+import edu.purdue.cs626.anonencrypt.TextEncoder;
+import edu.purdue.cs626.anonencrypt.Util;
 import edu.purdue.cs626.anonencrypt.db.Database;
 
 /**
@@ -112,40 +117,102 @@ public class Application {
 		Statement s = conn.createStatement();
 		s.execute(sql);
 	}
-	
+
 	/**
 	 * Re-key parameters and return the information to publish.
+	 * 
 	 * @return Public information as a {@link ReKeyInformation} instance.
 	 * @throws Exception
 	 */
 	public ReKeyInformation reKey() throws Exception {
-		
+
 		ReKey reKey = new ReKey(this.params);
 		Element mk = reKey.update();
 		ApplicationInstaller.saveMasterKey(mk);
-		
-		//Get all contacts in the database and generate public information.
+
+		// Get all contacts in the database and generate public information.
 		String sql = "SELECT id, random FROM Contact";
 		Connection conn = Database.getConnection();
 		Statement s = conn.createStatement();
-		
+
 		ResultSet rs = s.executeQuery(sql);
 		HashMap<Element, Element> idRndMap = new HashMap<Element, Element>();
-		while(rs.next()) {
+		while (rs.next()) {
 			Element id = this.params.getPairing().getZr().newElement();
 			Element rnd = this.params.getPairing().getZr().newElement();
-			
+
 			id.setFromBytes(Base64.decode(rs.getString(1)));
 			rnd.setFromBytes(Base64.decode(rs.getString(2)));
-			
+
 			idRndMap.put(id, rnd);
 		}
-		
+
 		return reKey.getPublicInfo(idRndMap);
 
+	}
+
+	public void saveMessage(String user, String msg) throws Exception {
+		String sql = "UPDATE Contact SET lastMsg='" + msg
+				+ "' WHERE contactId = '" + user + "'";
+		Connection conn = Database.getConnection();
+		Statement s = conn.createStatement();
+		s.execute(sql);
+	}
+
+	/**
+	 * Send the last message of the requested user.
+	 * 
+	 * @param updateRequest
+	 * @return
+	 */
+	public String getUpdate(String updateRequest) throws Exception {
+		UpdateRequest ur = new UpdateRequest(Util.getOMElement(updateRequest));
+
+		// Get the user's parameter's from the DB
+		String user = ur.getUser();
+
+		Connection conn = Database.getConnection();
+		Statement s = conn.createStatement();
+		String sql = "SELECT privDataFromContact, lstMsg FROM Contact WHERE contactId='"
+				+ user + "'";
+		ResultSet rs = s.executeQuery(sql);
+		if (rs.next()) {
+			String privDataStr = rs.getString(1);
+			String msg = rs.getString(2);
+
+			// Create priv data object
+			ContactPrivData cpd = new ContactPrivData(
+					Util.getOMElement(privDataStr));
+			AEParameters contactParams = cpd.getParams();
+			
+			//Convert the request id to an Element
+			Element idElem = contactParams.getPairing().getG1().newElement();
+			idElem.setFromBytes(Base64.decode(ur.getRndId()));
+			idElem = idElem.getImmutable();
+			
+			//Encode the msg to be sent
+			TextEncoder encoder = new TextEncoder();
+			encoder.init(contactParams);
+			Element[] msgElems = encoder.encode(msg);
+			
+			//Encrypt the msg
+			Encrypt encrypt = new Encrypt();
+			encrypt.init(contactParams);
+			
+			
+			AECipherText cipherText = encrypt.doEncrypt(msgElems, idElem);
+			
+
+			
+			return null;
+			
+		} else {
+			return null;
+		}
 	}
 
 	AEParameters getParams() {
 		return params;
 	}
+
 }

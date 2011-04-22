@@ -47,7 +47,7 @@ public class TestEncrypt extends TestCase {
 		Element pubKey = params.getH1().powZn(id1)
 				.mul(params.getH2().powZn(id2));
 
-		AECipherText ct = encrypt.doEncrypt(plain, pubKey);
+		AECipherTextBlock ct = encrypt.doEncrypt(plain, pubKey);
 
 		Decrypt decrypt = new Decrypt();
 		decrypt.init(params);

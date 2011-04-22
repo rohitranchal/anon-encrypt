@@ -18,23 +18,24 @@ public class Encrypt {
 	 * Encrypt a set of given plaintext encoded elements
 	 * @param input Array of plaintext encoded elements
 	 * @param pubKey Public key element
-	 * @return An array of {@link AECipherText} objects
+	 * @return An array of {@link AECipherTextBlock} objects
 	 */
-	public AECipherText[] doEncrypt(Element[] input, Element pubKey) {
-		AECipherText[] output = new AECipherText[input.length];
+	public AECipherText doEncrypt(Element[] input, Element pubKey) {
+		AECipherTextBlock[] blocks = new AECipherTextBlock[input.length];
 		for(int i = 0; i < input.length; i++) {
-			output[i] = doEncrypt(input[i], pubKey);
+			blocks[i] = doEncrypt(input[i], pubKey);
 		}
-		return output;
+		
+		return new AECipherText(blocks);
 	}
 	
 	/**
 	 * Encrypt a given plaintext encoded element
 	 * @param plainText The plaintext encoded element
 	 * @param pubKey Public key element
-	 * @return an {@link AECipherText} object
+	 * @return an {@link AECipherTextBlock} object
 	 */
-	public AECipherText doEncrypt(Element plainText, Element pubKey) {
+	public AECipherTextBlock doEncrypt(Element plainText, Element pubKey) {
 		
 		Element s = this.pairing.getZr().newRandomElement();
 		
@@ -46,7 +47,7 @@ public class Encrypt {
 		
 		Element c = pubKey.getImmutable().mul(this.params.getG3().getImmutable()).powZn(s);
 		
-		return new AECipherText(a, b, c);
+		return new AECipherTextBlock(a, b, c);
 		
 	}
 	

@@ -25,8 +25,8 @@ public class TestApplicationInstaller extends TestCase {
 
 		String userHome = System.getProperty("user.home");
 		String dbPath = userHome + File.separator
-				+ ApplicationInstaller.CONFIG_DIR + File.separator
-				+ ApplicationInstaller.DB_NAME;
+				+ Constants.CONFIG_DIR + File.separator
+				+ Constants.DB_NAME;
 
 		Connection conn = Database.getConnection(dbPath);
 
@@ -46,8 +46,8 @@ public class TestApplicationInstaller extends TestCase {
 		}
 
 		String paramPath = userHome + File.separator
-				+ ApplicationInstaller.CONFIG_DIR + File.separator
-				+ ApplicationInstaller.PARAM_FILE_NAME;
+				+ Constants.CONFIG_DIR + File.separator
+				+ Constants.PARAM_FILE_NAME;
 		StAXOMBuilder builder = new StAXOMBuilder(paramPath);
 		OMElement paramElem = builder.getDocumentElement();
 		AEParameters params = new AEParameters(paramElem);
@@ -56,8 +56,8 @@ public class TestApplicationInstaller extends TestCase {
 		assertEquals(paramElem.toString(), params.serialize());
 
 		String mkPath = userHome + File.separator
-				+ ApplicationInstaller.CONFIG_DIR + File.separator
-				+ ApplicationInstaller.MASTER_KEY_FILE_NAME;
+				+ Constants.CONFIG_DIR + File.separator
+				+ Constants.MASTER_KEY_FILE_NAME;
 		File mkFile = new File(mkPath);
 		FileInputStream fis = new FileInputStream(mkFile);
 		byte[] data = new byte[(int)mkFile.length()];
@@ -73,4 +73,6 @@ public class TestApplicationInstaller extends TestCase {
 		installer.unInstall();
 
 	}
+	
+	
 }

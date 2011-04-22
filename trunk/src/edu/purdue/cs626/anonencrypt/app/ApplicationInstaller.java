@@ -13,7 +13,7 @@ import edu.purdue.cs626.anonencrypt.AEParameters;
 import edu.purdue.cs626.anonencrypt.db.Database;
 
 /**
- * Installer inchage of setting up parameters and the database. The database and
+ * Installer in charge of setting up parameters and the database. The database and
  * parameters stored in the .ae directory in the user home directory.
  * 
  * @author Ruchith Fernando
@@ -78,6 +78,9 @@ public class ApplicationInstaller {
 
 	}
 
+	/**
+	 * Remove configuration directory
+	 */
 	public void unInstall() {
 		String userHome = System.getProperty("user.home");
 		String configDirPath = userHome + File.separator + Constants.CONFIG_DIR;
@@ -85,7 +88,11 @@ public class ApplicationInstaller {
 		rmDir(configDir);
 	}
 
-	public void rmDir(File dir) {
+	/**
+	 * Delete a directory and its content.
+	 * @param dir The directory to be deleted
+	 */
+	private void rmDir(File dir) {
 		if (dir.exists()) {
 			File[] files = dir.listFiles();
 			for (int i = 0; i < files.length; i++) {

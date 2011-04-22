@@ -45,6 +45,12 @@ public class Application {
 	 */
 	private Element masterKey;
 
+	/**
+	 * This holds the temporary private keys created in requesting a contact's
+	 * updates.
+	 */
+	private HashMap<String, AEPrivateKey> tmpPrivKeyMap = new HashMap<String, AEPrivateKey>();
+
 	public Application() throws Exception {
 		String userHome = System.getProperty("user.home");
 		String paramPath = userHome + File.separator + Constants.CONFIG_DIR
@@ -185,36 +191,36 @@ public class Application {
 			ContactPrivData cpd = new ContactPrivData(
 					Util.getOMElement(privDataStr));
 			AEParameters contactParams = cpd.getParams();
-			
-			//Convert the request id to an Element
+
+			// Convert the request id to an Element
 			Element idElem = contactParams.getPairing().getG1().newElement();
 			idElem.setFromBytes(Base64.decode(ur.getRndId()));
 			idElem = idElem.getImmutable();
-			
-			//Encode the msg to be sent
+
+			// Encode the msg to be sent
 			TextEncoder encoder = new TextEncoder();
 			encoder.init(contactParams);
 			Element[] msgElems = encoder.encode(msg);
-			
-			//Encrypt the msg
+
+			// Encrypt the msg
 			Encrypt encrypt = new Encrypt();
 			encrypt.init(contactParams);
-			
-			
+
 			AECipherText cipherText = encrypt.doEncrypt(msgElems, idElem);
-			
+
 			return cipherText.serialize();
-			
-		} 
-		
+
+		}
+
 		return null;
-		
+
 	}
-	
+
 	/**
 	 * Create an update request for a given user.
 	 * 
-	 * @param user The name of the user as a {@link String}.
+	 * @param user
+	 *            The name of the user as a {@link String}.
 	 * 
 	 * @return An {@link UpdateRequest} object with the new random key.
 	 */
@@ -225,19 +231,32 @@ public class Application {
 		String sql = "SELECT privDataFromContact FROM Contact WHERE contactId='"
 				+ user + "'";
 		ResultSet rs = s.executeQuery(sql);
-		if(rs.next()) {
+		if (rs.next()) {
 			String privDataStr = rs.getString(1);
 
 			// Create priv data object
 			ContactPrivData cpd = new ContactPrivData(
 					Util.getOMElement(privDataStr));
-			
+
 			ContactKeyGen keyGen = new ContactKeyGen();
 			keyGen.init(cpd.getId(), cpd.getPrivKey(), cpd.getParams());
-			Element rndId = keyGen.genRandomID();
 			
-		} 
-		
+			//Random identifier
+			Element rndId = keyGen.genRandomID();
+
+			//Store the private key in memory
+			AEPrivateKey privKey = keyGen.getTmpPrivKey(rndId);
+			this.tmpPrivKeyMap.put(user, privKey);
+			
+			//The temp public key
+			Element tmpPubKey = keyGen.getTmpPubKey(rndId);
+			
+			//Return a new reqeuest instance
+			return new UpdateRequest(user, Base64.encode(tmpPubKey.toBytes()));
+			
+		}
+
+		//No such user -- This won't be reached!
 		return null;
 	}
 

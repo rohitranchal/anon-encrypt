@@ -87,10 +87,11 @@ public class ReKey {
 		Iterator<Element> ids = idRndMap.keySet().iterator();
 		while (ids.hasNext()) {
 			Element id = (Element) ids.next();
+			Element r = idRndMap.get(id);
 
-			Element newC1 = this.mk.mul(
-					this.params.getH1().powZn(id).mul(this.params.getG3()))
-					.getImmutable();
+			Element tmp = this.params.getH1().powZn(id)
+					.mul(this.params.getG3());
+			Element newC1 = this.mk.mul(tmp.powZn(r)).getImmutable();
 			Element blindId = id.powZn(rnd);
 
 			newC1Map.put(blindId, newC1);

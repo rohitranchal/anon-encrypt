@@ -14,6 +14,14 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.Base64;
 import org.bouncycastle.crypto.CipherParameters;
 
+/**
+ * Parameter wrapper.
+ * This holds all the public parameters required for encryption.
+ * Once instantiated this will also hold an instance of the {@link Pairing}.
+ * 
+ * @author Ruchith Fernando
+ *
+ */
 public class AEParameters implements CipherParameters {
 
 	private CurveParams curveParams;
@@ -28,6 +36,11 @@ public class AEParameters implements CipherParameters {
 	
 	private Pairing pairing;
 
+	/**
+	 * Used to instantiate with a stored/transferred parameter file.
+	 * 
+	 * @param elem
+	 */
 	public AEParameters(OMElement elem) {
 		OMElement curveElem = elem.getFirstChildWithName(new QName("Curve"));
 		this.curveParams = new CurveParams();

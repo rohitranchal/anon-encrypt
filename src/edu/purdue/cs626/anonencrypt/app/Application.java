@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.axiom.om.OMElement;
@@ -205,6 +206,15 @@ public class Application {
 		Statement s = conn.createStatement();
 		s.execute(sql);
 	}
+	
+	public String getMessage(String user) throws Exception {
+		String sql = "SELECT lastMsg FROM Contact WHERE contactId = '" + user + "'";
+		Connection conn = Database.getConnection();
+		Statement s = conn.createStatement();
+		ResultSet rs = s.executeQuery(sql);
+		rs.next();
+		return rs.getString(1);
+	}
 
 	/**
 	 * Send the last message of the requested user.
@@ -329,6 +339,20 @@ public class Application {
 		return msg;
 	}
 
+	public String[] getContactList() throws Exception {
+		Connection conn = Database.getConnection();
+		Statement s = conn.createStatement();
+		String sql = "SELECT contactId FROM Contact";
+		
+		ArrayList<String> names = new ArrayList<String>();
+		ResultSet rs = s.executeQuery(sql);
+		while(rs.next()) {
+			names.add(rs.getString(1));
+		}
+
+		return names.toArray(new String[names.size()]);
+	}
+	
 	
 	private ContactPrivData getContactPrivData(String user) throws Exception {
 		Connection conn = Database.getConnection();
@@ -347,6 +371,9 @@ public class Application {
 		
 		return null; //No such user
 	}
+	
+	
+	
 	/*
 	 * For test cases
 	 */

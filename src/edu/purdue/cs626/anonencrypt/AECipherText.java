@@ -29,7 +29,7 @@ public class AECipherText {
 	public String serialize() {
 		String ouput = "<CipherText>\n";
 		for(int i = 0; i < this.blocks.length; i ++) {
-			ouput = this.blocks[i].serialize() + "\n";
+			ouput += this.blocks[i].serialize() + "\n";
 		}
 		ouput += "</CipherText>";
 		return ouput;

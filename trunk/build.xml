@@ -6,6 +6,8 @@
 	<property name="build" location="build" />
 	<property name="dist" location="dist" />
 	<property name="dir.libs" location="lib" />
+	<property name="jar.library" location="ae.jar" />
+
 
 	<path id="classpath.libraries" description="3rd party libs">
 		<fileset dir="${dir.libs}">
@@ -16,10 +18,10 @@
 
 	<path id="classpath.test">
 		<path refid="classpath.libraries" />
-        <pathelement path="${build}"/>
+		<pathelement path="${build}" />
 	</path>
 
-	<target name="init">
+	<target name="init" depends="clean">
 		<!-- Create the time stamp -->
 		<tstamp />
 		<!-- Create the build directory structure used by compile -->
@@ -32,9 +34,9 @@
 		<javac srcdir="${test}" destdir="${build}" classpathref="classpath.libraries" />
 	</target>
 
-	<target name="test" depends="clean, compile">
-		
-		<mkdir dir="${build}/reports"/>
+	<target name="test" depends="compile">
+
+		<mkdir dir="${build}/reports" />
 		<junit printsummary="yes" haltonfailure="yes" fork="yes" dir="${basedir}">
 			<classpath refid="classpath.test" />
 
@@ -56,9 +58,15 @@
 		<jar jarfile="${dist}/lib/MyProject-${DSTAMP}.jar" basedir="${build}" />
 	</target>
 
+	<target name="jar" depends="compile" description="Creates the ${jar.library}">
+
+		<jar jarfile="${jar.library}" basedir="${build}" />
+	</target>
+
 	<target name="clean" description="clean up">
 		<!-- Delete the ${build} and ${dist} directory trees -->
 		<delete dir="${build}" />
+		<delete file="${jar.library}" />
 		<delete dir="${dist}" />
 	</target>
 </project>

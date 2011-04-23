@@ -18,6 +18,7 @@ import edu.purdue.cs626.anonencrypt.AECipherText;
 import edu.purdue.cs626.anonencrypt.AEParameters;
 import edu.purdue.cs626.anonencrypt.AEPrivateKey;
 import edu.purdue.cs626.anonencrypt.ContactKeyGen;
+import edu.purdue.cs626.anonencrypt.Decrypt;
 import edu.purdue.cs626.anonencrypt.Encrypt;
 import edu.purdue.cs626.anonencrypt.ReKey;
 import edu.purdue.cs626.anonencrypt.ReKeyInformation;
@@ -50,6 +51,8 @@ public class Application {
 	 * updates.
 	 */
 	private HashMap<String, AEPrivateKey> tmpPrivKeyMap = new HashMap<String, AEPrivateKey>();
+
+	private HashMap<String, AEParameters> paramCache = new HashMap<String, AEParameters>();
 
 	public Application() throws Exception {
 		String userHome = System.getProperty("user.home");
@@ -180,7 +183,7 @@ public class Application {
 
 		Connection conn = Database.getConnection();
 		Statement s = conn.createStatement();
-		String sql = "SELECT privDataFromContact, lstMsg FROM Contact WHERE contactId='"
+		String sql = "SELECT privDataFromContact, lastMsg FROM Contact WHERE contactId='"
 				+ user + "'";
 		ResultSet rs = s.executeQuery(sql);
 		if (rs.next()) {
@@ -208,7 +211,10 @@ public class Application {
 
 			AECipherText cipherText = encrypt.doEncrypt(msgElems, idElem);
 
-			return cipherText.serialize();
+			UpdateResponse uRes = new UpdateResponse(user,
+					cipherText.serialize());
+
+			return uRes.serialize();
 
 		}
 
@@ -240,26 +246,55 @@ public class Application {
 
 			ContactKeyGen keyGen = new ContactKeyGen();
 			keyGen.init(cpd.getId(), cpd.getPrivKey(), cpd.getParams());
-			
-			//Random identifier
+
+			// Random identifier
 			Element rndId = keyGen.genRandomID();
 
-			//Store the private key in memory
+			// Store the private key in memory
 			AEPrivateKey privKey = keyGen.getTmpPrivKey(rndId);
 			this.tmpPrivKeyMap.put(user, privKey);
-			
-			//The temp public key
+			this.paramCache.put(user, cpd.getParams());
+
+			// The temp public key
 			Element tmpPubKey = keyGen.getTmpPubKey(rndId);
-			
-			//Return a new reqeuest instance
+
+			// Return a new reqeuest instance
 			return new UpdateRequest(user, Base64.encode(tmpPubKey.toBytes()));
-			
+
 		}
 
-		//No such user -- This won't be reached!
+		// No such user -- This won't be reached!
 		return null;
 	}
 
+	public String processUpdateResponse(String response) throws Exception {
+		UpdateResponse ur = new UpdateResponse(Util.getOMElement(response));
+
+		String user = ur.getUser();
+
+		AEPrivateKey privKey = this.tmpPrivKeyMap.get(user);
+		AEParameters contactParams = this.paramCache.get(user);
+
+		String cipherTxtStr = ur.getCipherTextString();
+		AECipherText ct = new AECipherText(Util.getOMElement(cipherTxtStr),
+				contactParams.getPairing());
+
+		Decrypt decrypt = new Decrypt();
+		decrypt.init(contactParams);
+		Element[] plainElems = decrypt.doDecrypt(ct.getBlocks(), privKey);
+		TextEncoder encoder = new TextEncoder();
+		encoder.init(contactParams);
+		byte[] decoded = encoder.decode(plainElems);
+		
+		String msg = new String(decoded).trim();
+		this.saveMessage(user, msg);
+		
+		return msg;
+	}
+
+	/*
+	 * For test cases
+	 */
 	AEParameters getParams() {
 		return params;
 	}

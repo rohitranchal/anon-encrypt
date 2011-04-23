@@ -76,6 +76,21 @@ public class TestApplication extends TestCase {
 		assertEquals(data.getParams().getCurveParams(), dataFromContact.getParams().getCurveParams());
 		
 		//test saving a msg from Bob
+		String msg = "Hello!!!";
+		app.saveMessage("Bob", msg);
+		
+		rs = s.executeQuery("SELECT lastMsg FROM Contact WHERE contactId = 'Bob'");
+		rs.next();
+		String val = rs.getString(1);
+		assertEquals(msg, val);
+		
+		
+		UpdateRequest ur = app.getUpdateRequest("Bob");
+		String responseString = app.getUpdate(ur.serialize());
+		
+		String updateMsg = app.processUpdateResponse(responseString);
+		
+		assertEquals(msg.trim(), updateMsg);
 		
 	}
 	

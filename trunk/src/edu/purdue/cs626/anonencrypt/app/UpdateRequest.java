@@ -31,8 +31,8 @@ public class UpdateRequest {
 	
 	public String serialize() {
 		String output = "<UpdateRequest>";
-		output += "<User>" + this.user + "</User>";
-		output += "<ID>" + this.rndId + "</ID>";
+		output += "<User>" + this.user + "</User>\n";
+		output += "<ID>" + this.rndId + "</ID>\n";
 		output += "</UpdateRequest>";
 		return output;
 	}

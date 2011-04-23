@@ -160,7 +160,44 @@ public class Application {
 		return reKey.getPublicInfo(idRndMap);
 
 	}
-
+	
+	public boolean processReKey(String user, String reKeyData) throws Exception {
+		//Obtian user's parameters
+		ContactPrivData cpd = this.getContactPrivData(user);
+		
+		ReKeyInformation rki = new ReKeyInformation(
+				Util.getOMElement(reKeyData), cpd.getParams().getPairing());
+		
+		Element rnd = rki.getRnd();
+		
+		//Raise the given id to rnd and obtain the search key 
+		Element searchKey = cpd.getId().powZn(rnd).getImmutable();
+		
+		Element c1 = rki.getNewC1map().get(searchKey).getImmutable();
+		if(c1 != null) {
+			AEPrivateKey privKey = cpd.getPrivKey();
+			AEPrivateKey newPrivKey = new AEPrivateKey(c1, privKey.getC2(), privKey.getC3());
+			
+			AEParameters params = cpd.getParams();
+			params.setG1(rki.getG1().getImmutable()); //update g1
+			
+			cpd = new ContactPrivData(params, cpd.getId(), newPrivKey);
+			this.registerContact(user, cpd);
+			
+			return true;
+		} else {
+			//Too bad you have been revoked by the user!!!
+			return false;
+		}
+		
+	}
+	
+	/**
+	 * Store message from a user
+	 * @param user The user name
+	 * @param msg Message
+	 * @throws Exception
+	 */
 	public void saveMessage(String user, String msg) throws Exception {
 		String sql = "UPDATE Contact SET lastMsg='" + msg
 				+ "' WHERE contactId = '" + user + "'";
@@ -292,6 +329,24 @@ public class Application {
 		return msg;
 	}
 
+	
+	private ContactPrivData getContactPrivData(String user) throws Exception {
+		Connection conn = Database.getConnection();
+		Statement s = conn.createStatement();
+		String sql = "SELECT privDataFromContact FROM Contact WHERE contactId='"
+				+ user + "'";
+		ResultSet rs = s.executeQuery(sql);
+		if (rs.next()) {
+			String privDataStr = rs.getString(1);
+			String msg = rs.getString(2);
+
+			// Create priv data object
+			return  new ContactPrivData(Util.getOMElement(privDataStr));
+			
+		}
+		
+		return null; //No such user
+	}
 	/*
 	 * For test cases
 	 */

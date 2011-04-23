@@ -128,7 +128,7 @@ public class AEParameters implements CipherParameters {
 		this.g = g;
 	}
 
-	void setG1(Element g1) {
+	public void setG1(Element g1) {
 		this.g1 = g1;
 	}
 

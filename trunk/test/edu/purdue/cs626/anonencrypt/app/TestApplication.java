@@ -5,13 +5,12 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import junit.framework.TestCase;
+
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.util.Base64;
 
-import edu.purdue.cs626.anonencrypt.ReKeyInformation;
 import edu.purdue.cs626.anonencrypt.db.Database;
-
-import junit.framework.TestCase;
 
 /**
  * Testing main application API behavior.

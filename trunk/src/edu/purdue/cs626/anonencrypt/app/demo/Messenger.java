@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 
 import edu.purdue.cs626.anonencrypt.ReKeyInformation;
 import edu.purdue.cs626.anonencrypt.Util;
@@ -114,8 +115,8 @@ public class Messenger {
 			ReKeyInformation rki = app.reKey();
 			System.out.println("--------------RE-KEY_INFO:START--------------");
 			String info = rki.serialize();
-			System.out.println("--------------RE-KEY_INFO:END----------------");
 			System.out.println(info);
+			System.out.println("--------------RE-KEY_INFO:END----------------");
 		}
 	}
 
@@ -131,10 +132,7 @@ public class Messenger {
 
 	private static void doProcessUpdateResponse(BufferedReader stdin)
 			throws IOException, FileNotFoundException, Exception {
-		System.out.println("Enter update response file path : ");
-		String path = stdin.readLine();
-
-		String data = getFileData(path);
+		String data = getInputFromZenity("Enter update response");
 		String msg = app.processUpdateResponse(data);
 
 		System.out.println("Update message : " + msg);
@@ -143,9 +141,9 @@ public class Messenger {
 	private static void serveUpdateReq(BufferedReader stdin)
 			throws IOException, FileNotFoundException, Exception {
 		System.out.println("Enter update request file path : ");
-		String path = stdin.readLine();
+	
 
-		String data = getFileData(path);
+		String data = getInputFromZenity("Enter update request");
 		String resp = app.getUpdate(data);
 		System.out
 				.println("-----------REMOTE_UPDATE_RESPONSE:START-----------");
@@ -196,36 +194,35 @@ public class Messenger {
 		System.out.println("Enter contact name :");
 		String user = stdin.readLine();
 
-		System.out.println("Enter file path :");
-		String dataFilePath = stdin.readLine();
-		String data = getFileData(dataFilePath);
+		String data = getInputFromZenity("Enter private cert from " + user);
 		app.registerContact(user, new ContactPrivData(Util.getOMElement(data)));
+		System.out.println("Private certificate installed successfully!\n");
 	}
 
-	private static String getFileData(String dataFilePath)
-			throws FileNotFoundException, IOException {
-		File f = new File(dataFilePath);
-
-		StringBuffer data = new StringBuffer();
-
-		if (f.exists()) {
-			BufferedReader reader = new BufferedReader(new FileReader(f));
-			String line = null;
-			while ((line = reader.readLine()) != null) {
-				data.append(line).append(System.getProperty("line.separator"));
-			}
-			reader.close();
-		} else {
-			System.out.println("ERROR: no such file!");
-		}
-		return data.toString();
-	}
+//	private static String getFileData(String dataFilePath)
+//			throws FileNotFoundException, IOException {
+//		File f = new File(dataFilePath);
+//
+//		StringBuffer data = new StringBuffer();
+//
+//		if (f.exists()) {
+//			BufferedReader reader = new BufferedReader(new FileReader(f));
+//			String line = null;
+//			while ((line = reader.readLine()) != null) {
+//				data.append(line).append(System.getProperty("line.separator"));
+//			}
+//			reader.close();
+//		} else {
+//			System.out.println("ERROR: no such file!");
+//		}
+//		return data.toString();
+//	}
 
 	private static void doDirectMsg(BufferedReader stdin) throws IOException,
 			Exception {
 		System.out.println("Enter contact name:");
 		String user = stdin.readLine();
-		System.out.println("Enter plain message:");
+		System.out.println("Enter plain message that you received from " + user + " :");
 		String msg = stdin.readLine();
 		app.saveMessage(user, msg);
 		System.out.println(user + " >> " + msg);
@@ -265,4 +262,21 @@ public class Messenger {
 	private static void printInstallMsg() {
 		System.out.println("Please install application!");
 	}
+	
+	private static String getInputFromZenity(String title) throws Exception {
+		String val = "";
+		String[] cmd = new String[]{"zenity", "--text-info", "--editable", "--title=" + title + ""};
+		
+		Process p = Runtime.getRuntime().exec(cmd);
+		BufferedReader in
+		   = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		String data = null;
+		while((data = in.readLine()) != null) {
+			val += data + "\n";
+		}
+		System.out.println(val);
+		return val;
+	}
+	
+	
 }

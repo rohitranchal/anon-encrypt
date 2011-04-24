@@ -182,7 +182,8 @@ public class Application {
 		//Raise the given id to rnd and obtain the search key 
 		Element searchKey = cpd.getId().powZn(rnd).getImmutable();
 		
-		Element c1 = rki.getNewC1map().get(searchKey).getImmutable();
+		Element tmp = rki.getNewC1map().get(Base64.encode(searchKey.toBytes()));
+		Element c1 = tmp.getImmutable();
 		if(c1 != null) {
 			AEPrivateKey privKey = cpd.getPrivKey();
 			AEPrivateKey newPrivKey = new AEPrivateKey(c1, privKey.getC2(), privKey.getC3());
@@ -382,8 +383,6 @@ public class Application {
 		ResultSet rs = s.executeQuery(sql);
 		if (rs.next()) {
 			String privDataStr = rs.getString(1);
-			String msg = rs.getString(2);
-
 			// Create priv data object
 			return  new ContactPrivData(Util.getOMElement(privDataStr));
 			

@@ -31,7 +31,7 @@ public class ReKeyInformation {
 	 */
 	private Element rnd;
 
-	private HashMap<Element, Element> newC1map;
+	private HashMap<String, Element> newC1map;
 
 	/**
 	 * Create {@link ReKeyInformation} object with published data.
@@ -57,19 +57,18 @@ public class ReKeyInformation {
 		OMElement contactsElem = elem.getFirstChildWithName(new QName("Contacts"));
 		
 		Iterator<OMElement> contactElems = contactsElem.getChildrenWithLocalName("Contact");
-		this.newC1map = new HashMap<Element, Element>();
+		this.newC1map = new HashMap<String, Element>();
 		while (contactElems.hasNext()) {
 			OMElement contactElem = (OMElement) contactElems.next();
 			
 			OMElement idElem = contactElem.getFirstChildWithName(new QName("Id"));
-			Element id = zr.newElement();
-			id.setFromBytes(Base64.decode(idElem.getText()));
+			
 			
 			OMElement c1Elem = contactElem.getFirstChildWithName(new QName("C1"));
 			Element c1 = group1.newElement();
 			c1.setFromBytes(Base64.decode(c1Elem.getText()));
 			
-			this.newC1map.put(id, c1);
+			this.newC1map.put(idElem.getText(), c1);
 		}
 		
 	}
@@ -87,7 +86,7 @@ public class ReKeyInformation {
 	 *            the blinded identity.
 	 */
 	public ReKeyInformation(Element g1, Element rnd,
-			HashMap<Element, Element> newC1Map) {
+			HashMap<String, Element> newC1Map) {
 		this.g1 = g1;
 		this.rnd = rnd;
 		this.newC1map = newC1Map;
@@ -105,11 +104,11 @@ public class ReKeyInformation {
 				+ "</Random>\n";
 		output += "<Contacts>\n";
 
-		Iterator<Element> ids = this.newC1map.keySet().iterator();
+		Iterator<String> ids = this.newC1map.keySet().iterator();
 		while (ids.hasNext()) {
 			output += "<Contact>\n";
-			Element id = (Element) ids.next();
-			output += "<Id>" + Base64.encode(id.toBytes()) + "</Id>";
+			String id = (String) ids.next();
+			output += "<Id>" + id + "</Id>";
 
 			Element c1 = this.newC1map.get(id);
 			output += "<C1>" + Base64.encode(c1.toBytes()) + "</C1>\n";
@@ -131,7 +130,7 @@ public class ReKeyInformation {
 		return rnd;
 	}
 
-	public HashMap<Element, Element> getNewC1map() {
+	public HashMap<String, Element> getNewC1map() {
 		return newC1map;
 	}
 	

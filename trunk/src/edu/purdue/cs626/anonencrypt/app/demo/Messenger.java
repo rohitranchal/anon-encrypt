@@ -44,7 +44,7 @@ public class Messenger {
 		}
 		boolean start = true;
 		int selection = 0;
-		while (selection != 10) {
+		while (selection != 22) {
 			if (start) {
 				printUsage();
 				start = false;
@@ -89,6 +89,9 @@ public class Messenger {
 			case 9:
 				doReKey(stdin);
 				break;
+			case 10:
+				processContactReKey(stdin);
+				break;
 			case 20:
 				install();
 				break;
@@ -106,6 +109,20 @@ public class Messenger {
 			}
 		}
 
+	}
+
+	private static void processContactReKey(BufferedReader stdin) throws Exception {
+		System.out.println("Enter contact name :");
+		String user = stdin.readLine();
+		
+		String data = getInputFromZenity("Enter re-key information from " + user);
+		boolean result = app.processReKey(user, data);
+		if(result) {
+			System.out.println("Update successful!");
+		} else {
+			System.out.println("Seems like " + user + 
+					" doesn't consider you to be a friend anymore :P");
+		}
 	}
 
 	private static void doReKey(BufferedReader stdin) throws Exception {

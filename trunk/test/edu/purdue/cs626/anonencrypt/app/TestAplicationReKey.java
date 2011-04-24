@@ -31,7 +31,7 @@ public class TestAplicationReKey extends TestCase {
 	public void testReKey() throws Exception {
 		Application app = new Application();
 		
-		for(int i = 0; i < 20; i++) {
+		for(int i = 0; i < 2; i++) {
 			ContactPrivData data = app.createContact("Bob" + i);
 			// now register the contact using the same private information
 			app.registerContact("Bob" + i, data);
@@ -48,5 +48,11 @@ public class TestAplicationReKey extends TestCase {
 		ReKeyInformation newInfo = new ReKeyInformation(builder.getDocumentElement(), app.getParams().getPairing());
 		
 		assertEquals(info.getG1(), newInfo.getG1());
+		
+		//Update Bob1's info
+		
+		boolean result = app.processReKey("Bob1", publish);
+		assertTrue(result);
+		
 	}
 }

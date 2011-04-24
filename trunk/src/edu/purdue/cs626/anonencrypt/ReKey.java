@@ -3,6 +3,8 @@ package edu.purdue.cs626.anonencrypt;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.apache.axiom.om.util.Base64;
+
 import it.unisa.dia.gas.jpbc.Element;
 
 /**
@@ -79,7 +81,7 @@ public class ReKey {
 	 */
 	public ReKeyInformation getPublicInfo(HashMap<Element, Element> idRndMap) {
 
-		HashMap<Element, Element> newC1Map = new HashMap<Element, Element>();
+		HashMap<String, Element> newC1Map = new HashMap<String, Element>();
 
 		Element rnd = this.params.getPairing().getZr().newRandomElement()
 				.getImmutable();
@@ -94,7 +96,7 @@ public class ReKey {
 			Element newC1 = this.mk.mul(tmp.powZn(r)).getImmutable();
 			Element blindId = id.powZn(rnd);
 
-			newC1Map.put(blindId, newC1);
+			newC1Map.put(Base64.encode(blindId.toBytes()), newC1);
 
 		}
 

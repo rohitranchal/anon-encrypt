@@ -66,13 +66,13 @@
 	<target name="demo" depends="jar" description="Runs the demo applicatoin">
 
 		<java classname="edu.purdue.cs626.anonencrypt.app.demo.Messenger" fork="true">
-		         <classpath>
-		           <pathelement location="ae.jar"/>
-					<path refid="classpath.libraries" />
-		         </classpath>
-		       </java>
+			<classpath>
+				<pathelement location="ae.jar" />
+				<path refid="classpath.libraries" />
+			</classpath>
+		</java>
 	</target>
-	
+
 	<target name="clean" description="clean up">
 		<!-- Delete the ${build} and ${dist} directory trees -->
 		<delete dir="${build}" />

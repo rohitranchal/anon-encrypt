@@ -236,6 +236,10 @@ public class Application {
 		if (rs.next()) {
 			String privDataStr = rs.getString(1);
 			String msg = rs.getString(2);
+			
+			if(msg == null) {
+				return null;
+			}
 
 			// Create priv data object
 			ContactPrivData cpd = new ContactPrivData(
@@ -321,7 +325,15 @@ public class Application {
 
 		AEPrivateKey privKey = this.tmpPrivKeyMap.get(user);
 		AEParameters contactParams = this.paramCache.get(user);
+		
+		if(privKey == null) {
+			throw new RuntimeException("No private key");
+		}
 
+		if(contactParams == null) {
+			throw new RuntimeException("Contact parameters");
+		}
+		
 		String cipherTxtStr = ur.getCipherTextString();
 		AECipherText ct = new AECipherText(Util.getOMElement(cipherTxtStr),
 				contactParams.getPairing());

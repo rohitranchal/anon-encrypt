@@ -98,6 +98,13 @@ public class ApplicationInstaller {
 		File configDir = new File(configDirPath);
 		rmDir(configDir);
 	}
+	
+	public static boolean isInstalled() {
+		String userHome = System.getProperty("user.home");
+		String configDirPath = userHome + File.separator + Constants.CONFIG_DIR;
+		File configDir = new File(configDirPath);
+		return configDir.exists() && configDir.isDirectory();
+	}
 
 	/**
 	 * Delete a directory and its content.
@@ -121,5 +128,7 @@ public class ApplicationInstaller {
 			dir.delete();
 		}
 	}
+	
+
 
 }

@@ -129,6 +129,14 @@ public class Application {
 		s.execute(sql);
 	}
 
+	public boolean removeContact(String name) throws Exception {
+		String sql = "DELETE FROM Contact WHERE contactId = '" + name + "'";
+		Connection conn = Database.getConnection();
+		Statement s = conn.createStatement();
+		s.execute(sql);
+		return s.getUpdateCount() == 1;
+	}
+	
 	/**
 	 * Re-key parameters and return the information to publish.
 	 * 

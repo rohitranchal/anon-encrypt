@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import edu.purdue.cs626.anonencrypt.ReKeyInformation;
 import edu.purdue.cs626.anonencrypt.Util;
 import edu.purdue.cs626.anonencrypt.app.Application;
 import edu.purdue.cs626.anonencrypt.app.ApplicationInstaller;
@@ -16,118 +17,157 @@ import edu.purdue.cs626.anonencrypt.app.UpdateRequest;
 public class Messenger {
 
 	private static Application app;
-	
+
 	private static void printUsage() {
 		System.out.println("Options (Help 0):");
-		System.out.println("1.) Install");
-		System.out.println("2.) List contacts");
-		System.out.println("3.) Add contact");
-		System.out.println("4.) Add contact : enter remote priv data");
-		System.out.println("5.) Set direct update of contact");
-		System.out.println("6.) Request remote update of contact");
-		System.out.println("7.) Serve update request");
-		System.out.println("8.) Process remote update of contact");
-		System.out.println("9.) Uninstall");
-		System.out.println("10.) Exit!!!");
+
+		System.out.println("1.) List contacts");
+		System.out.println("2.) Add contact");
+		System.out.println("3.) Add contact : enter remote priv data");
+		System.out.println("4.) Set direct update of contact");
+		System.out.println("5.) Request remote update of contact");
+		System.out.println("6.) Serve update request");
+		System.out.println("7.) Process remote update of contact");
+		System.out.println("8.) Remove contact");
+		System.out.println("9.) Re-key system");
+		System.out.println("10.) Process contact re-key information");
+		System.out.println("20.) Install");
+		System.out.println("21.) Uninstall");
+		System.out.println("22.) Exit!!!");
 	}
-	
+
 	public static void main(String[] args) throws Exception {
 
-		if(ApplicationInstaller.isInstalled()) {
+		if (ApplicationInstaller.isInstalled()) {
 			app = new Application();
 		}
 		boolean start = true;
 		int selection = 0;
-		while(selection != 10) {
-			if(start) {
+		while (selection != 10) {
+			if (start) {
 				printUsage();
 				start = false;
 			}
 			System.out.println("Enter option: ");
-			
-			BufferedReader stdin = new BufferedReader
-		      						(new InputStreamReader(System.in));
+
+			BufferedReader stdin = new BufferedReader(new InputStreamReader(
+					System.in));
 			String value;
 			value = stdin.readLine();
-			
-			if(value.equals("")) {
+
+			if (value.equals("")) {
 				continue;
 			}
-			
+
 			selection = Integer.parseInt(value);
-			switch(selection) {
+			switch (selection) {
 			case 1:
-				install();
-				break;
-			case 2:
 				printContactList();
 				break;
-			case 3:
+			case 2:
 				addContact(stdin);
 				break;
-			case 4:
+			case 3:
 				processRemotePrivData(stdin);
 				break;
-			case 5:
+			case 4:
 				doDirectMsg(stdin);
 				break;
-			case 6:
+			case 5:
 				remoteUpdateReq(stdin);
 				break;
+			case 6:
+				serveUpdateReq(stdin);
+				break;
 			case 7:
-				serveUpdateReq(stdin);		
+				doProcessUpdateResponse(stdin);
 				break;
 			case 8:
-				System.out.println("Enter update response file path : ");
-				String path = stdin.readLine();
-				
-				String data = getFileData(path);
-				String msg = app.processUpdateResponse(data);
-				
-				System.out.println("Update message : " + msg);
+				removeContact(stdin);
 				break;
 			case 9:
+				doReKey(stdin);
+				break;
+			case 20:
+				install();
+				break;
+			case 21:
 				unInstall();
 				break;
 			case 0:
 				printUsage();
 				break;
-			case 10:
+			case 22:
 				exit();
 				break;
 			default:
 				break;
 			}
 		}
-		
+
+	}
+
+	private static void doReKey(BufferedReader stdin) throws Exception {
+		System.out.println("Are you sure (Y/N)?");
+		String resp = stdin.readLine();
+		if(resp.equalsIgnoreCase("Y")) {
+			ReKeyInformation rki = app.reKey();
+			System.out.println("--------------RE-KEY_INFO:START--------------");
+			String info = rki.serialize();
+			System.out.println("--------------RE-KEY_INFO:END----------------");
+			System.out.println(info);
+		}
+	}
+
+	private static void removeContact(BufferedReader stdin) throws IOException,
+			Exception {
+		System.out.println("Enter contact name :");
+		String user = stdin.readLine();
+		boolean result = app.removeContact(user);
+		if (result) {
+			System.out.println(user + " removed successfully!");
+		}
+	}
+
+	private static void doProcessUpdateResponse(BufferedReader stdin)
+			throws IOException, FileNotFoundException, Exception {
+		System.out.println("Enter update response file path : ");
+		String path = stdin.readLine();
+
+		String data = getFileData(path);
+		String msg = app.processUpdateResponse(data);
+
+		System.out.println("Update message : " + msg);
 	}
 
 	private static void serveUpdateReq(BufferedReader stdin)
 			throws IOException, FileNotFoundException, Exception {
 		System.out.println("Enter update request file path : ");
 		String path = stdin.readLine();
-		
+
 		String data = getFileData(path);
 		String resp = app.getUpdate(data);
-		System.out.println("-----------REMOTE_UPDATE_RESPONSE:START-----------");
+		System.out
+				.println("-----------REMOTE_UPDATE_RESPONSE:START-----------");
 		System.out.println(resp);
-		System.out.println("-----------REMOTE_UPDATE_RESPONSE:END-------------");
+		System.out
+				.println("-----------REMOTE_UPDATE_RESPONSE:END-------------");
 	}
 
 	private static void remoteUpdateReq(BufferedReader stdin)
 			throws IOException, Exception {
 		System.out.println("Enter contact name :");
 		String user = stdin.readLine();
-		
+
 		UpdateRequest ur = app.getUpdateRequest(user);
-		
+
 		System.out.println("-----------REMOTE_UPDATE_REQUEST:START-----------");
 		System.out.println(ur.serialize());
 		System.out.println("-----------REMOTE_UPDATE_REQUEST:END-------------");
 	}
 
 	private static void install() throws Exception {
-		if(app != null) {
+		if (app != null) {
 			System.out.println("Aleady installed");
 		} else {
 			new ApplicationInstaller().install();
@@ -142,7 +182,7 @@ public class Messenger {
 	}
 
 	private static void unInstall() {
-		if(app != null) {
+		if (app != null) {
 			new ApplicationInstaller().unInstall();
 			System.out.println("Removed!");
 			app = null;
@@ -155,7 +195,7 @@ public class Messenger {
 			throws IOException, FileNotFoundException, Exception {
 		System.out.println("Enter contact name :");
 		String user = stdin.readLine();
-		
+
 		System.out.println("Enter file path :");
 		String dataFilePath = stdin.readLine();
 		String data = getFileData(dataFilePath);
@@ -165,13 +205,13 @@ public class Messenger {
 	private static String getFileData(String dataFilePath)
 			throws FileNotFoundException, IOException {
 		File f = new File(dataFilePath);
-		
+
 		StringBuffer data = new StringBuffer();
-		
-		if(f.exists()) {
+
+		if (f.exists()) {
 			BufferedReader reader = new BufferedReader(new FileReader(f));
 			String line = null;
-			while((line = reader.readLine()) != null) {
+			while ((line = reader.readLine()) != null) {
 				data.append(line).append(System.getProperty("line.separator"));
 			}
 			reader.close();
@@ -188,28 +228,29 @@ public class Messenger {
 		System.out.println("Enter plain message:");
 		String msg = stdin.readLine();
 		app.saveMessage(user, msg);
-		System.out.println(user  + " >> " + msg);
+		System.out.println(user + " >> " + msg);
 	}
 
 	private static void printContactList() throws Exception {
-		if(app == null) {
+		if (app == null) {
 			printInstallMsg();
 		}
 		String[] contacts = app.getContactList();
 		System.out.println("========================================");
 		System.out.println("|          CONTACT LIST                |");
 		System.out.println("========================================");
-		
+
 		for (int i = 0; i < contacts.length; i++) {
-			System.out.println(contacts[i] + " >> " + app.getMessage(contacts[i]));
+			System.out.println(contacts[i] + " >> "
+					+ app.getMessage(contacts[i]));
 		}
 		System.out.println("========================================");
-		
+
 	}
 
 	private static void addContact(BufferedReader stdin) throws IOException,
 			Exception {
-		if(app == null) {
+		if (app == null) {
 			printInstallMsg();
 		}
 		System.out.println("Enter contact name: ");
@@ -220,7 +261,7 @@ public class Messenger {
 		System.out.println(privData.serialize());
 		System.out.println("---------------PRIVATE_DATA:END-----------------");
 	}
-	
+
 	private static void printInstallMsg() {
 		System.out.println("Please install application!");
 	}

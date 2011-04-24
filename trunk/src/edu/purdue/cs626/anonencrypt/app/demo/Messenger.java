@@ -44,7 +44,7 @@ public class Messenger {
 				start = false;
 			}
 			System.out.println("Enter option: ");
-
+			
 			BufferedReader stdin = new BufferedReader
 		      						(new InputStreamReader(System.in));
 			String value;
@@ -104,7 +104,7 @@ public class Messenger {
 
 	private static void serveUpdateReq(BufferedReader stdin)
 			throws IOException, FileNotFoundException, Exception {
-		System.out.print("Enter update request file path : ");
+		System.out.println("Enter update request file path : ");
 		String path = stdin.readLine();
 		
 		String data = getFileData(path);
@@ -116,7 +116,7 @@ public class Messenger {
 
 	private static void remoteUpdateReq(BufferedReader stdin)
 			throws IOException, Exception {
-		System.out.print("Enter contact name :");
+		System.out.println("Enter contact name :");
 		String user = stdin.readLine();
 		
 		UpdateRequest ur = app.getUpdateRequest(user);
@@ -153,10 +153,10 @@ public class Messenger {
 
 	private static void processRemotePrivData(BufferedReader stdin)
 			throws IOException, FileNotFoundException, Exception {
-		System.out.print("Enter contact name :");
+		System.out.println("Enter contact name :");
 		String user = stdin.readLine();
 		
-		System.out.print("Enter file path :");
+		System.out.println("Enter file path :");
 		String dataFilePath = stdin.readLine();
 		String data = getFileData(dataFilePath);
 		app.registerContact(user, new ContactPrivData(Util.getOMElement(data)));
@@ -183,9 +183,9 @@ public class Messenger {
 
 	private static void doDirectMsg(BufferedReader stdin) throws IOException,
 			Exception {
-		System.out.print("Enter contact name:");
+		System.out.println("Enter contact name:");
 		String user = stdin.readLine();
-		System.out.print("Enter plain message:");
+		System.out.println("Enter plain message:");
 		String msg = stdin.readLine();
 		app.saveMessage(user, msg);
 		System.out.println(user  + " >> " + msg);
@@ -212,7 +212,8 @@ public class Messenger {
 		if(app == null) {
 			printInstallMsg();
 		}
-		System.out.print("Enter contact name: ");
+		System.out.println("Enter contact name: ");
+		System.out.flush();
 		String name = stdin.readLine();
 		ContactPrivData privData = app.createContact(name);
 		System.out.println("---------------PRIVATE_DATA:START---------------");

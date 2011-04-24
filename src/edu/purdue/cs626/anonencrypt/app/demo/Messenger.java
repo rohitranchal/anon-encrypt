@@ -104,7 +104,7 @@ public class Messenger {
 
 	private static void serveUpdateReq(BufferedReader stdin)
 			throws IOException, FileNotFoundException, Exception {
-		System.out.println("Enter update request file path : ");
+		System.out.print("Enter update request file path : ");
 		String path = stdin.readLine();
 		
 		String data = getFileData(path);
@@ -116,7 +116,7 @@ public class Messenger {
 
 	private static void remoteUpdateReq(BufferedReader stdin)
 			throws IOException, Exception {
-		System.out.println("Enter contact name :");
+		System.out.print("Enter contact name :");
 		String user = stdin.readLine();
 		
 		UpdateRequest ur = app.getUpdateRequest(user);
@@ -153,10 +153,10 @@ public class Messenger {
 
 	private static void processRemotePrivData(BufferedReader stdin)
 			throws IOException, FileNotFoundException, Exception {
-		System.out.println("Enter contact name :");
+		System.out.print("Enter contact name :");
 		String user = stdin.readLine();
 		
-		System.out.println("Enter file path :");
+		System.out.print("Enter file path :");
 		String dataFilePath = stdin.readLine();
 		String data = getFileData(dataFilePath);
 		app.registerContact(user, new ContactPrivData(Util.getOMElement(data)));
@@ -212,7 +212,7 @@ public class Messenger {
 		if(app == null) {
 			printInstallMsg();
 		}
-		System.out.println("Enter contact name: ");
+		System.out.print("Enter contact name: ");
 		String name = stdin.readLine();
 		ContactPrivData privData = app.createContact(name);
 		System.out.println("---------------PRIVATE_DATA:START---------------");

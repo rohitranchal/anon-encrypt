@@ -16,10 +16,10 @@
 
 \begin{frame}{Problem}
 \begin{itemize}
-\item A user wants to send a message to all his contacts
-\item Even if they are offline
+\item A user wants to send a message to all his current contacts
+\item Even if they are offline!
 \item \textbf{Only} trusts his/her immediate contacts
-\item Contact can re-distribute messages
+\item Contact can re-distribute messages on requests
 \end{itemize}
 \end{frame}
 
@@ -93,24 +93,34 @@ Constant Size Ciphertext, Boneh et.al)
 
 \begin{itemize}
 \item Update $Encrypt()$ to work with ${h_1}^{I_1}{h_2}^{{I_2}_1} = ID$
-\item On re-key update $\alpha$ and only generate minimum public data for existing contacts.
 \item To encrypt for Bob \\ $CT = Encrypt'(msg, ID, params)$
-
+\item On re-key update $\alpha$ and only generate minimum public data for existing contacts.
 \end{itemize}
 \end{frame}
+
+\begin{frame}{Usage}
+\begin{itemize}
+\item First level identity (${I_r}_1$) and private key to a contact
+\item A contact issue him/herself a second level identity with a random ${I_r}_2$
+\item Broadcsts a request for data ($<user, ID_r>$) where $ID_r = {h_1}^{{I_r}_1}{h_2}^{{I_r}_2}$
+\item Any other contact of the user can respond to the request using $params_{user}$ : \\\
+$CT = Encrypt'(msg, ID_r, params_{user})$
+\end{itemize}
+\end{frame}
+
 
 
 \begin{frame}{Implementation}
 \begin{itemize}
 \item http://code.google.com/p/anon-encrypt/
-\item Using JPBC (http://gas.dia.unisa.it/projects/jpbc/)
+\item Using Java Pairing Based Cryptography Library (JPBC)\footnote{http://gas.dia.unisa.it/projects/jpbc/}
 \item Implemented as a library
 \item Demo application
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Demonstration}
-DEMO!
+\Huge{DEMO!}
 \end{frame}
 
 \end{document}

@@ -355,7 +355,11 @@ public class Application {
 		byte[] decoded = encoder.decode(plainElems);
 		
 		String msg = new String(decoded).trim();
-		this.saveMessage(user, msg);
+		try {
+			this.saveMessage(user, msg);
+		} catch (Exception e) {
+			msg += e.getMessage();
+		}
 		
 		return msg;
 	}

@@ -183,8 +183,8 @@ public class Application {
 		Element searchKey = cpd.getId().powZn(rnd).getImmutable();
 		
 		Element tmp = rki.getNewC1map().get(Base64.encode(searchKey.toBytes()));
-		Element c1 = tmp.getImmutable();
-		if(c1 != null) {
+		if(tmp != null) {
+			Element c1 = tmp.getImmutable();
 			AEPrivateKey privKey = cpd.getPrivKey();
 			AEPrivateKey newPrivKey = new AEPrivateKey(c1, privKey.getC2(), privKey.getC3());
 			

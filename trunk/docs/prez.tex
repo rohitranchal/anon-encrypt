@@ -1,0 +1,105 @@
+\documentclass{beamer}
+\usepackage[latin1]{inputenc}
+\usepackage{graphics}
+\usepackage{amsfonts}
+\usetheme{Warsaw}
+\title[CS 626 : Project Presentation]{Private Anonymous Messaging \\With Friends!}
+\author{Ruchith Fernando}
+\institute{Purdue University}
+\date{April 26, 2011}
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Problem}
+\begin{itemize}
+\item A user wants to send a message to all his contacts
+\item Even if they are offline
+\item \textbf{Only} trusts his/her immediate contacts
+\item Contact can re-distribute messages
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Problem}
+\begin{figure}
+\includegraphics[height=6cm]{img/img1.png} 
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Problem}
+\begin{figure}
+\includegraphics[height=6cm]{img/img2.png} 
+\end{figure}
+\end{frame}
+
+\begin{frame}{Proposed Solution}
+\begin{itemize}
+\item Modify HIBE (Hierarchical Identity Based Encryption with
+Constant Size Ciphertext, Boneh et.al)
+\item Each contact is issued a private key
+\item Contacts generate \textbf{anonymous} public keys using theis private key
+\item Broadcast update request to be processed other contacts 
+\item Re-key mechanism with \textbf{public} data
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Hierarchical Identity Based Encryption}
+\begin{figure}
+\includegraphics[height=3cm]{img/img3.png} 
+\end{figure}
+\pause \begin{itemize}
+\item Identities:
+ \begin{itemize}
+	\item Alice: $I_1$
+	\item Bob: $I_1,{I_2}_1$
+	\item Charlie: $I_1,{I_2}_2$
+\end{itemize}
+\pause \item $e : \mathbb{G} \times \mathbb{G} \to \mathbb{G}_1 , |\mathbb{G}| = p$
+\pause \item $params = (g, g_1, g_2, g_3, h_1, h_2) ,  g_1 = g^\alpha$
+\pause \item $mk = {g_2}^\alpha , \alpha \in \mathbb{Z}_p$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Hierarchical Identity Based Encryption}
+\begin{figure}
+\includegraphics[height=3cm]{img/img3.png} 
+\end{figure}
+
+\begin{itemize}
+\item Alice :
+\begin{itemize}
+\item ${K_{priv}}_{alice} = KeyGen(I_1, params, mk)$ 
+\item ${K_{pub}}_{alice} = I_1$
+\end{itemize}
+
+\item Bob :
+\begin{itemize}
+\item ${K_{priv}}_{bob} = KeyGen(I_1, I_2, params, {K_{priv}}_{alice})$
+\item ${K_{pub}}_{bob} = I_1, I_2$
+\end{itemize}
+
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Implementation}
+\begin{itemize}
+\item Using JPBC (http://gas.dia.unisa.it/projects/jpbc/)
+\item Implemented as a library
+\item Demo application
+\item Performance : TODO
+\item Hosted at : http://code.google.com/p/anon-encrypt/
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Demonstration}
+DEMO!
+\end{frame}
+
+\end{document}

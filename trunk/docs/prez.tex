@@ -80,21 +80,32 @@ Constant Size Ciphertext, Boneh et.al)
 \item Bob :
 \begin{itemize}
 \item ${K_{priv}}_{bob} = KeyGen(I_1, I_2, params, {K_{priv}}_{alice})$
-\item ${K_{pub}}_{bob} = I_1, I_2$
+\item ${K_{pub}}_{bob} = I_1, {I_2}_1$
 \end{itemize}
+
+\item To encrypt for Bob \\ $CT = Encrypt(msg, I_1, {I_2}_1, params)$
+
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Changes to HIBE}
+
+\begin{itemize}
+\item Update $Encrypt()$ to work with ${h_1}^{I_1}{h_2}^{{I_2}_1} = ID$
+\item On re-key update $\alpha$ and only generate minimum public data for existing contacts.
+\item To encrypt for Bob \\ $CT = Encrypt'(msg, ID, params)$
 
 \end{itemize}
 \end{frame}
 
 
-
 \begin{frame}{Implementation}
 \begin{itemize}
+\item http://code.google.com/p/anon-encrypt/
 \item Using JPBC (http://gas.dia.unisa.it/projects/jpbc/)
 \item Implemented as a library
 \item Demo application
-\item Performance : TODO
-\item Hosted at : http://code.google.com/p/anon-encrypt/
 \end{itemize}
 \end{frame}
 

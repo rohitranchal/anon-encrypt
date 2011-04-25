@@ -1,12 +1,9 @@
 package edu.purdue.cs626.anonencrypt.app.demo;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 
 import edu.purdue.cs626.anonencrypt.ReKeyInformation;
 import edu.purdue.cs626.anonencrypt.Util;
@@ -215,25 +212,6 @@ public class Messenger {
 		app.registerContact(user, new ContactPrivData(Util.getOMElement(data)));
 		System.out.println("Private certificate installed successfully!\n");
 	}
-
-//	private static String getFileData(String dataFilePath)
-//			throws FileNotFoundException, IOException {
-//		File f = new File(dataFilePath);
-//
-//		StringBuffer data = new StringBuffer();
-//
-//		if (f.exists()) {
-//			BufferedReader reader = new BufferedReader(new FileReader(f));
-//			String line = null;
-//			while ((line = reader.readLine()) != null) {
-//				data.append(line).append(System.getProperty("line.separator"));
-//			}
-//			reader.close();
-//		} else {
-//			System.out.println("ERROR: no such file!");
-//		}
-//		return data.toString();
-//	}
 
 	private static void doDirectMsg(BufferedReader stdin) throws IOException,
 			Exception {

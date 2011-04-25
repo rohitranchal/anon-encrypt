@@ -358,7 +358,7 @@ public class Application {
 		try {
 			this.saveMessage(user, msg);
 		} catch (Exception e) {
-			msg += e.getMessage();
+			msg += " << This was not saved!";
 		}
 		
 		return msg;

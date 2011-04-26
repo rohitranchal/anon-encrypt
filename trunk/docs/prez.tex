@@ -17,9 +17,9 @@
 \begin{frame}{Problem}
 \begin{itemize}
 \item A user wants to send a message to all his current contacts
-\item Even if they are offline!
+\item Even if they are \textbf{offline!}
 \item \textbf{Only} trusts his/her immediate contacts
-\item Contact can re-distribute messages on requests
+\item A contact can re-distribute messages on requests
 \end{itemize}
 \end{frame}
 
@@ -41,10 +41,10 @@
 \begin{itemize}
 \item Modify HIBE (Hierarchical Identity Based Encryption with
 Constant Size Ciphertext, Boneh et.al)
-\item Each contact is issued a private key
-\item Contacts generate \textbf{anonymous} public keys using theis private key
-\item Broadcast update request to be processed other contacts 
-\item Re-key mechanism with \textbf{public} data
+\item Each contact is issued a private key (only private channel for key exchange)
+\item Contacts generate \textbf{anonymous} public keys using their private keys
+\item Broadcast update request to be processed by other contacts 
+\item Re-key mechanism with \textbf{public} data (no private channel requirement)
 \end{itemize}
 \end{frame}
 
@@ -60,8 +60,8 @@ Constant Size Ciphertext, Boneh et.al)
 	\item Charlie: $I_1,{I_2}_2$
 \end{itemize}
 \pause \item $e : \mathbb{G} \times \mathbb{G} \to \mathbb{G}_1 , |\mathbb{G}| = p$
-\pause \item $params = (g, g_1, g_2, g_3, h_1, h_2) ,  g_1 = g^\alpha$
-\pause \item $mk = {g_2}^\alpha , \alpha \in \mathbb{Z}_p$
+\pause \item $params = (g, g_1, g_2, g_3, h_1, h_2) ,  g_1 = g^\alpha , \alpha \in \mathbb{Z}_p$
+\pause \item $mk = {g_2}^\alpha$
 \end{itemize}
 \end{frame}
 
@@ -100,14 +100,25 @@ Constant Size Ciphertext, Boneh et.al)
 
 \begin{frame}{Usage}
 \begin{itemize}
-\item First level identity (${I_r}_1$) and private key to a contact
-\item A contact issue him/herself a second level identity with a random ${I_r}_2$
-\item Broadcsts a request for data ($<user, ID_r>$) where $ID_r = {h_1}^{{I_r}_1}{h_2}^{{I_r}_2}$
-\item Any other contact of the user can respond to the request using $params_{user}$ : \\\
+\item First level identity ($I_{r_1}$) and private key to a contact
+\item A contact issue him/herself a second level identity with a random $I_{r_2}$
+\item Broadcsts a request for data ($<$\emph{user}, $ID_r>$) where $ID_r = {h_1}^{I_{r_1}}{h_2}^{I_{r_2}}$
+\item Any other contact of the \emph{user} can respond to the request, by encrypting with $params_{user}$ : \\\
 $CT = Encrypt'(msg, ID_r, params_{user})$
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Usage : Revocation}
+\begin{itemize}
+\item If the \emph{user} removes a contact
+\item Re-key :
+\begin{itemize}
+\item $params_{user}$ update 
+\item A public component of the current contacts' private keys
+\item Indexed by blinded $ID_{contact}$
+\end{itemize}
+\end{itemize}
+\end{frame}
 
 
 \begin{frame}{Implementation}

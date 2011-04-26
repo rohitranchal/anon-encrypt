@@ -2,6 +2,7 @@
 \usepackage[latin1]{inputenc}
 \usepackage{graphics}
 \usepackage{amsfonts}
+\usepackage{wasysym}
 \usetheme{Warsaw}
 \title[CS 626 : Project Presentation]{Private Anonymous Messaging \\With Friends!}
 \author{Ruchith Fernando}
@@ -52,16 +53,16 @@ Constant Size Ciphertext, Boneh et.al)
 \begin{figure}
 \includegraphics[height=3cm]{img/img3.png} 
 \end{figure}
-\pause \begin{itemize}
+\begin{itemize}
 \item Identities:
  \begin{itemize}
 	\item Alice: $I_1$
 	\item Bob: $I_1,I_{2_1}$
 	\item Charlie: $I_1,I_{2_2}$
 \end{itemize}
-\pause \item $e : \mathbb{G} \times \mathbb{G} \to \mathbb{G}_1 , |\mathbb{G}| = p$
-\pause \item $params = (g, g_1, g_2, g_3, h_1, h_2) ,  g_1 = g^\alpha , \alpha \in \mathbb{Z}_p$
-\pause \item $mk = {g_2}^\alpha$
+\item $e : \mathbb{G} \times \mathbb{G} \to \mathbb{G}_1 , |\mathbb{G}| = p$
+\item $params = (g, g_1, g_2, g_3, h_1, h_2) ,  g_1 = g^\alpha , \alpha \in \mathbb{Z}_p$
+\item $mk = {g_2}^\alpha$
 \end{itemize}
 \end{frame}
 
@@ -100,8 +101,8 @@ Constant Size Ciphertext, Boneh et.al)
 
 \begin{frame}{Usage : Encryption}
 \begin{itemize}
-\item First level identity ($I_{r_1}$) and private key to a contact
-\item A contact issue him/herself a second level identity with a random $I_{r_2}$
+\item Contact: First level identity ($I_{r_1}$) and private key
+\item A contact issues him/herself a second level identity with a \textbf{random} $I_{r_2}$
 \item Broadcsts a request for data ($<$\emph{user}, $ID_r>$) where $ID_r = {h_1}^{I_{r_1}}{h_2}^{I_{r_2}}$
 \item Any other contact of the \emph{user} can respond to the request, by encrypting with $params_{user}$ : \\\
 $CT = Encrypt'(msg, ID_r, params_{user})$
@@ -114,8 +115,7 @@ $CT = Encrypt'(msg, ID_r, params_{user})$
 \item Re-key : Parameters
 \begin{itemize}
 \item Generate a new master key : $\alpha' \in \mathbb{Z}_p $,  ${g_2}^{\alpha'}$
-\item $params_{user}$ update : Only $g_1 = g^{\alpha'}$ \\
-\item Curent contacts' private keys
+\item $params_{user}$ update : Only $g_1 = g^{\alpha'}$ 
 \end{itemize}
 \item Re-key : Contact private key
 \begin{itemize}
@@ -137,7 +137,9 @@ $CT = Encrypt'(msg, ID_r, params_{user})$
 \end{frame}
 
 \begin{frame}{Demonstration}
-\Huge{DEMO!}
+\begin{center}
+\Huge{DEMO!} \\ \smiley
+\end{center}
 \end{frame}
 
 \end{document}

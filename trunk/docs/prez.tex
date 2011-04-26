@@ -56,8 +56,8 @@ Constant Size Ciphertext, Boneh et.al)
 \item Identities:
  \begin{itemize}
 	\item Alice: $I_1$
-	\item Bob: $I_1,{I_2}_1$
-	\item Charlie: $I_1,{I_2}_2$
+	\item Bob: $I_1,I_{2_1}$
+	\item Charlie: $I_1,I_{2_2}$
 \end{itemize}
 \pause \item $e : \mathbb{G} \times \mathbb{G} \to \mathbb{G}_1 , |\mathbb{G}| = p$
 \pause \item $params = (g, g_1, g_2, g_3, h_1, h_2) ,  g_1 = g^\alpha , \alpha \in \mathbb{Z}_p$
@@ -80,10 +80,10 @@ Constant Size Ciphertext, Boneh et.al)
 \item Bob :
 \begin{itemize}
 \item ${K_{priv}}_{bob} = KeyGen(I_1, I_2, params, {K_{priv}}_{alice})$
-\item ${K_{pub}}_{bob} = I_1, {I_2}_1$
+\item ${K_{pub}}_{bob} = I_1, I_{2_1}$
 \end{itemize}
 
-\item To encrypt for Bob \\ $CT = Encrypt(msg, I_1, {I_2}_1, params)$
+\item To encrypt for Bob \\ $CT = Encrypt(msg, I_1, I_{2_1}, params)$
 
 
 \end{itemize}
@@ -92,13 +92,13 @@ Constant Size Ciphertext, Boneh et.al)
 \begin{frame}{Changes to HIBE}
 
 \begin{itemize}
-\item Update $Encrypt()$ to work with ${h_1}^{I_1}{h_2}^{{I_2}_1} = ID$
+\item Update $Encrypt()$ to work with ${h_1}^{I_1}{h_2}^{I_{2_1}} = ID$
 \item To encrypt for Bob \\ $CT = Encrypt'(msg, ID, params)$
 \item On re-key update $\alpha$ and only generate minimum public data for existing contacts.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Usage}
+\begin{frame}{Usage : Encryption}
 \begin{itemize}
 \item First level identity ($I_{r_1}$) and private key to a contact
 \item A contact issue him/herself a second level identity with a random $I_{r_2}$
@@ -111,10 +111,16 @@ $CT = Encrypt'(msg, ID_r, params_{user})$
 \begin{frame}{Usage : Revocation}
 \begin{itemize}
 \item If the \emph{user} removes a contact
-\item Re-key :
+\item Re-key : Parameters
 \begin{itemize}
-\item $params_{user}$ update 
-\item A public component of the current contacts' private keys
+\item Generate a new master key : $\alpha' \in \mathbb{Z}_p $,  ${g_2}^{\alpha'}$
+\item $params_{user}$ update : Only $g_1 = g^{\alpha'}$ \\
+\item Curent contacts' private keys
+\end{itemize}
+\item Re-key : Contact private key
+\begin{itemize}
+\item $K_{priv}=({{g_2}^{\alpha'}} \cdot {({{h_1}^{I_1}} \cdot {g_3} )}^r , g^r, {h_2}^r, {h_3}^r) = (C_1, C_2, C_3)$ 
+\item Only $C_1$ need to be published along with $I_1$
 \item Indexed by blinded $ID_{contact}$
 \end{itemize}
 \end{itemize}

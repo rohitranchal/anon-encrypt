@@ -154,7 +154,7 @@ public class Messenger {
 
 	private static void serveUpdateReq(BufferedReader stdin)
 			throws IOException, FileNotFoundException, Exception {
-		System.out.println("Enter update request file path : ");
+		System.out.println("Enter update request : ");
 	
 
 		String data = getInputFromZenity("Enter update request");

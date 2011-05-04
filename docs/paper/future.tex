@@ -6,8 +6,12 @@ Reduce the re-key size\\
 \subsection{Size of re-key information}
 Currently we generate a minimum amount of information that is required to re-key a peer and its contacts. But in this scheme the re-key informaiton is of order n where n is the number of contacts of the peer. It would be interesting to evaluate the possibility of reducing the size of this public information while maintaining the same properties.
 
+\subsection{Incentives to forward messages}
+This sheme relies on the fact that the contacts belonging to the set $C^+$ (those who holds the latest $M_P$) will respond to an $update$ request $Q_P$ with correct a response $S_P$. It will be useful to evaluate the possibility of coming up with an incentive scheme for contacts in $C^+$ to respond to $Q_P$s.
+
 \subsection{Security roof}
 We plan to prove that an adversary with polynomially bounded resources will not be able to ...??
 
 \subsection{Implementation of message routing}
 The current implementation only covers the cryptographic primitives. It will be interesting to use these with a peer to peer network where the peers are connected only to their private contacts and evaluate the performance. It might be possible to be implemented as a plugin to Freenet \cite{freenet}.
+

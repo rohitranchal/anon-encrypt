@@ -1,0 +1,16 @@
+\section{Priliminary Notions}
+
+In this section we introduce the necessary background information that our work is based on.
+
+\subsection{Hierarchical Identity Based Encryption}
+Identity based encryption first proposed by Shamir\cite{Shamir:1985:ICS:19478.19483} is a public key encryption scheme where the identity of an entity can be used as the public key. The first complete solution for this was presented by Boneh and Franklin \cite{Boneh:2003:IEW:639069.639089}. Any party who intends to send a message to another will simply use a set of public parameters of a trusted authority along with the identity of the recipient will encrypt using this scheme. The recipient of the cipher text will be able to obtain the corresponding private key from the thrid party (who excutes private key generation algorithm for the given identity after authenticating the requester) and decrypt the cipher text to obtain the plain text.
+
+This idea of identity based encryption was extended to a hierarchy of identities \cite{Horwitz02towardhierarchical}, \cite{BBG05}, where at each level the private key is used as the input to the key generation algorithm along with the global parameteres defined by the root. We modified the scheme presented in \cite{BBG05} to derive our solution and the basic idea is presented as follows.
+
+There are four algorithms: $Setup$, $KeyGen$, $Encrypt$ and $Decrypt$.
+\begin{itemize}
+\item $Setup$
+\item $KeyGen$
+\item $Encrypt$
+\item $Decrypt$
+\end{itemize}

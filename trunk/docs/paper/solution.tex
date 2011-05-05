@@ -17,7 +17,7 @@ This will generate generates the public parameters and the master key of the pee
 \subsection{Registering a contact}
 
 The main idea is to setup a two level ($l=2$) HIBE system at each peer. When a peer $P$ registers a $C_{P_i}$ it will create a new random first level identifier $I_{r_i} \in \mathbb{Z}_p$ and corresponding private key ($d_{I_{r_i}}$). The private key and the identifier will be communicated to $C_{P_i}$ using a private channel. $d_{I_{r_i}}$ is of the form
-$({{g_2}^{\alpha'}} \cdot {({{h_1}^{I_{r_i}}} \cdot {g_3} )}^r , g^r, {h_2}^r, {h_3}^r)$ ,
+$({{g_2}^{\alpha}} \cdot {({{h_1}^{I_{r_i}}} \cdot {g_3} )}^r , g^r, {h_2}^r, {h_3}^r)$ ,
 where $r \in \mathbb{G}$ is random.
 
 \begin{itemize}
@@ -39,10 +39,16 @@ Suppose the identifier assigned to $C_{P_{req}}$ by $P$ is $I_{r_1}$
 $C_{P_{req}}$ publishes $<P, ID_{req}>$ and any of $P$'s other contacts will be able to respond to this request. This request information can simply be made publicly available using a common medium. The steps in creating the response is described next.
 
 \subsection{Encryption and update response}
-Note that in the hierarchical identity based encyrption scheme \cite{BBG05} the plain identity values of an entity are used in generating the cipher text. During the encryption the following value is derived using the identity values of the target.
+When a contact of $P$ observes the tuple $<P, ID_{req}>$ and decides to serve this request it will first encrypt the latest $update$ message $M_P$ from $P$ using the following modified encryption function ($Encrypt'$) and $P$'s public parameters $params_P$. 
 
-Identity is simply a random number in the group
+$Encrypt' (params_P, ID_{req}, M_P)$ :
 
+\begin{itemize}
+	\item Select a random $s \in \mathbb{Z}_p$ 
+	\item $CT_{resp} = (e(g_1, g_2)^s \cdot M,  g^s,  {({ID_{req}} \cdot {g_3})}^s) = (A, B, C)$
+\end{itemize}
+
+The contact can now publish the tuple \\$<P, ID_{req}, CT_{resp}>$.
 
 
 \subsection{Re-key}
@@ -53,5 +59,26 @@ The set of contacts at a peer $C$ can change in two ways:
 \end{itemize}
 
 When a new contact ($C_{P'}$) joins the peer $P$ simply can carryout new contact registration without and this doesn't require any changes to the parameters. The new contact will be able to request updates of the peer from its other contacts in the set ($C - C_{P'}$). 
-However when $P$ needs to remove a contact $C_{P'}$ from the list of contacts, it has to update its parametes. We find a minimal set of parameters that will be changed in such a situation and generate public information that the set $C - C_{P'}$ will be able to use to configure themselves.
 
+However when $P$ needs to remove a contact $C_{P'}$ from the list of contacts, it has to update its parametes. We present an approach where we generate public information that the set $C - C_{P'}$ will be able to use to configure themselves.
+
+In peer setup, the generated HIBE configuration if of the form  $params = (g, g_1, g_2, g_3, h_1, h_2)$ and $master-key = {g_2}^{\alpha}$ where $g_1 = g^{\alpha}$ and $\alpha \in \mathbb{Z}_p$ is random. In the case of re-key a peer :
+\begin{itemize}
+\item Geneates a new random $\alpha' \in \mathbb{Z}_p$
+\item Sets $master-key = {g_2}^{\alpha'}$
+\item Set $g_1 = g^{\alpha'}$
+\end{itemize}
+
+With this change $P$ will have to update the private keys of the contacts. Note that in contact registration process $P$ stored the tuple $<I_{r_i}, r>$ for each contact $C_{P_i}$. 
+
+To update contacts:
+
+First generate a random $u \in \mathbb{Z}_p$
+
+Initialize a list $<{id'}_i, A_i>$ and for each contact $C_{P_i} \in C$:
+\begin{itemize}
+\item generate the first component of the private keys of the contacts as ${{g_2}^{\alpha'}} \cdot {({{h_1}^{I_{r_i}}} \cdot {g_3} )}^{r_i} = A$. This $r$ value is from $<I_{r_i}, r>$.
+\item Add  $<{{I_{r_i}}^u}, A>$ to the $<{id'}_i, A_i>$ list.
+\end{itemize}
+
+Finally the complete re-key information to be published is : $<g_1, u, <{id'}_i, A_i>>$. Note that ${id'}_i$ is the identifier of $C_{P_i}$ blinded using $u$.

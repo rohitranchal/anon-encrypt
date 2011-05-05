@@ -9,7 +9,7 @@ This idea of identity based encryption was extended to a hierarchy of identities
 
 Let $e : \mathbb{G} \times \mathbb{G} \to \mathbb{G}_1 $ be a bilinear map where $\mathbb{G}$ is a group of prime order $p$. An identity is defined as $ID = (I_1, ..., I_k) \in ({{\mathbb{Z}}^*}_p)^k$ where $k$ is the depth of the hierarchy that the $ID$ belongs to.
 
-There are four algorithms: $Setup$, $KeyGen$, $Encrypt$ and $Decrypt$. $l$ is the maxium depth of the hierarchy allowed.
+There are four algorithms: $Setup$, $KeyGen$, $Encrypt$ and $Decrypt$. $l$ is the maxium depth of the hierarchy allowed.\\
 
 \begin{itemize}
 \item $Setup (l)$, generates the public parameters and the master key as follows:
@@ -18,8 +18,9 @@ There are four algorithms: $Setup$, $KeyGen$, $Encrypt$ and $Decrypt$. $l$ is th
 	\item Set $g_1 = g^{\alpha}$
 	\item Pick random $g_2, g_3, h_1, ..., h_l \in \mathbb{G}$
 	\item $params = (g, g_1, g_2, g_3, h_1, ..., h_l)$
-	\item $master-key = {g_2}^{\alpha}$
+	\item $master-key = {g_2}^{\alpha}$\\
 \end{itemize}	
+
 \item $KeyGen(d_{{ID}_{k-1}}, ID)$, generates the private key of the given $k^{th}$ level $ID$ using a $k-1$ level private key ($k \leq l$).
 
 First suppose the $k-1$ level private key was generated using the master key :
@@ -33,7 +34,7 @@ Now the $k^{th}$ level private key:
 \begin{itemize}
 	\item Select a random $t \in \mathbb{Z}_p$ 
 	\item Output $d_{{ID}_{k}}$ : \\
-	$({{a_0}\cdot{{b_k}^{I_k}}} \cdot {({{h_1}^{I_1}\cdot \cdot \cdot {h_k}^{I_k}} \cdot {g_3} )}^t , {a_1}\cdot{g^t}, {h_{k+1}}^t, ... , {h_l}^t)$
+	$({{a_0}\cdot{{b_k}^{I_k}}} \cdot {({{h_1}^{I_1}\cdot \cdot \cdot {h_k}^{I_k}} \cdot {g_3} )}^t , {a_1}\cdot{g^t}, {h_{k+1}}^t, ... , {h_l}^t)$\\
 \end{itemize}	
 
 \item $Encrypt (params, ID, M)$, encrypts a message $M \in \mathbb{G}$ using the public key $ID = (I_1, ..., I_k)$ :
@@ -41,10 +42,12 @@ Now the $k^{th}$ level private key:
 \begin{itemize}
 	\item Select a random $s \in \mathbb{Z}_p$ 
 	\item Output $CT$ : \\
-	$(e(g_1, g_2)^s \cdot M,  g^s,  {({{h_1}^{I_1}\cdot \cdot \cdot {h_k}^{I_k}} \cdot {g_3} )}^s)$\\$=(A, B, C)$
+	$(e(g_1, g_2)^s \cdot M,  g^s,  {({{h_1}^{I_1}\cdot \cdot \cdot {h_k}^{I_k}} \cdot {g_3} )}^s)$\\$=(A, B, C)$\\
 \end{itemize}	
 
 
 \item $Decrypt (d_{ID}, CT)$, dercypts a given cipher text of the above form $(A, B, C)$ using the given private key of the form $(a_0, a_1, b_k, ... , b_l)$. \\
-$(A \cdot e(a_1, C))/(e(B, a_0)) = M$
+$(A \cdot e(a_1, C))/(e(B, a_0)) = M$\\
 \end{itemize}
+
+Next section describes how this scheme is used to meet the requirements identified in section II.

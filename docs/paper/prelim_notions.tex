@@ -2,15 +2,49 @@
 
 In this section we introduce the necessary background information that our work is based on.
 
-\subsection{Hierarchical Identity Based Encryption}
-Identity based encryption first proposed by Shamir\cite{Shamir:1985:ICS:19478.19483} is a public key encryption scheme where the identity of an entity can be used as the public key. The first complete solution for this was presented by Boneh and Franklin \cite{Boneh:2003:IEW:639069.639089}. Any party who intends to send a message to another will simply use a set of public parameters of a trusted authority along with the identity of the recipient will encrypt using this scheme. The recipient of the cipher text will be able to obtain the corresponding private key from the thrid party (who excutes private key generation algorithm for the given identity after authenticating the requester) and decrypt the cipher text to obtain the plain text.
+\subsection{Hierarchical Identity Based Encryption (HIBE)}
+Identity based encryption first proposed by Shamir\cite{Shamir:1985:ICS:19478.19483} is a public key encryption scheme where the identity of an entity can be used as the public key. The first complete solution for this was presented by Boneh and Franklin \cite{Boneh:2003:IEW:639069.639089}. Any party who intends to send a message to another will simply use a set of public parameters of a trusted authority along with the identity of the recipient will encrypt using this scheme. The recipient of the cipher text will be able to obtain the corresponding private key from the third party (who executes private key generation algorithm for the given identity after authenticating the requester) and decrypt the cipher text to obtain the plain text.
 
-This idea of identity based encryption was extended to a hierarchy of identities \cite{Horwitz02towardhierarchical}, \cite{BBG05}, where at each level the private key is used as the input to the key generation algorithm along with the global parameteres defined by the root. We modified the scheme presented in \cite{BBG05} to derive our solution and the basic idea is presented as follows.
+This idea of identity based encryption was extended to a hierarchy of identities \cite{Horwitz02towardhierarchical}, \cite{BBG05}, where at each level the private key is used as the input to the key generation algorithm along with the global parameters defined by the root. The HIBE system is defined in \cite{BBG05} as follows (which we modify in deriving out scheme):\\
 
-There are four algorithms: $Setup$, $KeyGen$, $Encrypt$ and $Decrypt$.
+Let $e : \mathbb{G} \times \mathbb{G} \to \mathbb{G}_1 $ be a bilinear map where $\mathbb{G}$ is a group of prime order $p$. An identity is defined as $ID = (I_1, ..., I_k) \in ({{\mathbb{Z}}^*}_p)^k$ where $k$ is the depth of the hierarchy that the $ID$ belongs to.
+
+There are four algorithms: $Setup$, $KeyGen$, $Encrypt$ and $Decrypt$. $l$ is the maxium depth of the hierarchy allowed.
+
 \begin{itemize}
-\item $Setup$
-\item $KeyGen$
-\item $Encrypt$
-\item $Decrypt$
+\item $Setup (l)$, generates the public parameters and the master key as follows:
+\begin{itemize}
+	\item Select a generator $g \in \mathbb{G}$ and a random $\alpha \in \mathbb{Z}_p$
+	\item Set $g_1 = g^{\alpha}$
+	\item Pick random $g_2, g_3, h_1, ..., h_l \in \mathbb{G}$
+	\item $params = (g, g_1, g_2, g_3, h_1, ..., h_l)$
+	\item $master-key = {g_2}^{\alpha}$
+\end{itemize}	
+\item $KeyGen(d_{{ID}_{k-1}}, ID)$, generates the private key of the given $k^{th}$ level $ID$ using a $k-1$ level private key ($k \leq l$).
+
+First suppose the $k-1$ level private key was generated using the master key :
+\begin{itemize}
+	\item Select a random $r \in \mathbb{Z}_p$ 
+	\item Output $d_{{ID}_{k-1}}$ : \\
+	$({{g_2}^{\alpha}} \cdot {({{h_1}^{I_1}\cdot \cdot \cdot {h_{k-1}}^{I_{k-1}}} \cdot {g_3} )}^r , g^r, {h_{k}}^r, ... , {h_l}^r) = (a_0, a_1, b_k, ... , b_l)$
+\end{itemize}	
+
+Now the $k^{th}$ level private key:
+\begin{itemize}
+	\item Select a random $t \in \mathbb{Z}_p$ 
+	\item Output $d_{{ID}_{k}}$ : \\
+	$({{a_0}\cdot{{b_k}^{I_k}}} \cdot {({{h_1}^{I_1}\cdot \cdot \cdot {h_k}^{I_k}} \cdot {g_3} )}^t , {a_1}\cdot{g^t}, {h_{k+1}}^t, ... , {h_l}^t)$
+\end{itemize}	
+
+\item $Encrypt (params, ID, M)$, encrypts a message $M \in \mathbb{G}$ using the public key $ID = (I_1, ..., I_k)$ :
+
+\begin{itemize}
+	\item Select a random $s \in \mathbb{Z}_p$ 
+	\item Output $CT$ : \\
+	$(e(g_1, g_2)^s \cdot M,  g^s,  {({{h_1}^{I_1}\cdot \cdot \cdot {h_k}^{I_k}} \cdot {g_3} )}^s)$\\$=(A, B, C)$
+\end{itemize}	
+
+
+\item $Decrypt (d_{ID}, CT)$, dercypts a given cipher text of the above form $(A, B, C)$ using the given private key of the form $(a_0, a_1, b_k, ... , b_l)$. \\
+$(A \cdot e(a_1, C))/(e(B, a_0)) = M$
 \end{itemize}

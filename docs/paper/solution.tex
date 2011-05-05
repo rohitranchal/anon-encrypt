@@ -2,10 +2,56 @@
 
 Here we present the scheme that addresses the requirements identified in section II.
 
-\subsection{Encryption}
+\subsection{Peer setup}
+A peer $P$ will have a two level HIBE system parameters. This is by calling $setup(2)$.
+This will generate generates the public parameters and the master key of the peer as follows:
+\begin{itemize}
+	\item Select a generator $g \in \mathbb{G}$ and a random $\alpha \in \mathbb{Z}_p$
+	\item Set $g_1 = g^{\alpha}$
+	\item Pick random $g_2, g_3, h_1, h_2 \in \mathbb{G}$
+	\item $params = (g, g_1, g_2, g_3, h_1, h_2)$
+	\item $master-key = {g_2}^{\alpha}$
+\end{itemize}
+
+
+\subsection{Registering a contact}
+
+The main idea is to setup a two level ($l=2$) HIBE system at each peer. When a peer $P$ registers a $C_{P_i}$ it will create a new random first level identifier $I_{r_i} \in \mathbb{Z}_p$ and corresponding private key ($d_{I_{r_i}}$). The private key and the identifier will be communicated to $C_{P_i}$ using a private channel. $d_{I_{r_i}}$ is of the form
+$({{g_2}^{\alpha'}} \cdot {({{h_1}^{I_{r_i}}} \cdot {g_3} )}^r , g^r, {h_2}^r, {h_3}^r)$ ,
+where $r \in \mathbb{G}$ is random.
+
+\begin{itemize}
+\item $C_{P_i}$ keeps both $I_{r_1}$ and $d_{I_{r_1}}$ private along with the public parameters of $P$
+\item $P$ stores the tuple $<I_{r_i}, r>$, \footnote {This is used to update contact parameters in the case of a re-key.}
+\end{itemize}
+
+
+\subsection{A contact requesting an update}
+When $P$ sends an $update$ message it may send the update directly to available contacts by encrypting the message using their corresponding identifiers. The interesting case is when a contact $C_{P_{req}}$ needs to obtain the latest $update$ of $P$ and $P$ is no longer available online. In such a situation, as highlighted by in the requirements, $C_{P_{req}}$ will be able to generate a request for $P$'s update. This is generated as follows:
+
+Suppose the identifier assigned to $C_{P_{req}}$ by $P$ is $I_{r_1}$
+\begin{itemize}
+\item Select a random $I_{r_2}\in \mathbb{Z}_p$
+\item Set $ID_{req} = {h_1}^{I_{r_1}} \cdot {h_2}^{I_{r_2}}$
+\item Update Request to be published  = $<P, ID_{req}>$, here $P$ is an identifier string of $P$ known to all $P$'s contacts.
+\end{itemize}
+
+$C_{P_{req}}$ publishes $<P, ID_{req}>$ and any of $P$'s other contacts will be able to respond to this request. This request information can simply be made publicly available using a common medium. The steps in creating the response is described next.
+
+\subsection{Encryption and update response}
 Note that in the hierarchical identity based encyrption scheme \cite{BBG05} the plain identity values of an entity are used in generating the cipher text. During the encryption the following value is derived using the identity values of the target.
 
 Identity is simply a random number in the group
 
 
+
 \subsection{Re-key}
+The set of contacts at a peer $C$ can change in two ways:
+\begin{itemize}
+\item When a new contact joins
+\item when an existing contact is removed
+\end{itemize}
+
+When a new contact ($C_{P'}$) joins the peer $P$ simply can carryout new contact registration without and this doesn't require any changes to the parameters. The new contact will be able to request updates of the peer from its other contacts in the set ($C - C_{P'}$). 
+However when $P$ needs to remove a contact $C_{P'}$ from the list of contacts, it has to update its parametes. We find a minimal set of parameters that will be changed in such a situation and generate public information that the set $C - C_{P'}$ will be able to use to configure themselves.
+

@@ -1,6 +1,6 @@
 \section{Proposed Solution}
 
-Here we present the scheme that addresses the requirements identified in section II.
+Here we present the scheme that addresses the requirements identified in section II. We discuss the details of setting up the parameters of a peer, registering contacts, contacts generating update requests to be processed by other contacts, update response to such a request and re-key of the system at a peer and how contacts update themselves.
 
 \subsection{Peer Setup}
 A peer $P$ will have a two level HIBE system parameters. This is by calling $setup(2)$.
@@ -17,7 +17,7 @@ This will generate generates the public parameters and the master key of the pee
 \subsection{Registering a Contact}
 
 The main idea is to setup a two level ($l=2$) HIBE system at each peer. When a peer $P$ registers a $C_{P_i}$ it will create a new random first level identifier $I_{r_i} \in \mathbb{Z}_p$ and corresponding private key ($d_{I_{r_i}}$). The private key and the identifier will be communicated to $C_{P_i}$ using a private channel. $d_{I_{r_i}}$ is of the form
-$({{g_2}^{\alpha}} \cdot {({{h_1}^{I_{r_i}}} \cdot {g_3} )}^r , g^r, {h_2}^r, {h_3}^r)$ ,
+$({{g_2}^{\alpha}} \cdot {({{h_1}^{I_{r_i}}} \cdot {g_3} )}^r , g^r, {h_2}^r)$ ,
 where $r \in \mathbb{G}$ is random.
 
 \begin{itemize}
@@ -27,13 +27,13 @@ where $r \in \mathbb{G}$ is random.
 
 
 \subsection{A Contact Requesting an Update}
-When $P$ sends an $update$ message it may send the update directly to available contacts by encrypting the message using their corresponding identifiers. The interesting case is when a contact $C_{P_{req}}$ needs to obtain the latest $update$ of $P$ and $P$ is no longer available online. In such a situation, as highlighted by in the requirements, $C_{P_{req}}$ will be able to generate a request for $P$'s update. This is generated as follows:
+When $P$ sends an $update$ message it may send the update directly to available contacts by encrypting the message using their corresponding identifiers. The interesting case is when a contact $C_{P_{req}}$ needs to obtain the latest $update$ of $P$ and $P$ is no longer available online. In such a situation, as highlighted by in the requirements, $C_{P_{req}}$ will be able to generate a request for $P$'s update, $Q_p$. This is generated as follows:
 
 Suppose the identifier assigned to $C_{P_{req}}$ by $P$ is $I_{r_1}$
 \begin{itemize}
 \item Select a random $I_{r_2}\in \mathbb{Z}_p$
 \item Set $ID_{req} = {h_1}^{I_{r_1}} \cdot {h_2}^{I_{r_2}}$
-\item Update Request to be published  = $<P, ID_{req}>$, here $P$ is an identifier string of $P$ known to all $P$'s contacts.
+\item Update Request to be published $Q_P = <P, ID_{req}>$, here $P$ is an identifier string of $P$ known to all $P$'s contacts.
 \end{itemize}
 
 $C_{P_{req}}$ publishes $<P, ID_{req}>$ and any of $P$'s other contacts will be able to respond to this request. This request information can simply be made publicly available using a common medium. The steps in creating the response is described next.
@@ -48,12 +48,22 @@ $Encrypt' (params_P, ID_{req}, M_P)$ :
 	\item $CT_{resp} = (e(g_1, g_2)^s \cdot M,  g^s,  {({ID_{req}} \cdot {g_3})}^s) = (A, B, C)$
 \end{itemize}
 
-The contact can now publish the tuple \\$<P, ID_{req}, CT_{resp}>$.
+The contact can now publish the tuple \\$<P, ID_{req}, CT_{resp}>$ as the response $S_P$.
 
 \subsection{Decryption of the Update}
-The peer that generated the update request will obtain the response available and do the following to obtain the plain update message $M_P$.
+The contact that generated the update request will obtain the response available and do the following to obtain the plain update message $M_P$. Now it can generate the corresponding private key using the first level private key it possesses, using ${I_{r_2}}$ (used to generate $ID_{req}$) as the second level identifier. Suppose the first level private key is $d_{I_{r_1}} = (a_0, a_1, b_2)$, then:
 
-
+\begin{itemize}
+\item Private key for $ID_{req}$ : $d_{ID_{req}}$ 
+\begin{center}
+$= ({{a_0}\cdot{{b_2}^{I_{r_2}}}} \cdot {({{h_1}^{I_{r_1}}\cdot {h_2}^{I_{r_2}}} \cdot {g_3} )}^t , {a_1}\cdot{g^t})$\\
+$ = ({a_0}', {a_1}')$\\\
+\end{center}
+\item Finally to decrypt $CT_{resp} = (A, B, C) $ :\\
+	\begin{center}
+$(A \cdot e({a_1}', C))/(e(B, {a_0}')) = M_P$\\\
+	\end{center}
+\end{itemize}
 
 
 \subsection{Peer Re-key}
@@ -82,19 +92,19 @@ First generate a random $u \in \mathbb{Z}_p$
 
 Initialize a list $<{id'}_i, A_i>$ and for each contact $C_{P_i} \in C$:
 \begin{itemize}
-\item generate the first component of the private keys of the contacts as ${{g_2}^{\alpha'}} \cdot {({{h_1}^{I_{r_i}}} \cdot {g_3} )}^{r_i} = A$. This $r$ value is from $<I_{r_i}, r>$.
-\item Add  $<{{I_{r_i}}^u}, A>$ to the $<{id'}_i, A_i>$ list.
+\item generate the first component of the private keys of the contacts as ${{g_2}^{\alpha'}} \cdot {({{h_1}^{I_{r_i}}} \cdot {g_3} )}^{r_i} = A$. This $r$ value is from the stored $<I_{r_i}, r>$.
+\item Add  $<{u^{I_{r_i}}}, A>$ to the $<{id'}_i, A_i>$ list.
 \end{itemize}
 
 Finally the complete re-key information to be published is 
 \begin{center}
 $<P, g_1, u, [<{id'}_1, A_1>, ...,  <{id'}_n, A_n>]>$ ,
-\end{center} where $n = |C|$. Note that ${id'}_i$ is the identifier of $C_{P_i}$ blinded using $u$.\\
+\end{center} where $n = |C|$. Note that ${id'}_i$ is the identifier of $C_{P_i}$ blinded using $u$ where ${id'}_i = u^{I_{r_i}}$.\\
 
 When a peer $C_{P_i} \in C$ obtains this information it will simply do the following :
 \begin{itemize}
 \item Update $P$'s public parameters by replacing the $g_1$ value with received value.
-\item Retrieve its identifier issued by $P$ ($I_{r_i}$) and compute $id' = {I_{r_i}}^u$
+\item Retrieve its identifier issued by $P$ ($I_{r_i}$) and compute $id' = u^{I_{r_i}}$
 \item Obtain the updated first component of its private key from the list $[<{id'}_1, A_1>, ...,  <{id'}_n, A_n>]$ using $id'$.\\
 \end{itemize}
 

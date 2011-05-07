@@ -1,0 +1,1 @@
+rm paper.blg paper.log paper.bbl paper.aux && pdflatex paper && bibtex paper && pdflatex paper && pdflatex paper

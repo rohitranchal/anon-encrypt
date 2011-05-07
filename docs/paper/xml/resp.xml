@@ -1,0 +1,13 @@
+<UpdateResponse>
+  <User>bob</User>
+  <EncryptedData>
+    <CipherText>
+      <CipherTextBlock>
+        <A>A36dIcExw6eyf77ddApX5UQ==</A>
+        <B>fGKC3aKxQYUDfMzSAxN/vpQ==</B>
+        <C>jwQvbUDJaXwrpI6jMJ4xMAA==</C>
+      </CipherTextBlock>
+    </CipherText>
+  </EncryptedData>
+</UpdateResponse>
+

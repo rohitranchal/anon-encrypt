@@ -1,4 +1,4 @@
-\section{Priliminary Notions}
+\section{Preliminary Notions}
 
 In this section we introduce the necessary background information that our work is based on.
 
@@ -9,7 +9,7 @@ This idea of identity based encryption was extended to a hierarchy of identities
 
 Let $e : \mathbb{G} \times \mathbb{G} \to \mathbb{G}_1 $ be a bilinear map where $\mathbb{G}$ is a group of prime order $p$. An identity is defined as $ID = (I_1, ..., I_k) \in ({{\mathbb{Z}}^*}_p)^k$ where $k$ is the depth of the hierarchy that the $ID$ belongs to.
 
-There are four algorithms: $Setup$, $KeyGen$, $Encrypt$ and $Decrypt$. $l$ is the maxium depth of the hierarchy allowed.\\
+There are four algorithms: $Setup$, $KeyGen$, $Encrypt$ and $Decrypt$. $l$ is the maximum depth of the hierarchy allowed.\\
 
 \begin{itemize}
 \item $Setup (l)$, generates the public parameters and the master key as follows:
@@ -46,7 +46,7 @@ Now the $k^{th}$ level private key:
 \end{itemize}	
 
 
-\item $Decrypt (d_{ID}, CT)$, dercypts a given cipher text of the above form $(A, B, C)$ using the given private key of the form $(a_0, a_1, b_k, ... , b_l)$. \\
+\item $Decrypt (d_{ID}, CT)$, decrypts a given cipher text of the above form $(A, B, C)$ using the given private key of the form $(a_0, a_1, b_k, ... , b_l)$. \\
 $(A \cdot e(a_1, C))/(e(B, a_0)) = M$\\
 \end{itemize}
 

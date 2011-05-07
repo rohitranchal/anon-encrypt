@@ -1,16 +1,23 @@
 \section{Future Work}
 
-TODO Add comparison with broadcast encryption somewhere\\
+We identified a quite a few areas of future research that stems from this preliminary work. Next we describe those potential issues to be addressed.
 
 \subsection{Size of re-key information}
-Currently we generate a minimum amount of information that is required to re-key a peer and its contacts. But in this scheme the re-key informaiton is of order n where n is the number of contacts of the peer. It would be interesting to evaluate the possibility of reducing the size of this public information while maintaining the same properties.
+Currently we generate a minimum amount of information that is required to re-key a peer and its contacts. But in this scheme the re-key information is of order n where n is the number of contacts of the peer. It would be interesting to evaluate the possibility of reducing the size of this public information while maintaining the same properties.
 
 \subsection{Incentives to forward messages}
-This sheme relies on the fact that the contacts belonging to the set $C^+$ (those who holds the latest $M_P$) will respond to an $update$ request $Q_P$ with correct a response $S_P$. It will be useful to evaluate the possibility of coming up with an incentive scheme for contacts in $C^+$ to respond to $Q_P$s. [TODO: describe properties of such a scheme]
+This scheme relies on the fact that the contacts belonging to the set $C^+$ (those who holds the latest $M_P$) will respond to an $update$ request $Q_P$ with correct a response $S_P$. It will be useful to evaluate the possibility of coming up with an incentive scheme for contacts in $C^+$ to respond to $Q_P$s. We need a mechanism where the responses can be evaluated for their correctness with the given context (time of the request etc.).
 
-\subsection{Security roof}
-We plan to prove that an adversary with polynomially bounded resources will not be able to ...??
+\subsection{Formal Proof of Security}
+We have not provided a formal proof of security in this work and we plan to prove that, given a request message, an adversary with polynomially bounded resources will not be able to:
+\begin{itemize}
+\item Distinguish the contact who generated the request when compared with another request, and
+\item Distinguish the valid response to the request given two responses (one valid and one not).
+\item Infer the valid response message to the given response.
+\end{itemize}
+
+Furthermore we will prove that a polynomially bounded contact who was removed before a re-key operation will not be able to derive the new private key based on the public re-key information.
 
 \subsection{Implementation of message routing}
-The current implementation only covers the cryptographic primitives. It will be interesting to use these with a peer to peer network where the peers are connected only to their private contacts and evaluate the performance. It might be possible to be implemented as a plugin to Freenet \cite{freenet}.
+The current implementation only covers the cryptographic primitives. It will be interesting to use these with a peer to peer network where the peers are connected only to their private contacts and evaluate the performance. It might be possible to be implemented as a plug-in to Freenet \cite{freenet}.
 

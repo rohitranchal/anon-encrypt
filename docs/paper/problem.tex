@@ -16,7 +16,7 @@ We identify the following requirements in distributing messages in the above sys
 	\item Any $C_{P_i} \in C^-$ will be able to publish a query requesting an update of $P$. This is called an update request and is denoted by $Q_P$.
 	\item Any  $C_{P_i} \in C^+$ will be able to publish a response to a $Q_P$. This response is denoted by $S_P$ and an eavesdropper with polynomially bounded resources should not be able to compute the original $M_P$ using $S_P$.
 	\item The contact who provides $S_P$ should not be able to learn who generated $Q_P$.
-	\item The contact who generates $Q_P$ and receives the corresponding $S_P$ should not be able to learn who generated $S_P$.
+	\item The contact who generates $Q_P$ and receives the corresponding $S_P$ should be able to extract $M_P$ but should not be able to learn who generated $S_P$.
 	\item When the composition of $C$ changes to new set of peers $C'$, $P$ should be able to update private configuration of the members of $C'$ with the issue of a public message.
 	\item After such an update those peers in the set $C - C'$ should not be able to obtain an $update$ of $P$.
 \end{itemize}
@@ -28,7 +28,7 @@ Note that a peer only trusts and has knowledge of its immediate contacts and is 
 
 \begin{center}
 \begin{figure}[here]
-\resizebox{!}{6cm}{\includegraphics{img/img1.pdf}}
+\resizebox{!}{6.5cm}{\includegraphics{img/img1.pdf}}
 \caption{A user (Alice) and her contacts (Bob, Charlie, David and Nancy)}
 \label{fig:fig1}
 \end{figure}

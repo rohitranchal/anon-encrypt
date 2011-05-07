@@ -26,28 +26,36 @@ There are four algorithms: $Setup$, $KeyGen$, $Encrypt$ and $Decrypt$. $l$ is th
 First suppose the $k-1$ level private key was generated using the master key :
 \begin{itemize}
 	\item Select a random $r \in \mathbb{Z}_p$ 
-	\item Output $d_{{ID}_{k-1}}$ : \\
-	$({{g_2}^{\alpha}} \cdot {({{h_1}^{I_1}\cdot \cdot \cdot {h_{k-1}}^{I_{k-1}}} \cdot {g_3} )}^r , g^r, {h_{k}}^r, ... , {h_l}^r) = (a_0, a_1, b_k, ... , b_l)$
+	\item Output $d_{{ID}_{k-1}} = (a_0, a_1, b_k, ... , b_l) = $ 
+	\begin{center}
+	$({{g_2}^{\alpha}} \cdot {({{h_1}^{I_1}\cdot \cdot \cdot {h_{k-1}}^{I_{k-1}}} \cdot {g_3} )}^r , g^r, {h_{k}}^r, ... , {h_l}^r)$\\\
+	\end{center}
 \end{itemize}	
 
 Now the $k^{th}$ level private key:
 \begin{itemize}
 	\item Select a random $t \in \mathbb{Z}_p$ 
-	\item Output $d_{{ID}_{k}}$ : \\
-	$({{a_0}\cdot{{b_k}^{I_k}}} \cdot {({{h_1}^{I_1}\cdot \cdot \cdot {h_k}^{I_k}} \cdot {g_3} )}^t , {a_1}\cdot{g^t}, {h_{k+1}}^t, ... , {h_l}^t)$\\
+	\item Output $d_{{ID}_{k}} = $  
+	\begin{center}
+	$({{a_0}\cdot{{b_k}^{I_k}}} \cdot {({{h_1}^{I_1}\cdot \cdot \cdot {h_k}^{I_k}} \cdot {g_3} )}^t , {a_1}\cdot{g^t}, {h_{k+1}}^t, ... , {h_l}^t)$\\\
+	\end{center}
 \end{itemize}	
 
 \item $Encrypt (params, ID, M)$, encrypts a message $M \in \mathbb{G}$ using the public key $ID = (I_1, ..., I_k)$ :
 
 \begin{itemize}
 	\item Select a random $s \in \mathbb{Z}_p$ 
-	\item Output $CT$ : \\
-	$(e(g_1, g_2)^s \cdot M,  g^s,  {({{h_1}^{I_1}\cdot \cdot \cdot {h_k}^{I_k}} \cdot {g_3} )}^s)$\\$=(A, B, C)$\\
+	\item Output $CT =(A, B, C) = $  
+	\begin{center}
+	$(e(g_1, g_2)^s \cdot M,  g^s,  {({{h_1}^{I_1}\cdot \cdot \cdot {h_k}^{I_k}} \cdot {g_3} )}^s)$\\\
+	\end{center}
 \end{itemize}	
 
 
 \item $Decrypt (d_{ID}, CT)$, decrypts a given cipher text of the above form $(A, B, C)$ using the given private key of the form $(a_0, a_1, b_k, ... , b_l)$. \\
-$(A \cdot e(a_1, C))/(e(B, a_0)) = M$\\
+	\begin{center}
+$(A \cdot e(a_1, C))/(e(B, a_0)) = M$\\\
+	\end{center}
 \end{itemize}
 
 Next section describes how this scheme is used to meet the requirements identified in section II.

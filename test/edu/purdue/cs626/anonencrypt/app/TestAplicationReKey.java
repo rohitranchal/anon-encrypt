@@ -31,7 +31,7 @@ public class TestAplicationReKey extends TestCase {
 	public void testReKey() throws Exception {
 		Application app = new Application();
 		
-		for(int i = 0; i < 2; i++) {
+		for(int i = 0; i < 3; i++) {
 			ContactPrivData data = app.createContact("Bob" + i);
 			// now register the contact using the same private information
 			app.registerContact("Bob" + i, data);

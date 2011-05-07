@@ -9,7 +9,7 @@ Currently we generate a minimum amount of information that is required to re-key
 This scheme relies on the fact that the contacts belonging to the set $C^+$ (those who holds the latest $M_P$) will respond to an $update$ request $Q_P$ with correct a response $S_P$. It will be useful to evaluate the possibility of coming up with an incentive scheme for contacts in $C^+$ to respond to $Q_P$s. We need a mechanism where the responses can be evaluated for their correctness with the given context (time of the request etc.).
 
 \subsection{Formal Proof of Security}
-We have not provided a formal proof of security in this work and we plan to prove that, given a request message, an adversary with polynomially bounded resources will not be able to:
+Even though we evaluated high level security aspects of this work in section V, we have not provided a formal proof of security. We plan to prove that, given a request message, an adversary with polynomially bounded resources will not be able to:
 \begin{itemize}
 \item Distinguish the contact who generated the request when compared with another request, and
 \item Distinguish the valid response to the request given two responses (one valid and one not).

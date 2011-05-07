@@ -94,7 +94,7 @@ public class ReKey {
 			Element tmp = this.params.getH1().powZn(id)
 					.mul(this.params.getG3());
 			Element newC1 = this.mk.mul(tmp.powZn(r)).getImmutable();
-			Element blindId = id.powZn(rnd);
+			Element blindId = rnd.powZn(id);
 
 			newC1Map.put(Base64.encode(blindId.toBytes()), newC1);
 

@@ -180,7 +180,7 @@ public class Application {
 		Element rnd = rki.getRnd();
 		
 		//Raise the given id to rnd and obtain the search key 
-		Element searchKey = cpd.getId().powZn(rnd).getImmutable();
+		Element searchKey = rnd.powZn(cpd.getId().getImmutable()).getImmutable();
 		
 		Element tmp = rki.getNewC1map().get(Base64.encode(searchKey.toBytes()));
 		if(tmp != null) {

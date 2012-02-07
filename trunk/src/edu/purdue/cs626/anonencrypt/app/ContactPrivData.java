@@ -58,7 +58,7 @@ public class ContactPrivData {
 	}
 	
 	/**
-	 * This is used ot create a {@link ContactPrivData} instance when the 
+	 * This is used to create a {@link ContactPrivData} instance when the 
 	 * private key is generated.
 	 * @param params Encryption parameters.
 	 * @param id Random identifier for this contact.

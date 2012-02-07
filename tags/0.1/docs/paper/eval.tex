@@ -1,0 +1,30 @@
+\section{Evaluation}
+
+We present a high level theoretical evaluation here\footnote{Formal proof of security is to be included in a future revision of this work}.
+
+\subsection{Update Request}
+A contact of peer $P$ generates a random identifier for any other party to use in encryption of an $update$ message (which is included in the update request $Q_P$). As described in section IV.C this takes the form :
+\begin{center}
+$ID_{req} = {h_1}^{I_{r_1}} \cdot {h_2}^{I_{r_2}}$
+\end{center}
+
+Here $h_1$ and $h_2$ are public values but $I_{r_1}$ and $I_{r_2}$ values are only known to the contact who generates the request. Therefore it is clear that for an eavesdropper with computationally bounded resources, it is infeasible to evaluate $ID_{req}$ and obtain the two values $I_{r_1}$ and $I_{r_2}$.
+
+\subsection{Update response}
+When a contact  of $P$ responds to a $Q_P$ with a response $S_P$ which of the form $<P, ID_{req}, CT_{resp}>$. Here $CT_{resp}$ is original HIBE encryption of $M_P$ using the identity $I_{r_1}, I_{r_2}$. This is secure with the security assurances provided by the original HIBE scheme \cite{BBG05}. Hence any other party (with polynomially bounded resources) other than the contact who generated $ID_{req}$ will not be able to learn any information about $P$'s update $M_P$. Furthermore process does not leak any information as to who generated $S_P$ to the contact who generated $Q_P$.
+
+\subsection{Re-key}
+
+When a peer $P$ is re-keyed the information published is :
+\begin{center}
+$<P, g_1, u, [<{id'}_1, A_1>, ...,  <{id'}_n, A_n>]>$
+\end{center}
+
+Here $g_1 = g^{\alpha'}$ is a public parameter of $P$ in the original HIBE scheme and $\alpha'$ value is safe due to the discrete logarithm problem. 
+
+We further utilize the hardness of the discrete logarithm problem to blind the identity values in the map of $A_i$ values. Here $u$ value is raised to the power of the first level identity of the contact ($I_{r_i}$). Since the identity values are only known to those corresponding contacts, to an eavesdropper (polynomially bounded) $A_i$ values in the map are simply indexed by a set of random values.
+
+Finally the $A_i$ values are of the form ${{g_2}^{\alpha'}} \cdot {({{h_1}^{I_{r_i}}} \cdot {g_3} )}^{r_i}$. Here the $r_i$ value is private between the peer $P$ and contact $C_{P_i}$ and $\alpha'$ is private to the peer $P$. Therefore using this $A_i$ value is it impossible to obtain the $r_i$ value (under the same assumptions as above). Therefore no one other than $P$ will be able to compute the other two components of the private key issued to $C_{P_i}$. Therefore the tuple $<{id'}_i, A_i>$ does not compromise the private key information or the identity of the contact.
+
+After removing a contact and re-keying the parameters of a peer, the removed contact will still be able to issue a request for an update. Even if a current contact of the peer responds to such a request, the removed contact will not be able to decrypt and obtain the message due to the use of the new HIBE parameters.
+

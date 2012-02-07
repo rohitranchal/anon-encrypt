@@ -1,1 +1,0 @@
-java -cp ae.jar:lib/axiom.jar:lib/bcprov-jdk16-146.jar:lib/commons-logging-1.0.4.jar:lib/commons-logging-api-1.0.4.jar:lib/derbyclient.jar:lib/derby.jar:lib/jna-3.1.0.jar:lib/jpbc-api-1.1.0.jar:lib/jpbc-crypto-1.1.0.jar:lib/jpbc-pbc-1.1.0.jar:lib/jpbc-plaf-1.1.0.jar edu.purdue.cs626.anonencrypt.app.demo.Messenger

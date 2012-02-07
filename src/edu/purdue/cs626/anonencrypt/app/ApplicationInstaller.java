@@ -1,15 +1,14 @@
 package edu.purdue.cs626.anonencrypt.app;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.Statement;
-
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.sql.Connection;
+import java.sql.Statement;
+
 import edu.purdue.cs626.anonencrypt.AEParameterGenerator;
 import edu.purdue.cs626.anonencrypt.AEParameters;
 import edu.purdue.cs626.anonencrypt.db.Database;

@@ -1,26 +1,29 @@
 package org.ruchith.ae.base;
 
-import java.io.ByteArrayInputStream;
-
-import javax.xml.namespace.QName;
-
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 
+import java.io.ByteArrayInputStream;
+
+import javax.xml.namespace.QName;
+
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.Base64;
 import org.bouncycastle.crypto.CipherParameters;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
 
 /**
- * Parameter wrapper.
- * This holds all the public parameters required for encryption.
- * Once instantiated this will also hold an instance of the {@link Pairing}.
+ * Parameter wrapper. This holds all the public parameters required for
+ * encryption. Once instantiated this will also hold an instance of the
+ * {@link Pairing}.
  * 
  * @author Ruchith Fernando
- *
+ * 
  */
 public class AEParameters implements CipherParameters {
 
@@ -33,7 +36,7 @@ public class AEParameters implements CipherParameters {
 	private Element h1;
 	private Element h2;
 	private Element h3;
-	
+
 	private Pairing pairing;
 
 	/**
@@ -170,4 +173,11 @@ public class AEParameters implements CipherParameters {
 		return output;
 	}
 
+	public JsonNode serializeJSON() {
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode rootNode = mapper.createObjectNode();
+		String strVal = this.g.toString();
+		((ObjectNode) rootNode).put("g", Base64.encode(strVal.getBytes()));
+		return rootNode;
+	}
 }

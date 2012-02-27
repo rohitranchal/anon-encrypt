@@ -39,6 +39,43 @@ public class AEParameters implements CipherParameters {
 
 	private Pairing pairing;
 
+	public AEParameters(ObjectNode on) {
+		this.curveParams = new CurveParams();
+		this.curveParams.load(new ByteArrayInputStream(Base64.decode(on.get(
+				"curve").getTextValue())));
+
+		this.pairing = PairingFactory.getPairing(this.curveParams);
+		Field group1 = this.pairing.getG1();
+
+		Element tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(on.get("g").getTextValue()));
+		this.g = tmpElem.getImmutable();
+		
+		tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(on.get("g1").getTextValue()));
+		this.g1 = tmpElem.getImmutable();
+		
+		tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(on.get("g2").getTextValue()));
+		this.g2 = tmpElem.getImmutable();
+		
+		tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(on.get("g3").getTextValue()));
+		this.g3 = tmpElem.getImmutable();
+		
+		tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(on.get("h1").getTextValue()));
+		this.h1 = tmpElem.getImmutable();
+		
+		tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(on.get("h2").getTextValue()));
+		this.h2 = tmpElem.getImmutable();
+		
+		tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(on.get("h3").getTextValue()));
+		this.h3 = tmpElem.getImmutable();
+	}
+
 	/**
 	 * Used to instantiate with a stored/transferred parameter file.
 	 * 
@@ -173,11 +210,18 @@ public class AEParameters implements CipherParameters {
 		return output;
 	}
 
-	public JsonNode serializeJSON() {
+	public ObjectNode serializeJSON() {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode rootNode = mapper.createObjectNode();
-		String strVal = this.g.toString();
-		((ObjectNode) rootNode).put("g", Base64.encode(strVal.getBytes()));
-		return rootNode;
+		ObjectNode on = (ObjectNode) rootNode;
+		on.put("curve", Base64.encode(this.curveParams.toString().getBytes()));
+		on.put("g", Base64.encode(this.g.toBytes()));
+		on.put("g1", Base64.encode(this.g1.toBytes()));
+		on.put("g2", Base64.encode(this.g2.toBytes()));
+		on.put("g3", Base64.encode(this.g3.toBytes()));
+		on.put("h1", Base64.encode(this.h1.toBytes()));
+		on.put("h2", Base64.encode(this.h2.toBytes()));
+		on.put("h3", Base64.encode(this.h3.toBytes()));
+		return on;
 	}
 }

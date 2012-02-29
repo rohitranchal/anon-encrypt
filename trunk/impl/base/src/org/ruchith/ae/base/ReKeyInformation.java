@@ -7,10 +7,10 @@ import it.unisa.dia.gas.jpbc.Pairing;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import javax.xml.namespace.QName;
-
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.util.Base64;
+import org.bouncycastle.util.encoders.Base64;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
 
 /**
  * Wrapper for re-key information. Serialization of this generates the public
@@ -36,41 +36,32 @@ public class ReKeyInformation {
 	/**
 	 * Create {@link ReKeyInformation} object with published data.
 	 * 
-	 * @param elem
-	 *            The published re-key information as an {@link OMElement}.
+	 * @param on
+	 *            The published re-key information .
 	 * @param pairing
 	 *            We need the {@link Pairing} to be able to recreate the
 	 *            elements. This must be from the {@link AEParameters} of the
 	 *            user that the published re-key information belongs to.
 	 */
-	public ReKeyInformation(OMElement elem, Pairing pairing) {
-		OMElement g1Elem = elem.getFirstChildWithName(new QName("G1"));
+	public ReKeyInformation(ObjectNode on, Pairing pairing) {
+		
 		Field group1 = pairing.getG1();
 		this.g1 = group1.newElement();
-		this.g1.setFromBytes(Base64.decode(g1Elem.getText()));
+		this.g1.setFromBytes(Base64.decode(on.get("g1").getTextValue()));
 		
-		OMElement rndElem = elem.getFirstChildWithName(new QName("Random"));
 		Field zr = pairing.getZr();
 		this.rnd = zr.newElement();
-		this.rnd.setFromBytes(Base64.decode(rndElem.getText()));
+		this.rnd.setFromBytes(Base64.decode(on.get("rnd").getTextValue()));
 		
-		OMElement contactsElem = elem.getFirstChildWithName(new QName("Contacts"));
-		
-		Iterator<OMElement> contactElems = contactsElem.getChildrenWithLocalName("Contact");
 		this.newC1map = new HashMap<String, Element>();
-		while (contactElems.hasNext()) {
-			OMElement contactElem = (OMElement) contactElems.next();
-			
-			OMElement idElem = contactElem.getFirstChildWithName(new QName("Id"));
-			
-			
-			OMElement c1Elem = contactElem.getFirstChildWithName(new QName("C1"));
+		ArrayNode contacts = (ArrayNode)on.get("contacts");
+		for(int i = 0; i < contacts.size(); i++) {
+			ObjectNode c = (ObjectNode)contacts.get(i);
+			String id = on.get("id").getTextValue();
 			Element c1 = group1.newElement();
-			c1.setFromBytes(Base64.decode(c1Elem.getText()));
-			
-			this.newC1map.put(idElem.getText(), c1);
+			c1.setFromBytes(Base64.decode(on.get("c1").getTextValue()));
+			this.newC1map.put(id, c1);
 		}
-		
 	}
 
 	/**
@@ -92,36 +83,28 @@ public class ReKeyInformation {
 		this.newC1map = newC1Map;
 	}
 
-	/**
-	 * Output the XML data to publish as a {@link String}.
-	 * 
-	 * @return {@link String} of XML data.
-	 */
-	public String serialize() {
-		String output = "<ReKeyInformation>\n";
-		output += "<G1>" + Base64.encode(this.g1.toBytes()) + "</G1>\n";
-		output += "<Random>" + Base64.encode(this.rnd.toBytes())
-				+ "</Random>\n";
-		output += "<Contacts>\n";
-
+	public ObjectNode serializeJSON() {
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode on = mapper.createObjectNode();
+		
+		on.put("g1", new String(Base64.encode(this.g1.toBytes())));
+		on.put("rnd", new String(Base64.encode(this.rnd.toBytes())));
+		
+		ArrayNode contacts = (ArrayNode) mapper.createArrayNode();
 		Iterator<String> ids = this.newC1map.keySet().iterator();
 		while (ids.hasNext()) {
-			output += "<Contact>\n";
+			ObjectNode tmpC = mapper.createObjectNode();
 			String id = (String) ids.next();
-			output += "<Id>" + id + "</Id>";
-
+			tmpC.put("id", id);
 			Element c1 = this.newC1map.get(id);
-			output += "<C1>" + Base64.encode(c1.toBytes()) + "</C1>\n";
-
-			output += "</Contact>\n";
-
+			tmpC.put("c1", new String(Base64.encode(c1.toBytes())));
+			contacts.add(tmpC);
 		}
-		output += "</Contacts>\n";
-
-		output += "</ReKeyInformation>";
-		return output;
+		on.put("contacts", contacts);
+		
+		return on;
 	}
-
+	
 	public Element getG1() {
 		return g1;
 	}

@@ -1,11 +1,11 @@
 package org.ruchith.ae.base;
 
+import it.unisa.dia.gas.jpbc.Element;
+
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.apache.axiom.om.util.Base64;
-
-import it.unisa.dia.gas.jpbc.Element;
+import org.bouncycastle.util.encoders.Base64;
 
 /**
  * To re key, create an instance of this with the current params. Call
@@ -96,7 +96,7 @@ public class ReKey {
 			Element newC1 = this.mk.mul(tmp.powZn(r)).getImmutable();
 			Element blindId = rnd.powZn(id);
 
-			newC1Map.put(Base64.encode(blindId.toBytes()), newC1);
+			newC1Map.put(new String(Base64.encode(blindId.toBytes())), newC1);
 
 		}
 

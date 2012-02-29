@@ -1,12 +1,12 @@
 package org.ruchith.ae.base;
 
-import javax.xml.namespace.QName;
-
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.util.Base64;
-
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
+
+import org.bouncycastle.util.encoders.Base64;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
 
 /**
  * A block of cipher text.
@@ -25,23 +25,19 @@ public class AECipherTextBlock {
 		this.b = b;
 		this.c = c;
 	}
-
-	public AECipherTextBlock(OMElement elem, Pairing pairing) {
-		OMElement aElem = elem.getFirstChildWithName(new QName("A"));
+	
+	public AECipherTextBlock(ObjectNode on, Pairing pairing) {
 		Element tmp = pairing.getGT().newElement();
-		tmp.setFromBytes(Base64.decode(aElem.getText()));
+		tmp.setFromBytes(Base64.decode(on.get("a").getTextValue()));
 		this.a = tmp.getImmutable();
 		
-		OMElement bElem = elem.getFirstChildWithName(new QName("B"));
 		tmp = pairing.getG1().newElement();
-		tmp.setFromBytes(Base64.decode(bElem.getText()));
+		tmp.setFromBytes(Base64.decode(on.get("b").getTextValue()));
 		this.b = tmp.getImmutable();
 		
-		OMElement cElem = elem.getFirstChildWithName(new QName("C"));
 		tmp = pairing.getG1().newElement();
-		tmp.setFromBytes(Base64.decode(cElem.getText()));
+		tmp.setFromBytes(Base64.decode(on.get("c").getTextValue()));
 		this.c = tmp.getImmutable();
-		
 	}
 	
 	public Element getA() {
@@ -56,14 +52,14 @@ public class AECipherTextBlock {
 		return c;
 	}
 
-	public String serialize() {
-		String output = "<CipherTextBlock>\n";
+	public ObjectNode serializeJSON() {
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode rootNode = mapper.createObjectNode();
+		ObjectNode on = (ObjectNode) rootNode;
+		on.put("a", new String(Base64.encode(this.a.toBytes())));
+		on.put("b", new String(Base64.encode(this.b.toBytes())));
+		on.put("c", new String(Base64.encode(this.c.toBytes())));
 		
-		output += "<A>" + Base64.encode(this.a.toBytes()) + "</A>\n";
-		output += "<B>" + Base64.encode(this.b.toBytes()) + "</B>\n";
-		output += "<C>" + Base64.encode(this.c.toBytes()) + "</C>\n";
-		output += "</CipherTextBlock>";
-		
-		return output;
+		return on;
 	}
 }

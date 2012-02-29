@@ -1,11 +1,12 @@
 package org.ruchith.ae.base;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import it.unisa.dia.gas.jpbc.Pairing;
 
-import org.apache.axiom.om.OMElement;
+import java.util.ArrayList;
+
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
 
 public class AECipherText {
 	
@@ -15,25 +16,27 @@ public class AECipherText {
 		this.blocks = blocks;
 	}
 	
-	public AECipherText(OMElement elem, Pairing pairing) {
+	public AECipherText(ArrayNode an, Pairing pairing) {
 		ArrayList<AECipherTextBlock> blockList = new ArrayList<AECipherTextBlock>();
-		Iterator<OMElement> blockElems = elem.getChildrenWithLocalName("CipherTextBlock");
-		while (blockElems.hasNext()) {
-			OMElement blockElem = (OMElement) blockElems.next();
-			blockList.add(new AECipherTextBlock(blockElem, pairing));
+		for(int i = 0; i < an.size(); i++) {
+			ObjectNode on = (ObjectNode)an.get(i);
+			blockList.add(new AECipherTextBlock(on, pairing));
 		}
 
 		this.blocks = blockList.toArray(new AECipherTextBlock[blockList.size()]);
 	}
 
-	public String serialize() {
-		String ouput = "<CipherText>\n";
-		for(int i = 0; i < this.blocks.length; i ++) {
-			ouput += this.blocks[i].serialize() + "\n";
+	
+	public ArrayNode serializeJSON() {
+		ObjectMapper mapper = new ObjectMapper();
+		ArrayNode an = mapper.createArrayNode();
+		for (int i = 0; i < this.blocks.length; i++) {
+			an.add(this.blocks[i].serializeJSON());
 		}
-		ouput += "</CipherText>";
-		return ouput;
+		
+		return an;
 	}
+	
 
 	public AECipherTextBlock[] getBlocks() {
 		return blocks;

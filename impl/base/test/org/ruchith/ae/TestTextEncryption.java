@@ -1,5 +1,8 @@
 package org.ruchith.ae;
 
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
+import org.ruchith.ae.base.AECipherText;
 import org.ruchith.ae.base.AECipherTextBlock;
 import org.ruchith.ae.base.AEParameterGenerator;
 import org.ruchith.ae.base.AEParameters;
@@ -63,11 +66,24 @@ public class TestTextEncryption extends TestCase {
 		String plainText = "The quick brown fox jumps over the lazy dog";
 		Element[] encoded = encoder.encode(plainText);
 		AECipherTextBlock[] ct = encrypt.doEncrypt(encoded, pubKey).getBlocks();
+//		for (int i = 0; i < ct.length; i++) {
+//			System.out.println(ct[i].serializeJSON());
+//		}
 		
+		AECipherText ctWrap = new AECipherText(ct);
+		String ctVal = ctWrap.serializeJSON().toString();
+		System.out.println(ctVal);
+		
+		ObjectMapper mapper = new ObjectMapper();
+		ArrayNode an = (ArrayNode) mapper.readTree(ctVal);
+		System.out.println(an);
+		
+		AECipherText newCtWrap = new AECipherText(an, pairing);
+		System.out.println(newCtWrap.serializeJSON());
 		
 		Decrypt decrypt = new Decrypt();
 		decrypt.init(params);
-		Element[] result = decrypt.doDecrypt(ct, tmpPriv);
+		Element[] result = decrypt.doDecrypt(newCtWrap.getBlocks(), tmpPriv);
 		
 		
 		String decoded = new String(encoder.decode(result)).trim();

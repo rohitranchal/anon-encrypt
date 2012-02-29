@@ -3,16 +3,12 @@ package org.ruchith.ae;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
-
-import java.io.FileInputStream;
-import java.io.InputStream;
+import junit.framework.TestCase;
 
 import org.ruchith.ae.base.AEParameterGenerator;
 import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.AEPrivateKey;
 import org.ruchith.ae.base.RootKeyGen;
-
-import junit.framework.TestCase;
 
 public class TestRootKeyGen extends TestCase {
 

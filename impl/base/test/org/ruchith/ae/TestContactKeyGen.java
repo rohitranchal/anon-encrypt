@@ -1,19 +1,17 @@
 package org.ruchith.ae;
 
-import java.io.ByteArrayInputStream;
+import it.unisa.dia.gas.jpbc.Element;
+import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
+import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
+import junit.framework.TestCase;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.ae.base.AEParameterGenerator;
 import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.AEPrivateKey;
 import org.ruchith.ae.base.ContactKeyGen;
 import org.ruchith.ae.base.RootKeyGen;
-
-import it.unisa.dia.gas.jpbc.Element;
-import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
-import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
-import junit.framework.TestCase;
 
 public class TestContactKeyGen extends TestCase {
 
@@ -30,24 +28,24 @@ public class TestContactKeyGen extends TestCase {
 		Element id1 = paramGen.getPairing().getZr().newRandomElement();
 		AEPrivateKey contactPriv = rkg.genKey(id1, paramGen.getMasterKey());
 
-		System.out.println(contactPriv.serialize());
+		System.out.println(contactPriv.serializeJSON());
 		
 		ContactKeyGen conKeyGen = new ContactKeyGen();
 		conKeyGen.init(id1, contactPriv, params);
 		Element id2 = conKeyGen.genRandomID();
 		AEPrivateKey tmpPriv = conKeyGen.getTmpPrivKey(id2);
+		System.out.println(tmpPriv.serializeJSON());
 		
-		System.out.println(tmpPriv.serialize());
 		
+		String privKeyVal = contactPriv.serializeJSON().toString();
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode on = (ObjectNode)mapper.readTree(privKeyVal);
 		
-		byte[] bytes = contactPriv.serialize().getBytes();
-		ByteArrayInputStream is = new ByteArrayInputStream(bytes);
-		OMElement elem = new StAXOMBuilder(is).getDocumentElement();
-		AEPrivateKey newContactPriv = new AEPrivateKey(elem, paramGen.getPairing());
-
-		
+		AEPrivateKey newContactPriv = new AEPrivateKey(on, paramGen.getPairing());
+		System.out.println(newContactPriv.serializeJSON());
 		assertEquals(contactPriv.getC1(), newContactPriv.getC1());
 		assertEquals(contactPriv.getC2(), newContactPriv.getC2());
 		assertEquals(contactPriv.getC3(), newContactPriv.getC3());
+		
 	}
 }

@@ -1,12 +1,17 @@
 package org.ruchith.ae.base;
 
 import java.util.ArrayList;
+
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.Base64;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
 
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Field;
@@ -26,6 +31,26 @@ public class AEPrivateKey {
 	private Element c2;
 	private ArrayList<Element> c3;
 
+	public AEPrivateKey(ObjectNode on, Pairing pairing) {
+		Field group1 = pairing.getG1();
+		
+		Element tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(on.get("c1").getTextValue()));
+		this.c1  = tmpElem.getImmutable();
+
+		tmpElem = group1.newElement();
+		tmpElem.setFromBytes(Base64.decode(on.get("c2").getTextValue()));
+		this.c2  = tmpElem.getImmutable();
+		
+		this.c3 = new ArrayList<Element>();
+		ArrayNode an = (ArrayNode)on.get("c3");
+		for(int i = 0; i < an.size(); i++) {
+			tmpElem = group1.newElement();
+			tmpElem.setFromBytes(Base64.decode(an.get(i).getTextValue()));
+			this.c3.add(tmpElem.getImmutable());
+		}
+	}
+	
 	public AEPrivateKey(OMElement elem, Pairing pairing) {
 		
 		Field group1 = pairing.getG1();
@@ -87,6 +112,22 @@ public class AEPrivateKey {
 		output += "</C3>\n";
 		output += "</AEPrivateKey>";
 		return output;
+	}
+	
+	public ObjectNode serializeJSON() {
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode rootNode = mapper.createObjectNode();
+		ObjectNode on = (ObjectNode) rootNode;
+		on.put("c1", Base64.encode(this.c1.toBytes()));
+		on.put("c2", Base64.encode(this.c2.toBytes()));
+		ArrayNode c3Node = mapper.createArrayNode();
+		for (Iterator iterator = this.c3.iterator(); iterator.hasNext();) {
+			Element tmpElem = (Element) iterator.next();
+			c3Node.add(Base64.encode(tmpElem.toBytes()));
+		}
+		on.put("c3", c3Node);
+		
+		return on;
 	}
 
 }

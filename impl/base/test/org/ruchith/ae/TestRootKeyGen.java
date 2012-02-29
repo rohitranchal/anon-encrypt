@@ -28,7 +28,7 @@ public class TestRootKeyGen extends TestCase {
 		rkg.init(params);
 		Element id1 = paramGen.getPairing().getZr().newRandomElement();
 		AEPrivateKey pk = rkg.genKey(id1, paramGen.getMasterKey());
-		System.out.println(pk.serialize());
+		System.out.println(pk.serializeJSON());
 	}
 
 }

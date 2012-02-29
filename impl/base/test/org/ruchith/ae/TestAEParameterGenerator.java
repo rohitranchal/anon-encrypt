@@ -4,6 +4,7 @@ import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
 import junit.framework.TestCase;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.ae.base.AEParameterGenerator;
 import org.ruchith.ae.base.AEParameters;
@@ -21,8 +22,11 @@ public class TestAEParameterGenerator extends TestCase {
 
                ObjectNode on = params.serializeJSON();
                System.out.println(on);
+               
+               ObjectMapper mapper = new ObjectMapper();
+               ObjectNode newOn = (ObjectNode)mapper.readTree(on.toString());
 
-               AEParameters newParams = new AEParameters(on);
+               AEParameters newParams = new AEParameters(newOn);
 
                assertEquals(params.getCurveParams(), newParams.getCurveParams());
                assertEquals(params.getG(), newParams.getG());

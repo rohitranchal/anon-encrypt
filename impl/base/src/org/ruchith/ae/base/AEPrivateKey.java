@@ -73,12 +73,12 @@ public class AEPrivateKey {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode rootNode = mapper.createObjectNode();
 		ObjectNode on = (ObjectNode) rootNode;
-		on.put("c1", Base64.encode(this.c1.toBytes()));
-		on.put("c2", Base64.encode(this.c2.toBytes()));
+		on.put("c1", new String(Base64.encode(this.c1.toBytes())));
+		on.put("c2", new String(Base64.encode(this.c2.toBytes())));
 		ArrayNode c3Node = mapper.createArrayNode();
 		for (Iterator iterator = this.c3.iterator(); iterator.hasNext();) {
 			Element tmpElem = (Element) iterator.next();
-			c3Node.add(Base64.encode(tmpElem.toBytes()));
+			c3Node.add(new String(Base64.encode(tmpElem.toBytes())));
 		}
 		on.put("c3", c3Node);
 		

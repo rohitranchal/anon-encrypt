@@ -151,14 +151,14 @@ public class AEParameters implements CipherParameters {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode rootNode = mapper.createObjectNode();
 		ObjectNode on = (ObjectNode) rootNode;
-		on.put("curve", Base64.encode(this.curveParams.toString().getBytes()));
-		on.put("g", Base64.encode(this.g.toBytes()));
-		on.put("g1", Base64.encode(this.g1.toBytes()));
-		on.put("g2", Base64.encode(this.g2.toBytes()));
-		on.put("g3", Base64.encode(this.g3.toBytes()));
-		on.put("h1", Base64.encode(this.h1.toBytes()));
-		on.put("h2", Base64.encode(this.h2.toBytes()));
-		on.put("h3", Base64.encode(this.h3.toBytes()));
+		on.put("curve", new String(Base64.encode(this.curveParams.toString().getBytes())));
+		on.put("g", new String(Base64.encode(this.g.toBytes())));
+		on.put("g1", new String(Base64.encode(this.g1.toBytes())));
+		on.put("g2", new String(Base64.encode(this.g2.toBytes())));
+		on.put("g3", new String(Base64.encode(this.g3.toBytes())));
+		on.put("h1", new String(Base64.encode(this.h1.toBytes())));
+		on.put("h2", new String(Base64.encode(this.h2.toBytes())));
+		on.put("h3", new String(Base64.encode(this.h3.toBytes())));
 		return on;
 	}
 }

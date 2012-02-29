@@ -5,9 +5,7 @@ import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
-
-import java.io.FileInputStream;
-import java.io.InputStream;
+import junit.framework.TestCase;
 
 import org.ruchith.ae.base.AECipherTextBlock;
 import org.ruchith.ae.base.AEParameterGenerator;
@@ -17,8 +15,6 @@ import org.ruchith.ae.base.ContactKeyGen;
 import org.ruchith.ae.base.Decrypt;
 import org.ruchith.ae.base.Encrypt;
 import org.ruchith.ae.base.RootKeyGen;
-
-import junit.framework.TestCase;
 
 public class TestEncrypt extends TestCase {
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="no_contacts">No contact yet</string>
+    <string name="app_name">SecMsg</string>
+    <string name="menu_create_contact">Add Contact</string>
+    <string name="menu_remote_data">Contact Remote Data</string>
+    <string name="menu_params">Parameters</string>
+    
+    
+    <string name="alert_title_create_contact">Create Contact</string>
+    <string name="alert_msg_create_contact">Enter name of contact</string>
+    
+    <string name="alert_msg_button_ok">OK</string>
+    <string name="alert_msg_button_cancel">Cancel</string>
+</resources>

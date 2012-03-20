@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/create_contact"
+          android:icon="@drawable/new_contact"
+          android:title="@string/menu_create_contact"/>
+    <item android:id="@+id/remote_data"
+          android:icon="@drawable/contact_remote_data"
+          android:title="@string/menu_remote_data" />
+	<item android:id="@+id/params"
+          android:icon="@drawable/settings"
+          android:title="@string/menu_params" />
+</menu>

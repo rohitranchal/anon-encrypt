@@ -1,0 +1,116 @@
+package org.ruchith.secmsg;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+public class DBAdapter {
+
+	public static final String KEY_ROWID = "_id";
+	public static final String KEY_CONTACT_ID = "contactId";
+	public static final String KEY_ID = "id";
+	public static final String KEY_RANDOM = "random";
+	public static final String KEY_PRIV_DATA = "privDataFromContact";
+	public static final String KEY_MY_CONTACT_ID = "myIdFromContact";
+	public static final String KEY_MESSAGE = "message";
+	public static final String KEY_PARAMS = "params";
+	public static final String KEY_MASTER_KEY = "masterKey";
+	
+
+	private static final String[] DB_CREATE = new String[] {
+			"CREATE TABLE Contact ("
+					+ "_id integer primary key autoincrement, "
+					+ "contactId text not null, " 
+					+ "id text not null, "
+					+ "random text not null, "
+					+ "privDataFromContact text, " 
+					+ "myIdFromContact text)",
+			"CREATE TABLE Message ("
+					+ "_id integer primary key autoincrement, "
+					+ "contactId text not null, " 
+					+ "message text not null)",
+			"CREATE TABLE Config ("
+					+ "params text not null, "
+					+ "masterKey text not null)"};
+
+	private static final String DATABASE_NAME = "data";
+	private static final String DATABASE_TABLE_CONTACT = "Contact";
+	private static final String DATABASE_TABLE_MESSAGE = "Message";
+	private static final String DATABASE_TABLE_CONFIG = "Config";
+	private static final int DATABASE_VERSION = 2;
+
+	private static final String TAG = "NotesDbAdapter";
+	private DatabaseHelper mDbHelper;
+	private SQLiteDatabase mDb;
+
+	private final Context mCtx;
+
+	private static class DatabaseHelper extends SQLiteOpenHelper {
+
+		DatabaseHelper(Context context) {
+			super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		}
+
+		@Override
+		public void onCreate(SQLiteDatabase db) {
+
+			for (int i = 0; i < DB_CREATE.length; i++) {
+				db.execSQL(DB_CREATE[i]);
+			}
+
+		}
+
+		@Override
+		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
+					+ newVersion + ", which will destroy all old data");
+			db.execSQL("DROP TABLE IF EXISTS notes");
+			onCreate(db);
+		}
+
+	}
+
+	public DBAdapter(Context ctx) {
+		this.mCtx = ctx;
+	}
+
+	public DBAdapter open() {
+		this.mDbHelper = new DatabaseHelper(this.mCtx);
+		this.mDb = this.mDbHelper.getWritableDatabase();
+		return this;
+	}
+
+	public void close() {
+		this.mDbHelper.close();
+	}
+
+	public Cursor fetchAllContacts() {
+		return mDb.query(DATABASE_TABLE_CONTACT, new String[] { KEY_ROWID,
+				KEY_CONTACT_ID }, null, null, null, null, null);
+	}
+	
+	public Cursor fetchConfig() {
+		return mDb.query(DATABASE_TABLE_CONFIG, new String[] { KEY_PARAMS,
+				KEY_MASTER_KEY}, null, null, null, null, null);
+	}
+	
+	public long addContact(String name, String id, String random) {
+		ContentValues values = new ContentValues();
+		values.put(KEY_CONTACT_ID, name);
+		values.put(KEY_MY_CONTACT_ID, id);
+		values.put(KEY_RANDOM, random);
+		
+		return mDb.insert(DATABASE_TABLE_CONTACT, null, values);
+	}
+	
+	public void addConfig(String params, String mk) {
+		ContentValues values = new ContentValues();
+		values.put(KEY_PARAMS, params);
+		values.put(KEY_MASTER_KEY, mk);
+		
+		mDb.insert(DATABASE_TABLE_CONFIG, null, values);
+	}
+}

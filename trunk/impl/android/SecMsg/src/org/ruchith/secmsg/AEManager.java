@@ -10,7 +10,6 @@ import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.ae.base.AEParameterGenerator;
 import org.ruchith.ae.base.AEParameters;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
@@ -18,16 +17,27 @@ public class AEManager {
 
 	private static final String TAG = "AEManager";
 	
-	private Context mCtx;
 	private DBAdapter mDbHelper;
 	private AEParameters params;
 	private Element masterKey;
+	
+	private static AEManager instance;
 
-	public AEManager(Context ctx, DBAdapter db) {
-		this.mCtx = ctx;
+	private AEManager(DBAdapter db) {
 		this.mDbHelper = db;
 		//Load configuration
 		this.loadConfiguration();
+	}
+	
+	public static AEManager getInstance(DBAdapter db) {
+		if(instance == null) {
+			instance = new AEManager(db);
+		}
+		return instance;
+	}
+	
+	public static AEManager getInstance() {
+		return instance;
 	}
 
 	private void loadConfiguration() {
@@ -74,7 +84,10 @@ public class AEManager {
 		
 		this.mDbHelper.addConfig(paramVal, mkVal);
 		
-		
+	}
+	
+	public AEParameters getParameters() {
+		return this.params;
 	}
 
 }

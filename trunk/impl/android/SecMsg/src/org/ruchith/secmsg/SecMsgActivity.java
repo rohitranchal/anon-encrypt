@@ -3,6 +3,7 @@ package org.ruchith.secmsg;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,10 +28,9 @@ public class SecMsgActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         this.mDbHelper = new DBAdapter(this);
         this.mDbHelper.open();
-        this.aeManager = new AEManager(this, this.mDbHelper);
+        this.aeManager = AEManager.getInstance(this.mDbHelper);
         setContentView(R.layout.main);
         this.fillData();
-        
     }
     
     
@@ -86,6 +86,9 @@ public class SecMsgActivity extends ListActivity {
     		
     		return true;
     	case R.id.params:
+    		Intent i = new Intent(this, ConfigurationActivity.class);
+    		
+    		startActivity(i);
     		return true;
     	}
     	return super.onMenuItemSelected(featureId, item);

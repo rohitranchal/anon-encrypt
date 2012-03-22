@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/base"/>
-	<classpathentry kind="lib" path="/home/ruchith/wp-j/base/lib/jpbc-plaf-1.1.0.jar"/>
-	<classpathentry kind="lib" path="/home/ruchith/wp-j/base/lib/jackson-xc-1.9.4.jar"/>
-	<classpathentry kind="lib" path="/home/ruchith/wp-j/base/lib/jpbc-crypto-1.1.0.jar"/>
-	<classpathentry kind="lib" path="/home/ruchith/wp-j/base/lib/jackson-jaxrs-1.9.4.jar"/>
-	<classpathentry kind="lib" path="/home/ruchith/wp-j/base/lib/jpbc-pbc-1.1.0.jar"/>
-	<classpathentry kind="lib" path="/home/ruchith/wp-j/base/lib/jackson-core-asl-1.9.4.jar"/>
-	<classpathentry kind="lib" path="/home/ruchith/wp-j/base/lib/jackson-mrbean-1.9.4.jar"/>
-	<classpathentry kind="lib" path="/home/ruchith/wp-j/base/lib/bcprov-jdk16-146.jar"/>
-	<classpathentry kind="lib" path="/home/ruchith/wp-j/base/lib/jpbc-api-1.1.0.jar"/>
-	<classpathentry kind="lib" path="/home/ruchith/wp-j/base/lib/jackson-mapper-asl-1.9.4.jar"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="lib" path="/base/lib/bcprov-jdk16-146.jar"/>
+	<classpathentry kind="lib" path="/base/lib/jackson-core-asl-1.9.4.jar"/>
+	<classpathentry kind="lib" path="/base/lib/jackson-jaxrs-1.9.4.jar"/>
+	<classpathentry kind="lib" path="/base/lib/jackson-mapper-asl-1.9.4.jar"/>
+	<classpathentry kind="lib" path="/base/lib/jackson-mrbean-1.9.4.jar"/>
+	<classpathentry kind="lib" path="/base/lib/jackson-xc-1.9.4.jar"/>
+	<classpathentry kind="lib" path="/base/lib/jpbc-api-1.1.0.jar"/>
+	<classpathentry kind="lib" path="/base/lib/jpbc-crypto-1.1.0.jar"/>
+	<classpathentry kind="lib" path="/base/lib/jpbc-pbc-1.1.0.jar"/>
+	<classpathentry kind="lib" path="/base/lib/jpbc-plaf-1.1.0.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

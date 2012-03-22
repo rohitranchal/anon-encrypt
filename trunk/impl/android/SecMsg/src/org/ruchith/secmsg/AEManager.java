@@ -90,4 +90,7 @@ public class AEManager {
 		return this.params;
 	}
 
+	public Element getMasterKey() {
+		return this.masterKey;
+	}
 }

@@ -100,7 +100,7 @@ public class DBAdapter {
 	public long addContact(String name, String id, String random) {
 		ContentValues values = new ContentValues();
 		values.put(KEY_CONTACT_ID, name);
-		values.put(KEY_MY_CONTACT_ID, id);
+		values.put(KEY_ID, id);
 		values.put(KEY_RANDOM, random);
 		
 		return mDb.insert(DATABASE_TABLE_CONTACT, null, values);

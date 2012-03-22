@@ -12,6 +12,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.Html;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,47 +23,45 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 public class SecMsgActivity extends ListActivity {
-	
+
 	private static final String TAG = "SecMsgActivity";
-	
+
 	private DBAdapter mDbHelper;
-    private Cursor mContactsCursor;
-    private AEManager aeManager;
-    
+	private Cursor mContactsCursor;
+	private AEManager aeManager;
 
-    /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.mDbHelper = new DBAdapter(this);
-        this.mDbHelper.open();
-        this.aeManager = AEManager.getInstance(this.mDbHelper);
-        setContentView(R.layout.main);
-        this.fillData();
-    }
-    
-    
-    private void fillData() {
-        mContactsCursor = mDbHelper.fetchAllContacts();
-        startManagingCursor(mContactsCursor);
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		this.mDbHelper = new DBAdapter(this);
+		this.mDbHelper.open();
+		this.aeManager = AEManager.getInstance(this.mDbHelper);
+		setContentView(R.layout.main);
+		this.fillData();
+	}
 
-        String[] from = new String[]{DBAdapter.KEY_CONTACT_ID};
+	private void fillData() {
+		mContactsCursor = mDbHelper.fetchAllContacts();
+		startManagingCursor(mContactsCursor);
 
-        int[] to = new int[]{R.id.text1};
+		String[] from = new String[] { DBAdapter.KEY_CONTACT_ID };
 
-        SimpleCursorAdapter notes = 
-            new SimpleCursorAdapter(this, R.layout.contact_row, mContactsCursor, from, to);
-        setListAdapter(notes);
-    }
-    
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-    	return true;
-    }
-    
-    @Override
+		int[] to = new int[] { R.id.text1 };
+
+		SimpleCursorAdapter notes = new SimpleCursorAdapter(this,
+				R.layout.contact_row, mContactsCursor, from, to);
+		setListAdapter(notes);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main, menu);
+		return true;
+	}
+
+	@Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
     	switch(item.getItemId()) {
     	case R.id.create_contact:
@@ -85,7 +85,7 @@ public class SecMsgActivity extends ListActivity {
 					Element id1 = params.getPairing().getZr().newRandomElement();
 					Element r = params.getPairing().getZr().newRandomElement();
 					AEPrivateKey contactPriv = rkg.genKey(id1, aeManager.getMasterKey(), r);
-					String contactPrivData = contactPriv.serializeJSON().toString();
+					String contactPrivData = Base64.encodeToString(contactPriv.serializeJSON().toString().getBytes(), Base64.DEFAULT);
 					
 					mDbHelper.addContact(val, id1.toString(), r.toString());
 					fillData();
@@ -93,9 +93,9 @@ public class SecMsgActivity extends ListActivity {
 					
 					Intent i = new Intent(Intent.ACTION_SEND);
 					i.setType("text/plain");
-					i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"recipient@example.com"});
-					i.putExtra(Intent.EXTRA_SUBJECT, "your data");
-					i.putExtra(Intent.EXTRA_TEXT   , contactPrivData);
+					i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"rfernand@purdue.edu"});
+					i.putExtra(Intent.EXTRA_SUBJECT, "Your Private Data");
+					i.putExtra(Intent.EXTRA_TEXT   , Html.fromHtml("<a href=\"secmsg://data/" + contactPrivData + "\">Click here to install private data</a><h1>test heading</h1>"));
 					try {
 					    startActivity(Intent.createChooser(i, "Send mail..."));
 					} catch (android.content.ActivityNotFoundException ex) {

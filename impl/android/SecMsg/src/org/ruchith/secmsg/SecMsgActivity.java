@@ -1,5 +1,11 @@
 package org.ruchith.secmsg;
 
+import it.unisa.dia.gas.jpbc.Element;
+
+import org.ruchith.ae.base.AEParameters;
+import org.ruchith.ae.base.AEPrivateKey;
+import org.ruchith.ae.base.RootKeyGen;
+
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
@@ -12,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 public class SecMsgActivity extends ListActivity {
 	
@@ -69,6 +76,31 @@ public class SecMsgActivity extends ListActivity {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					String val = input.getText().toString();
+					
+					
+					RootKeyGen rkg = new RootKeyGen();
+					AEParameters params = aeManager.getParameters();
+					rkg.init(params);
+					
+					Element id1 = params.getPairing().getZr().newRandomElement();
+					Element r = params.getPairing().getZr().newRandomElement();
+					AEPrivateKey contactPriv = rkg.genKey(id1, aeManager.getMasterKey(), r);
+					String contactPrivData = contactPriv.serializeJSON().toString();
+					
+					mDbHelper.addContact(val, id1.toString(), r.toString());
+					fillData();
+					
+					
+					Intent i = new Intent(Intent.ACTION_SEND);
+					i.setType("text/plain");
+					i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"recipient@example.com"});
+					i.putExtra(Intent.EXTRA_SUBJECT, "your data");
+					i.putExtra(Intent.EXTRA_TEXT   , contactPrivData);
+					try {
+					    startActivity(Intent.createChooser(i, "Send mail..."));
+					} catch (android.content.ActivityNotFoundException ex) {
+					    Toast.makeText(SecMsgActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+					}
 					Log.i(TAG, val);
 				}
 			});

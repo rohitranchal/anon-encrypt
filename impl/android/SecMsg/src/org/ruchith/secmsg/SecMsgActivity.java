@@ -1,5 +1,7 @@
 package org.ruchith.secmsg;
 
+import java.net.URLEncoder;
+
 import it.unisa.dia.gas.jpbc.Element;
 
 import org.ruchith.ae.base.AEParameters;
@@ -85,7 +87,9 @@ public class SecMsgActivity extends ListActivity {
 					Element id1 = params.getPairing().getZr().newRandomElement();
 					Element r = params.getPairing().getZr().newRandomElement();
 					AEPrivateKey contactPriv = rkg.genKey(id1, aeManager.getMasterKey(), r);
-					String contactPrivData = Base64.encodeToString(contactPriv.serializeJSON().toString().getBytes(), Base64.DEFAULT);
+					String pivDataVal = contactPriv.serializeJSON().toString();
+					
+//					String contactPrivData = Base64.encodeToString(pivDataVal.getBytes(), Base64.URL_SAFE);
 					
 					mDbHelper.addContact(val, id1.toString(), r.toString());
 					fillData();
@@ -95,7 +99,7 @@ public class SecMsgActivity extends ListActivity {
 					i.setType("text/plain");
 					i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"rfernand@purdue.edu"});
 					i.putExtra(Intent.EXTRA_SUBJECT, "Your Private Data");
-					i.putExtra(Intent.EXTRA_TEXT   , Html.fromHtml("<a href=\"secmsg://data/" + contactPrivData + "\">Click here to install private data</a><h1>test heading</h1>"));
+					i.putExtra(Intent.EXTRA_TEXT   , Html.fromHtml("<a href=\"secmsg://data/" + URLEncoder.encode(pivDataVal) + "\">Click here to install private data</a><h1>test heading</h1>"));
 					try {
 					    startActivity(Intent.createChooser(i, "Send mail..."));
 					} catch (android.content.ActivityNotFoundException ex) {

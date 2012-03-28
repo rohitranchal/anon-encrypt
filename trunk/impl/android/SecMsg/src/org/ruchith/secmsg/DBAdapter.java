@@ -106,6 +106,14 @@ public class DBAdapter {
 		return mDb.insert(DATABASE_TABLE_CONTACT, null, values);
 	}
 	
+	public boolean addPrivdata(String name, String privData) {
+		ContentValues values = new ContentValues();
+		values.put(KEY_PRIV_DATA, privData);
+		
+		return mDb.update(DATABASE_TABLE_CONTACT, values, KEY_CONTACT_ID + "='" + name + "'", null) > 0;
+	}
+	
+	
 	public void addConfig(String params, String mk) {
 		ContentValues values = new ContentValues();
 		values.put(KEY_PARAMS, params);

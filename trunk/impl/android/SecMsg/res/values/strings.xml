@@ -16,4 +16,10 @@
     <string name="config_name">Configuration</string>
     <string name="no_config">Configuration not loaded</string>
     
+    <string name="priva_data_button_save">Save</string>
+    <string name="priva_data_dialog_title">Remote Private Data</string>
+	<string name="priva_data_contact_name_hint">Enter contact name</string>
+    
+    
+    
 </resources>

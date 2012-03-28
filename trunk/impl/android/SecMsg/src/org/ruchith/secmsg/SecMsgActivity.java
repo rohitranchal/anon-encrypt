@@ -1,8 +1,8 @@
 package org.ruchith.secmsg;
 
-import java.net.URLEncoder;
-
 import it.unisa.dia.gas.jpbc.Element;
+
+import java.net.URLEncoder;
 
 import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.AEPrivateKey;
@@ -15,7 +15,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -42,7 +41,7 @@ public class SecMsgActivity extends ListActivity {
 		setContentView(R.layout.main);
 		this.fillData();
 	}
-
+	
 	private void fillData() {
 		mContactsCursor = mDbHelper.fetchAllContacts();
 		startManagingCursor(mContactsCursor);
@@ -55,6 +54,7 @@ public class SecMsgActivity extends ListActivity {
 				R.layout.contact_row, mContactsCursor, from, to);
 		setListAdapter(notes);
 	}
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

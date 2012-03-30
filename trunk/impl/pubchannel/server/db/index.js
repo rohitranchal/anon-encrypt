@@ -19,6 +19,7 @@ exports.addEntry = function(content) {
 					  throw err;
 				  }
 				});
+	client.end();
 };
 
 exports.getAllEntries = function(cb) {
@@ -28,9 +29,8 @@ exports.getAllEntries = function(cb) {
 			throw err;
 		}
 		
-		client.end();
 		cb(results);
-		
+		client.end();		
 	});
 	
 };

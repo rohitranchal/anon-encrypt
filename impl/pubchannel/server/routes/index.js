@@ -13,5 +13,4 @@ exports.index = function(req, res){
 exports.add = function(req, res){
 	db.addEntry('testing');  
 	res.send('test');
-	  
 };

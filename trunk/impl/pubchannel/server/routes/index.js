@@ -6,6 +6,7 @@ var db = require('../db');
 exports.index = function(req, res){
 	db.getAllEntries(result);
 	function result(val) {
+		console.log(val);
 		res.render('index', { title: 'Public Channel' , entries : val });
 	}
 };

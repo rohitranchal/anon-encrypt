@@ -7,6 +7,7 @@ exports.index = function(req, res){
 	db.getAllEntries(result);
 	function result(val) {
 		res.render('index', { title: 'Public Channel' , entries : val });
+		return;
 	}
 };
 

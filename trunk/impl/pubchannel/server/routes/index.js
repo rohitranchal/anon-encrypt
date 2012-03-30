@@ -11,6 +11,6 @@ exports.index = function(req, res){
  * Handle incoming entry requests
  */
 exports.add = function(req, res){
-	db.addEntry('testing');  
+	db.addEntry(req.params.val);  
 	res.send('test');
 };

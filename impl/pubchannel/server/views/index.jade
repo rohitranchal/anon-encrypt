@@ -1,3 +1,13 @@
 h1= title
-for entry in entries
-	li= entry.ID
+table
+	thead
+		tr
+			th ID
+			th Timestamp
+			th Content
+	tbody
+		- for entry in entries
+			tr
+				td=entry.ID
+				td=entry.TS
+				td=entry.Content

@@ -9,6 +9,7 @@ var client = mysql.createClient({
 client.query('USE pubchannel');
 
 exports.addEntry = function(content) {
+	console.log('adding entry ' + content);
 	client.query(
 			  'INSERT INTO Message '+
 			  'SET Content = ?',

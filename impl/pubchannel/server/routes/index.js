@@ -4,7 +4,10 @@ var db = require('../db');
  * GET home page.
  */
 exports.index = function(req, res){
-  res.render('index', { title: 'Express' });
+	db.getAllEntries(result);
+	function result(val) {
+		res.render('index', { title: 'Public Channel' , entries : val });
+	}
 };
 
 /*

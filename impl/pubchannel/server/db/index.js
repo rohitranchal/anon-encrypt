@@ -13,8 +13,12 @@ exports.addEntry = function(content) {
 	client.query(
 			  'INSERT INTO Message '+
 			  'SET Content = \'?\'',
-			  [content]
-			);
+			  [content], 
+			  	function(err, info) {
+				  if(err) {
+					  throw err;
+				  }
+				});
 };
 
 exports.getAllEntries = function(cb) {

@@ -12,7 +12,7 @@ exports.addEntry = function(content) {
 	console.log('adding entry ' + content);
 	client.query(
 			  'INSERT INTO Message '+
-			  'SET Content = \'?\'',
+			  'SET Content = ?',
 			  [content], 
 			  	function(err, info) {
 				  if(err) {

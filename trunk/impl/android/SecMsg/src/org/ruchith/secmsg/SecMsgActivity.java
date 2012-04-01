@@ -118,7 +118,7 @@ public class SecMsgActivity extends ListActivity {
     		alert.show();
     		
     		return true;
-    	case R.id.remote_data:
+    	case R.id.request_updates:
     		
     		return true;
     	case R.id.params:

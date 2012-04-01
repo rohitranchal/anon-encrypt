@@ -3,7 +3,7 @@
     <string name="no_contacts">No contact yet</string>
     <string name="app_name">SecMsg</string>
     <string name="menu_create_contact">Add Contact</string>
-    <string name="menu_remote_data">Contact Remote Data</string>
+    <string name="menu_request_updates">Request Updates</string>
     <string name="menu_params">Parameters</string>
     
     

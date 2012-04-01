@@ -8,6 +8,9 @@ var client = mysql.createClient({
 
 client.query('USE pubchannel');
 
+/**
+ * Add an entry into the Message table.
+ */
 exports.addEntry = function(content) {
 	console.log('adding entry ' + content);
 	client.query(
@@ -22,15 +25,16 @@ exports.addEntry = function(content) {
 	
 };
 
+/**
+ * Call the given callback function with the set of all entries.
+ */
 exports.getAllEntries = function(cb) {
-	
 	client.query('SELECT * FROM Message' , function selectCb(err, results, fields){
 		if(err) {
 			throw err;
 		}
 		
 		cb(results);
-				
 	});
 	
 };

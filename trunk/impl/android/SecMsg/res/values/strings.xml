@@ -20,6 +20,8 @@
     <string name="priva_data_dialog_title">Remote Private Data</string>
 	<string name="priva_data_contact_name_hint">Enter contact name</string>
     
-    
-    
+    <string name="req_update_button_ok">OK</string>
+    <string name="req_update_dialog_title">Request Update</string>
+	
+    <string name="ex_no_such_contact">No such contact</string>
 </resources>

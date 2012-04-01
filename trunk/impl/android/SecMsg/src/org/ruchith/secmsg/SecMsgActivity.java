@@ -2,19 +2,14 @@ package org.ruchith.secmsg;
 
 import it.unisa.dia.gas.jpbc.Element;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.AEPrivateKey;
 import org.ruchith.ae.base.RootKeyGen;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,17 +17,23 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class SecMsgActivity extends ListActivity {
 
 	private static final String TAG = "SecMsgActivity";
 
+	private static final int REQ_UPDATE_DIALOG = 1;
+	
 	private DBAdapter mDbHelper;
 	private Cursor mContactsCursor;
 	private AEManager aeManager;
@@ -127,13 +128,9 @@ public class SecMsgActivity extends ListActivity {
     	case R.id.request_updates:
     		
     		try {
-				String value = "testing_android" + Math.random()*1000;
-				
-				HttpClient client = new DefaultHttpClient();
-				HttpGet req = new HttpGet();
-				req.setURI(new URI(Constants.PUBCHANNEL_NEW_ENTRY_URL + URLEncoder.encode(value)));
-				HttpResponse resp = client.execute(req);
-				Log.i(TAG, "" + resp.getEntity().getContentLength());
+    			
+    			showDialog(REQ_UPDATE_DIALOG);
+    			
 			} catch (Exception e) {
 				Log.e(TAG, e.getMessage());
 			}
@@ -146,4 +143,58 @@ public class SecMsgActivity extends ListActivity {
     	}
     	return super.onMenuItemSelected(featureId, item);
     }
+	
+	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		switch (id) {
+		case REQ_UPDATE_DIALOG:
+			//Select the contact
+			LayoutInflater factory = LayoutInflater.from(this);
+			final View dialogView = factory
+					.inflate(R.layout.req_update_dialog, null);
+
+			Cursor c = mDbHelper.fetchAllContacts();
+			startManagingCursor(c);
+
+			String[] from = new String[] { DBAdapter.KEY_CONTACT_ID };
+
+			int[] to = new int[] { R.id.req_update_contact_text};
+
+			SimpleCursorAdapter contacts = new SimpleCursorAdapter(this,
+					R.layout.req_update_dialog_row, c, from, to);
+
+			final Spinner contactList = (Spinner) dialogView
+					.findViewById(R.id.req_update_contacts);
+			contactList.setAdapter(contacts);
+			
+			return new AlertDialog.Builder(SecMsgActivity.this)
+			.setTitle(R.string.req_update_dialog_title)
+			.setView(dialogView)
+			.setCancelable(false)
+			.setPositiveButton(R.string.req_update_button_ok,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int whichButton) {
+							
+							TextView tv = (TextView) contactList.getSelectedView();
+							String selectedContactName = tv.getText().toString();
+							
+							//Create a new DataRequester 
+							DataRequester dataRequester = 
+									new DataRequester(mDbHelper, SecMsgActivity.this);
+							dataRequester.request(selectedContactName); //Make request
+						}
+					})
+			.setNegativeButton(R.string.alert_msg_button_cancel,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int whichButton) {
+							//Nothing to do
+						}
+					}).create();
+		default:
+			return null;
+		}
+	}
 }

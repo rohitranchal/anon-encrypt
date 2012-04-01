@@ -18,28 +18,31 @@ public class DBAdapter {
 	public static final String KEY_MESSAGE = "message";
 	public static final String KEY_PARAMS = "params";
 	public static final String KEY_MASTER_KEY = "masterKey";
-	
+
+	public static final String KEY_REQUEST_ID = "reqId";
+	public static final String KEY_TMP_KEY = "key";
 
 	private static final String[] DB_CREATE = new String[] {
 			"CREATE TABLE Contact ("
 					+ "_id integer primary key autoincrement, "
-					+ "contactId text not null, " 
-					+ "id text not null, "
-					+ "random text not null, "
-					+ "privDataFromContact text, " 
+					+ "contactId text not null, " + "id text not null, "
+					+ "random text not null, " + "privDataFromContact text, "
 					+ "myIdFromContact text)",
 			"CREATE TABLE Message ("
 					+ "_id integer primary key autoincrement, "
-					+ "contactId text not null, " 
-					+ "message text not null)",
-			"CREATE TABLE Config ("
-					+ "params text not null, "
-					+ "masterKey text not null)"};
+					+ "contactId text not null, " + "message text not null)",
+			"CREATE TABLE Config (" + "params text not null, "
+					+ "masterKey text not null)",
+			"CREATE TABLE RequestInfo ("
+					+ "_id integer primary key autoincrement, "
+					+ "reqId text not null, " + "tmpKey text not null)" };
 
 	private static final String DATABASE_NAME = "data";
 	private static final String DATABASE_TABLE_CONTACT = "Contact";
 	private static final String DATABASE_TABLE_MESSAGE = "Message";
 	private static final String DATABASE_TABLE_CONFIG = "Config";
+	private static final String DATABASE_TABLE_REQ_INFO = "RequestInfo";
+
 	private static final int DATABASE_VERSION = 2;
 
 	private static final String TAG = "NotesDbAdapter";
@@ -87,38 +90,106 @@ public class DBAdapter {
 		this.mDbHelper.close();
 	}
 
+	/**
+	 * Return all contacts.
+	 * 
+	 * @return A {@link Cursor} with all {@link #KEY_ROWID} and
+	 *         {@link #KEY_CONTACT_ID} values.
+	 */
 	public Cursor fetchAllContacts() {
 		return mDb.query(DATABASE_TABLE_CONTACT, new String[] { KEY_ROWID,
 				KEY_CONTACT_ID }, null, null, null, null, null);
 	}
-	
+
+	/**
+	 * Return the stored configuration.
+	 * 
+	 * @return A {@link Cursor} with the parameters and the master key.
+	 */
 	public Cursor fetchConfig() {
 		return mDb.query(DATABASE_TABLE_CONFIG, new String[] { KEY_PARAMS,
-				KEY_MASTER_KEY}, null, null, null, null, null);
+				KEY_MASTER_KEY }, null, null, null, null, null);
 	}
-	
+
+	/**
+	 * Store information about a new contact.
+	 * 
+	 * @param name
+	 *            Name given to the contact.
+	 * @param id
+	 *            Generated id of the contact.
+	 * @param random
+	 *            Random value associated with the contact.
+	 * @return
+	 */
 	public long addContact(String name, String id, String random) {
 		ContentValues values = new ContentValues();
 		values.put(KEY_CONTACT_ID, name);
 		values.put(KEY_ID, id);
 		values.put(KEY_RANDOM, random);
-		
+
 		return mDb.insert(DATABASE_TABLE_CONTACT, null, values);
 	}
-	
+
+	/**
+	 * Store my private data from the remote contact.
+	 * 
+	 * @param name
+	 *            Name of the contact.
+	 * @param privData
+	 *            Serilized private data.
+	 * @return
+	 */
 	public boolean addPrivdata(String name, String privData) {
 		ContentValues values = new ContentValues();
 		values.put(KEY_PRIV_DATA, privData);
-		
-		return mDb.update(DATABASE_TABLE_CONTACT, values, KEY_CONTACT_ID + "='" + name + "'", null) > 0;
+
+		return mDb.update(DATABASE_TABLE_CONTACT, values, KEY_CONTACT_ID + "='"
+				+ name + "'", null) > 0;
 	}
-	
-	
+
+	/**
+	 * Obtain my private key of the contact.
+	 * @param name {@link #KEY_CONTACT_ID} of the contact.
+	 * @return {@link Cursor} with private data.
+	 */
+	public Cursor getPrivData(String name) {
+		return mDb.query(DATABASE_TABLE_CONTACT,
+				new String[] { KEY_ID, KEY_PRIV_DATA }, KEY_CONTACT_ID + "='" + name
+						+ "'", null, null, null, null);
+	}
+
+	/**
+	 * Store configuration.
+	 * 
+	 * @param params
+	 *            Global parameters.
+	 * @param mk
+	 *            The master key.
+	 */
 	public void addConfig(String params, String mk) {
 		ContentValues values = new ContentValues();
 		values.put(KEY_PARAMS, params);
 		values.put(KEY_MASTER_KEY, mk);
-		
+
 		mDb.insert(DATABASE_TABLE_CONFIG, null, values);
 	}
+
+	/**
+	 * Store the temporary key used for a request.
+	 * 
+	 * @param reqId
+	 *            Request id - public key value used
+	 * @param keyInfo
+	 *            Serialized public key
+	 * @return
+	 */
+	public long addRequestInfo(String reqId, String keyInfo) {
+		ContentValues values = new ContentValues();
+		values.put(KEY_REQUEST_ID, reqId);
+		values.put(KEY_TMP_KEY, keyInfo);
+
+		return mDb.insert(DATABASE_TABLE_REQ_INFO, null, values);
+	}
+
 }

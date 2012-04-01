@@ -2,8 +2,14 @@ package org.ruchith.secmsg;
 
 import it.unisa.dia.gas.jpbc.Element;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.AEPrivateKey;
 import org.ruchith.ae.base.RootKeyGen;
@@ -120,6 +126,17 @@ public class SecMsgActivity extends ListActivity {
     		return true;
     	case R.id.request_updates:
     		
+    		try {
+				String value = "testing_android" + Math.random()*1000;
+				
+				HttpClient client = new DefaultHttpClient();
+				HttpGet req = new HttpGet();
+				req.setURI(new URI(Constants.PUBCHANNEL_NEW_ENTRY_URL + URLEncoder.encode(value)));
+				HttpResponse resp = client.execute(req);
+				Log.i(TAG, "" + resp.getEntity().getContentLength());
+			} catch (Exception e) {
+				Log.e(TAG, e.getMessage());
+			}
     		return true;
     	case R.id.params:
     		Intent i = new Intent(this, ConfigurationActivity.class);

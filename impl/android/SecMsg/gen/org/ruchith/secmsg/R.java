@@ -17,13 +17,15 @@ public final class R {
         public static final int settings=0x7f020003;
     }
     public static final class id {
-        public static final int create_contact=0x7f060006;
+        public static final int create_contact=0x7f060008;
         public static final int layout_root=0x7f060002;
-        public static final int params=0x7f060008;
+        public static final int params=0x7f06000a;
         public static final int privdata_contact_text=0x7f060005;
         public static final int privdata_contacts=0x7f060004;
         public static final int privdata_val=0x7f060003;
-        public static final int remote_data=0x7f060007;
+        public static final int req_update_contact_text=0x7f060007;
+        public static final int req_update_contacts=0x7f060006;
+        public static final int request_updates=0x7f060009;
         public static final int text1=0x7f060001;
         public static final int textView1=0x7f060000;
     }
@@ -34,6 +36,8 @@ public final class R {
         public static final int main=0x7f030003;
         public static final int privdata_dialog=0x7f030004;
         public static final int privdata_dialog_contact_row=0x7f030005;
+        public static final int req_update_dialog=0x7f030006;
+        public static final int req_update_dialog_row=0x7f030007;
     }
     public static final class menu {
         public static final int main=0x7f050000;
@@ -47,7 +51,7 @@ public final class R {
         public static final int config_name=0x7f040009;
         public static final int menu_create_contact=0x7f040002;
         public static final int menu_params=0x7f040004;
-        public static final int menu_remote_data=0x7f040003;
+        public static final int menu_request_updates=0x7f040003;
         public static final int no_config=0x7f04000a;
         public static final int no_contacts=0x7f040000;
         public static final int priva_data_button_save=0x7f04000b;

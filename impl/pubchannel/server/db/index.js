@@ -38,3 +38,17 @@ exports.getAllEntries = function(cb) {
 	});
 	
 };
+
+/**
+ * Return entries starting from the given start index.
+ */
+exports.getEntriesFromIndex = function(start, cb) {
+	client.query('SELECT * FROM Message WHERE ID >= ' + start , 
+			function selectCb(err, results, fields){
+				if(err) {
+					throw err;
+				}
+				//Call the incoming callback with results
+				cb(results);
+			});	
+};

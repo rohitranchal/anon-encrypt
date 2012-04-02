@@ -1,6 +1,6 @@
 var db = require('../db');
 
-/*
+/**
  * GET home page.
  */
 exports.index = function(req, res){
@@ -17,10 +17,21 @@ exports.index = function(req, res){
 	}
 };
 
-/*
+/**
  * Handle incoming entry requests
  */
 exports.add = function(req, res){
 	db.addEntry(req.params.val);  
 	res.send('success');
+};
+
+/**
+ * Return all entries starting from the given index value.
+ */
+exports.pull = function(req, res) {
+	
+	db.getEntriesFromIndex(req.params.val, function(val) {
+		res.send(val);//Output JSON
+	});
+	
 };

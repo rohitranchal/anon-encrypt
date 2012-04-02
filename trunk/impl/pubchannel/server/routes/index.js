@@ -9,10 +9,10 @@ exports.index = function(req, res){
 		
 		//Replace content with base 64 decoded data
 		for(var i = 0; i < val.length; i++) {
-			console.log(val['Content']);
-			var s = val['Content'];
+			console.log(val[i].Content);
+			var s = val[i].Content;
 			
-			val['Content'] = new Buffer(s, 'base64').toString('ascii');
+			val[i].Content = new Buffer(s, 'base64').toString('ascii');
 		}
 		
 		res.render('index', { title: 'Public Channel' , entries : val });

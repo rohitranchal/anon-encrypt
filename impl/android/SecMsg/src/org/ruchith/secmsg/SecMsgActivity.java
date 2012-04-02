@@ -32,7 +32,8 @@ public class SecMsgActivity extends ListActivity {
 
 	private static final String TAG = "SecMsgActivity";
 
-	private static final int REQ_UPDATE_DIALOG = 1;
+	private static final int CREATE_CONTACT_DIALOG = 1;
+	private static final int REQ_UPDATE_DIALOG = 2;
 	
 	private DBAdapter mDbHelper;
 	private Cursor mContactsCursor;
@@ -74,6 +75,24 @@ public class SecMsgActivity extends ListActivity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
     	switch(item.getItemId()) {
     	case R.id.create_contact:
+    		showDialog(CREATE_CONTACT_DIALOG);
+    		return true;
+    	case R.id.request_updates:
+    		showDialog(REQ_UPDATE_DIALOG);
+    		return true;
+    	case R.id.params:
+    		Intent i = new Intent(this, ConfigurationActivity.class);
+    		startActivity(i);
+    		return true;
+    	}
+    	return super.onMenuItemSelected(featureId, item);
+    }
+	
+	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		switch (id) {
+		case CREATE_CONTACT_DIALOG:
     		AlertDialog.Builder alert = new AlertDialog.Builder(this);
     		alert.setTitle(R.string.alert_title_create_contact);
     		alert.setMessage(R.string.alert_msg_create_contact);
@@ -106,7 +125,7 @@ public class SecMsgActivity extends ListActivity {
 					i.setType("text/plain");
 					i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"rfernand@purdue.edu"});
 					i.putExtra(Intent.EXTRA_SUBJECT, "Your Private Data");
-					i.putExtra(Intent.EXTRA_TEXT   , Html.fromHtml("<a href=\"secmsg://data/" + URLEncoder.encode(pivDataVal) + "\">Click here to install private data</a><h1>test heading</h1>"));
+					i.putExtra(Intent.EXTRA_TEXT   , Html.fromHtml("<a href=\"secmsg://data/" + URLEncoder.encode(pivDataVal) + "\">Click here to install private data</a>"));
 					try {
 					    startActivity(Intent.createChooser(i, "Send mail..."));
 					} catch (android.content.ActivityNotFoundException ex) {
@@ -122,32 +141,8 @@ public class SecMsgActivity extends ListActivity {
 				}
 			});
     		
-    		alert.show();
-    		
-    		return true;
-    	case R.id.request_updates:
-    		
-    		try {
-    			
-    			showDialog(REQ_UPDATE_DIALOG);
-    			
-			} catch (Exception e) {
-				Log.e(TAG, e.getMessage());
-			}
-    		return true;
-    	case R.id.params:
-    		Intent i = new Intent(this, ConfigurationActivity.class);
-    		
-    		startActivity(i);
-    		return true;
-    	}
-    	return super.onMenuItemSelected(featureId, item);
-    }
-	
-	
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		switch (id) {
+    		return alert.show();
+
 		case REQ_UPDATE_DIALOG:
 			//Select the contact
 			LayoutInflater factory = LayoutInflater.from(this);
@@ -196,5 +191,11 @@ public class SecMsgActivity extends ListActivity {
 		default:
 			return null;
 		}
+	}
+	
+	@Override
+	public void finish() {
+		mDbHelper.close();
+		super.finish();
 	}
 }

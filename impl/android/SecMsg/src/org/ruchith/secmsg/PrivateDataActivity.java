@@ -86,4 +86,9 @@ public class PrivateDataActivity extends Activity {
 
 	}
 	
+	@Override
+	public void finish() {
+		db.close();
+		super.finish();
+	}
 }

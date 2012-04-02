@@ -4,8 +4,11 @@
           android:icon="@drawable/new_contact"
           android:title="@string/menu_create_contact"/>
     <item android:id="@+id/request_updates"
-          android:icon="@drawable/contact_remote_data"
+          android:icon="@drawable/req_update"
           android:title="@string/menu_request_updates" />
+    <item android:id="@+id/refresh"
+          android:icon="@drawable/refresh"
+          android:title="@string/menu_refresh" />
 	<item android:id="@+id/params"
           android:icon="@drawable/settings"
           android:title="@string/menu_params" />

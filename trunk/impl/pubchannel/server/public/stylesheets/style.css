@@ -1,12 +1,15 @@
 body {
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
-  color: #00B7FF;
+	color: #00B7FF;
 }
 
-table
-{
-table-layout:fixed;
+table {
+	table-layout: fixed;
+}
+
+td {
+	word-wrap: break-word
 }

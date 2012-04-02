@@ -1,5 +1,7 @@
 package org.ruchith.secmsg;
 
+import org.ruchith.secmsg.ae.UpdateRequest;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -20,7 +22,8 @@ public class DBAdapter {
 	public static final String KEY_MASTER_KEY = "masterKey";
 
 	public static final String KEY_REQUEST_ID = "reqId";
-	public static final String KEY_TMP_KEY = "key";
+	public static final String KEY_SALT = "salt";
+	public static final String KEY_TMP_KEY = "tmpKey";
 
 	private static final String[] DB_CREATE = new String[] {
 			"CREATE TABLE Contact ("
@@ -35,7 +38,10 @@ public class DBAdapter {
 					+ "masterKey text not null)",
 			"CREATE TABLE RequestInfo ("
 					+ "_id integer primary key autoincrement, "
-					+ "reqId text not null, " + "tmpKey text not null)" };
+					+ "contactId text not null, "
+					+ "salt text not null, "
+					+ "reqId text not null, " 
+					+ "tmpKey text not null)" };
 
 	private static final String DATABASE_NAME = "data";
 	private static final String DATABASE_TABLE_CONTACT = "Contact";
@@ -180,13 +186,19 @@ public class DBAdapter {
 	 * 
 	 * @param reqId
 	 *            Request id - public key value used
+	 * @param contact
+	 *            Name of the contact
+	 * @param salt
+	 *            Salt value used to hash contact name in {@link UpdateRequest}
 	 * @param keyInfo
 	 *            Serialized public key
 	 * @return
 	 */
-	public long addRequestInfo(String reqId, String keyInfo) {
+	public long addRequestInfo(String reqId, String contact, String salt, String keyInfo) {
 		ContentValues values = new ContentValues();
 		values.put(KEY_REQUEST_ID, reqId);
+		values.put(KEY_CONTACT_ID, contact);
+		values.put(KEY_SALT, salt);
 		values.put(KEY_TMP_KEY, keyInfo);
 
 		return mDb.insert(DATABASE_TABLE_REQ_INFO, null, values);

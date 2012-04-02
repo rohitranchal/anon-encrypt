@@ -4,17 +4,19 @@ import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 
 import java.net.URI;
-import java.net.URLEncoder;
+import java.util.UUID;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.bouncycastle.util.encoders.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.AEPrivateKey;
 import org.ruchith.ae.base.ContactKeyGen;
+import org.ruchith.secmsg.ae.UpdateRequest;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -66,15 +68,18 @@ public class DataRequester {
 			AEPrivateKey randPrivKey = keyGen.getTmpPrivKey(randId);
 			
 			// Store temp key
-			String publish = randId.toString();
-			db.addRequestInfo(publish, randPrivKey.serializeJSON().toString());
+			String salt = UUID.randomUUID().toString();
+			db.addRequestInfo(randId.toString(), contact, salt, randPrivKey.serializeJSON().toString());
+
+			UpdateRequest ur = new UpdateRequest(contact, salt, randId.toString());
+			
+			String publish = new String(Base64.encode(ur.serializeJSON().toString().getBytes()));
 			
 			// Send request
-
 			HttpClient client = new DefaultHttpClient();
 			HttpGet req = new HttpGet();
 			req.setURI(new URI(Constants.PUBCHANNEL_NEW_ENTRY_URL
-					+ URLEncoder.encode(publish)));
+					+ publish));
 			HttpResponse resp = client.execute(req);
 			Log.i(TAG, "" + resp.getEntity().getContentLength());
 			return true;

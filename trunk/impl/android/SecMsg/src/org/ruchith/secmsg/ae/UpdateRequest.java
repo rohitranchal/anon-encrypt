@@ -13,6 +13,8 @@ public class UpdateRequest {
 	
 	private static final String TAG = "DataRequester";
 
+	public static final String TYPE = "update_request";
+	
 	private String contact;
 	private String salt;
 	private String randId;
@@ -46,7 +48,7 @@ public class UpdateRequest {
 
 		String dgstValB64 = new String(Base64.encode(dgstVal));
 		
-		on.put("type",  "update_request");
+		on.put("type",  TYPE);
 		on.put("contact_dgst",  dgstValB64);
 		on.put("salt",  this.salt);
 		on.put("randId", this.randId);

@@ -38,6 +38,7 @@ public class SecMsgActivity extends ListActivity {
 	private DBAdapter mDbHelper;
 	private Cursor mContactsCursor;
 	private AEManager aeManager;
+	private DataRequestManager dataRequester;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -46,6 +47,7 @@ public class SecMsgActivity extends ListActivity {
 		this.mDbHelper = new DBAdapter(this);
 		this.mDbHelper.open();
 		this.aeManager = AEManager.getInstance(this.mDbHelper);
+		dataRequester = new DataRequestManager(mDbHelper, this);
 		setContentView(R.layout.main);
 		this.fillData();
 	}
@@ -83,6 +85,10 @@ public class SecMsgActivity extends ListActivity {
     	case R.id.params:
     		Intent i = new Intent(this, ConfigurationActivity.class);
     		startActivity(i);
+    		return true;
+    	case R.id.refresh:
+    		this.dataRequester.refresh();
+    		Toast.makeText(this, R.string.toast_refresh_done, Toast.LENGTH_SHORT).show();
     		return true;
     	}
     	return super.onMenuItemSelected(featureId, item);
@@ -175,9 +181,6 @@ public class SecMsgActivity extends ListActivity {
 							TextView tv = (TextView) contactList.getSelectedView();
 							String selectedContactName = tv.getText().toString();
 							
-							//Create a new DataRequester 
-							DataRequestManager dataRequester = 
-									new DataRequestManager(mDbHelper, SecMsgActivity.this);
 							dataRequester.request(selectedContactName); //Make request
 						}
 					})

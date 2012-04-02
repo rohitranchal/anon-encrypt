@@ -28,6 +28,7 @@ public class ConfigurationActivity extends ListActivity {
 		values[5] = "H1 : " + params.getH1().toString();
 		values[6] = "H2 : " + params.getH2().toString();
 		values[7] = "H3 : " + params.getH3().toString();
+		values[7] = "Public Channel Entry Index : " + manager.getPubChannelIndex();
 		
 		setListAdapter(new ArrayAdapter<String>(this,R.layout.config_row, values));
 		

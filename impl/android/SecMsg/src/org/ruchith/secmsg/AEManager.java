@@ -20,6 +20,7 @@ public class AEManager {
 	private DBAdapter mDbHelper;
 	private AEParameters params;
 	private Element masterKey;
+	private int pubChannelIndex;
 	
 	private static AEManager instance;
 
@@ -47,7 +48,7 @@ public class AEManager {
 			c.moveToFirst();
 			String paramVal = c.getString(c.getColumnIndexOrThrow(DBAdapter.KEY_PARAMS));
 			String mkVal = c.getString(c.getColumnIndexOrThrow(DBAdapter.KEY_MASTER_KEY));
-			
+			this.pubChannelIndex = c.getInt(c.getColumnIndexOrThrow(DBAdapter.KEY_PUB_CHANNEL_INDEX));
 			try {
 				ObjectMapper mapper = new ObjectMapper();
 				ObjectNode on = (ObjectNode) mapper.readTree(paramVal);
@@ -92,5 +93,9 @@ public class AEManager {
 
 	public Element getMasterKey() {
 		return this.masterKey;
+	}
+	
+	public int getPubChannelIndex() {
+		return this.pubChannelIndex;
 	}
 }

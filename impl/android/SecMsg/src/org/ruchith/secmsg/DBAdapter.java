@@ -19,6 +19,7 @@ public class DBAdapter {
 	public static final String KEY_MY_CONTACT_ID = "myIdFromContact";
 	public static final String KEY_MESSAGE = "message";
 	public static final String KEY_PARAMS = "params";
+	public static final String KEY_PUB_CHANNEL_INDEX = "pubChannelIndex";
 	public static final String KEY_MASTER_KEY = "masterKey";
 
 	public static final String KEY_REQUEST_ID = "reqId";
@@ -28,13 +29,18 @@ public class DBAdapter {
 	private static final String[] DB_CREATE = new String[] {
 			"CREATE TABLE Contact ("
 					+ "_id integer primary key autoincrement, "
-					+ "contactId text not null, " + "id text not null, "
-					+ "random text not null, " + "privDataFromContact text, "
+					+ "contactId text not null, " 
+					+ "id text not null, "
+					+ "random text not null, " 
+					+ "privDataFromContact text, "
 					+ "myIdFromContact text)",
 			"CREATE TABLE Message ("
 					+ "_id integer primary key autoincrement, "
-					+ "contactId text not null, " + "message text not null)",
-			"CREATE TABLE Config (" + "params text not null, "
+					+ "contactId text not null, " 
+					+ "message text not null)",
+			"CREATE TABLE Config (" 
+					+ "params text not null, "
+					+ "pubChannelIndex integer default 0, "
 					+ "masterKey text not null)",
 			"CREATE TABLE RequestInfo ("
 					+ "_id integer primary key autoincrement, "
@@ -114,7 +120,8 @@ public class DBAdapter {
 	 */
 	public Cursor fetchConfig() {
 		return mDb.query(DATABASE_TABLE_CONFIG, new String[] { KEY_PARAMS,
-				KEY_MASTER_KEY }, null, null, null, null, null);
+				KEY_PUB_CHANNEL_INDEX, KEY_MASTER_KEY }, 
+				null, null, null, null, null);
 	}
 
 	/**

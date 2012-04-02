@@ -22,14 +22,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
-public class DataRequester {
+public class DataRequestManager {
 
 	private static final String TAG = "DataRequester";
 
 	private DBAdapter db;
 	private Context ctx;
 
-	public DataRequester(DBAdapter dbAdapter, Context ctx) {
+	public DataRequestManager(DBAdapter dbAdapter, Context ctx) {
 		this.db = dbAdapter;
 		this.ctx = ctx;
 	}

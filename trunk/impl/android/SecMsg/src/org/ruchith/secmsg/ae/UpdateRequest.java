@@ -16,6 +16,7 @@ public class UpdateRequest {
 	private String contact;
 	private String salt;
 	private String randId;
+	private String contactDgst;
 	
 	public UpdateRequest(String contact, String salt, String randId) {
 		this.contact = contact;
@@ -24,7 +25,9 @@ public class UpdateRequest {
 	}
 
 	public UpdateRequest(ObjectNode on) {
-		//TODO
+		this.contactDgst = on.get("contact_dgst").getTextValue();
+		this.salt = on.get("salt").getTextValue();
+		this.randId = on.get("randId").getTextValue();
 	}
 	
 	public ObjectNode serializeJSON() {
@@ -49,6 +52,22 @@ public class UpdateRequest {
 		on.put("randId", this.randId);
 		
 		return on;
+	}
+
+	public String getContact() {
+		return contact;
+	}
+
+	public String getSalt() {
+		return salt;
+	}
+
+	public String getRandId() {
+		return randId;
+	}
+
+	public String getContactDgst() {
+		return contactDgst;
 	}
 	
 }

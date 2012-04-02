@@ -52,3 +52,18 @@ exports.getEntriesFromIndex = function(start, cb) {
 				cb(results);
 			});	
 };
+
+/**
+ * Return a specific entry.
+ */
+exports.getEntry = function(id, cb) {
+	client.query('SELECT * FROM Message WHERE ID = ' + id , 
+			function selectCb(err, results, fields){
+				if(err) {
+					throw err;
+				}
+				//Call the incoming callback with results
+				cb(results);
+			});	
+};
+

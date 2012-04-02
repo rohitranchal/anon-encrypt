@@ -10,6 +10,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.bouncycastle.util.encoders.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.secmsg.AEManager;
 
@@ -65,7 +66,7 @@ public class PublicChannel {
 	 * Return all new entries that are available.
 	 * @return A JSON {@link ObjectNode} instance with the results.
 	 */
-	public ObjectNode pullAll() {
+	public ArrayNode pullAll() {
 		try {
 			int index = AEManager.getInstance().getPubChannelIndex();
 			HttpGet req = new HttpGet();
@@ -74,7 +75,7 @@ public class PublicChannel {
 			InputStream content = resp.getEntity().getContent();
 			
 			ObjectMapper mapper = new ObjectMapper();
-			return (ObjectNode)mapper.readTree(new InputStreamReader(content));
+			return (ArrayNode) mapper.readTree(new InputStreamReader(content));
 		} catch (Exception e) {
 			Log.i(TAG, e.getMessage());
 			return null;

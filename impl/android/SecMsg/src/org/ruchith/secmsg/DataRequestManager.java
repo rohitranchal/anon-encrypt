@@ -3,14 +3,13 @@ package org.ruchith.secmsg;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 
-import java.io.IOException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.UUID;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
@@ -32,16 +31,28 @@ public class DataRequestManager {
 	private DBAdapter db;
 	private Context ctx;
 	private PublicChannel pubChannel;
+	
+	//Cached contact list
+	ArrayList<String> contactList = new ArrayList<String>();
 
 	public DataRequestManager(DBAdapter dbAdapter, Context ctx) {
 		this.db = dbAdapter;
 		this.ctx = ctx;
 		this.pubChannel = PublicChannel.getInstance();
+
+		Cursor c = db.fetchAllContacts();
+		c.moveToFirst();
+		while(!c.isAfterLast()) {
+			String contact = c.getString(c.getColumnIndex(DBAdapter.KEY_CONTACT_ID));
+			this.contactList.add(contact);
+			c.moveToNext();
+		}
+		c.close();
+
 	}
 
 	public boolean request(String contact) {
 		try {
-
 			// Get private key of contact
 			Cursor privDataC = db.getPrivData(contact);
 			String privDataStr = null;
@@ -55,6 +66,7 @@ public class DataRequestManager {
 				Log.i(TAG, this.ctx.getString(R.string.ex_no_such_contact));
 				return false;
 			}
+			privDataC.close();
 
 			AEManager aeManager = AEManager.getInstance();
 			ObjectMapper mapper = new ObjectMapper();
@@ -92,6 +104,9 @@ public class DataRequestManager {
 	}
 	
 	public void refresh() {
+		
+		int index = -1;
+		
 		try {
 			//Get all new content
 			ArrayNode an = this.pubChannel.pullAll();
@@ -113,10 +128,16 @@ public class DataRequestManager {
 					UpdateResponse tmpRes = new UpdateResponse(on);
 					processIncomingUpdateResponse(tmpRes);
 				}
+				
+				index = contentNode.get("ID").getIntValue();
 			}
 		} catch (Exception e) {
 			Log.e(TAG, e.getMessage());
 		}
+		
+		//Update public channel entry index
+		db.updatePublicChannelIndex(index);
+		AEManager.getInstance().reload();
 
 	}
 
@@ -138,14 +159,14 @@ public class DataRequestManager {
 	
 	private String getContact(String dgstVal, String salt) {
 		//Get the list of contacts I have
-		Cursor c = db.fetchAllContacts();
-		c.moveToFirst();
 
 		try {
 			MessageDigest dgst = MessageDigest.getInstance("SHA-512");
 			byte[] incoming = Base64.decode(dgstVal);
-			while(!c.isAfterLast()) {
-				String contact = c.getString(c.getColumnIndex(DBAdapter.KEY_CONTACT_ID));
+
+			for (Iterator<String> iterator = this.contactList.iterator(); 
+						iterator.hasNext();) {
+				String contact = (String) iterator.next();
 				String tmpVal = contact + salt;
 				byte[] tmpDgstValBytes = dgst.digest(tmpVal.getBytes());
 				

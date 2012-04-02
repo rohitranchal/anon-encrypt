@@ -18,6 +18,7 @@ public class DBAdapter {
 	public static final String KEY_PRIV_DATA = "privDataFromContact";
 	public static final String KEY_MY_CONTACT_ID = "myIdFromContact";
 	public static final String KEY_MESSAGE = "message";
+	public static final String KEY_MESSAGE_COUNT = "messageCount";
 	public static final String KEY_PARAMS = "params";
 	public static final String KEY_PUB_CHANNEL_INDEX = "pubChannelIndex";
 	public static final String KEY_MASTER_KEY = "masterKey";
@@ -36,7 +37,8 @@ public class DBAdapter {
 					+ "myIdFromContact text)",
 			"CREATE TABLE Message ("
 					+ "_id integer primary key autoincrement, "
-					+ "contactId text not null, " 
+					+ "contactId text not null, "
+					+ "messageCount integer not null, " 
 					+ "message text not null)",
 			"CREATE TABLE Config (" 
 					+ "params text not null, "
@@ -210,5 +212,26 @@ public class DBAdapter {
 
 		return mDb.insert(DATABASE_TABLE_REQ_INFO, null, values);
 	}
+	
+	public boolean updatePublicChannelIndex(int index) {
 
+		ContentValues values = new ContentValues();
+		values.put(KEY_PUB_CHANNEL_INDEX, new Integer(index));
+
+		return mDb.update(DATABASE_TABLE_CONFIG, values, null, null) > 0;		
+	}
+
+	/**
+	 * Get the last message 
+	 * @param name
+	 * @return
+	 */
+	public Cursor getMessage(String name) {
+//		
+//		String sql = "SELECT MAX(" + KEY_MESSAGE_COUNT + ") AS max_id FROM mytable";
+//		return mDb.query(DATABASE_TABLE_MESSAGE,
+//				new String[] { KEY_MESSAGE}, KEY_CONTACT_ID + "='" 
+//						+ name + "'", null, null, null, null);		
+		return null;//TODO
+	}
 }

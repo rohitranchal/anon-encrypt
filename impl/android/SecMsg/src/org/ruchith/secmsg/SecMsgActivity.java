@@ -176,8 +176,8 @@ public class SecMsgActivity extends ListActivity {
 							String selectedContactName = tv.getText().toString();
 							
 							//Create a new DataRequester 
-							DataRequester dataRequester = 
-									new DataRequester(mDbHelper, SecMsgActivity.this);
+							DataRequestManager dataRequester = 
+									new DataRequestManager(mDbHelper, SecMsgActivity.this);
 							dataRequester.request(selectedContactName); //Make request
 						}
 					})

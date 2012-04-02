@@ -35,3 +35,9 @@ exports.pull = function(req, res) {
 	});
 	
 };
+
+exports.entry = function(req, res) {
+	db.getEntry(req.params.id, function(val){
+		res.send(val);
+	});
+};

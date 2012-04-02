@@ -32,6 +32,7 @@ app.configure('production', function(){
 app.get('/', routes.index);
 app.get('/add/:val', routes.add);
 app.get('/pull/:val', routes.pull);
+app.get('/entry/:id', routes.entry);
 
 
 app.listen(3000);

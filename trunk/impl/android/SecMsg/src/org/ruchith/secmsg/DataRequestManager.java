@@ -23,10 +23,12 @@ public class DataRequestManager {
 
 	private DBAdapter db;
 	private Context ctx;
+	private PublicChannel pubChannel;
 
 	public DataRequestManager(DBAdapter dbAdapter, Context ctx) {
 		this.db = dbAdapter;
 		this.ctx = ctx;
+		this.pubChannel = PublicChannel.getInstance();
 	}
 
 	public boolean request(String contact) {
@@ -73,12 +75,17 @@ public class DataRequestManager {
 			String publish = ur.serializeJSON().toString();
 
 			// Send request
-			return PublicChannel.getInstance().publish(publish);
+			return this.pubChannel.publish(publish);
 
 		} catch (Exception e) {
 			Log.e(TAG, e.getMessage());
 			return false;
 		}
+	}
+	
+	public void refresh() {
+		ObjectNode on = this.pubChannel.pullAll();
+		Log.i(TAG, on.toString());
 	}
 
 }

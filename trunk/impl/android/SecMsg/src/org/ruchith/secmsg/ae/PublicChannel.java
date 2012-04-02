@@ -1,5 +1,7 @@
 package org.ruchith.secmsg.ae;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 
 import org.apache.http.HttpResponse;
@@ -7,7 +9,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.bouncycastle.util.encoders.Base64;
-import org.ruchith.secmsg.Constants;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
+import org.ruchith.secmsg.AEManager;
 
 import android.util.Log;
 
@@ -15,6 +19,11 @@ public class PublicChannel {
 
 	private static final String TAG = "PublicChannel";
 
+
+	private final static String PUBCHANNEL_URL = "http://ruchith.net";
+	private final static String PUBCHANNEL_NEW_ENTRY_URL = PUBCHANNEL_URL + "/add/";
+	private final static String PUBCHANNEL_PULL_URL = PUBCHANNEL_URL + "/pull/";
+	
 	private static PublicChannel publicChannel;
 	
 	private HttpClient client = new DefaultHttpClient();
@@ -42,14 +51,33 @@ public class PublicChannel {
 	public boolean publish(String message) {
 		try {
 			HttpGet req = new HttpGet();
-			req.setURI(new URI(Constants.PUBCHANNEL_NEW_ENTRY_URL
+			req.setURI(new URI(PUBCHANNEL_NEW_ENTRY_URL
 					+ new String(Base64.encode(message.getBytes()))));
 			HttpResponse resp = client.execute(req);
 			return resp.getEntity().getContentLength() > 0;
 		} catch (Exception e) {
 			Log.i(TAG, e.getMessage());
 			return false;
-		} 
+		}
+	}
 	
+	/**
+	 * Return all new entries that are available.
+	 * @return A JSON {@link ObjectNode} instance with the results.
+	 */
+	public ObjectNode pullAll() {
+		try {
+			int index = AEManager.getInstance().getPubChannelIndex();
+			HttpGet req = new HttpGet();
+			req.setURI(new URI(PUBCHANNEL_PULL_URL + index));
+			HttpResponse resp = client.execute(req);
+			InputStream content = resp.getEntity().getContent();
+			
+			ObjectMapper mapper = new ObjectMapper();
+			return (ObjectNode)mapper.readTree(new InputStreamReader(content));
+		} catch (Exception e) {
+			Log.i(TAG, e.getMessage());
+			return null;
+		}
 	}
 }

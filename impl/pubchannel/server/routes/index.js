@@ -8,14 +8,15 @@ exports.index = function(req, res){
 	function result(val) {
 		
 		//Replace content with base 64 decoded data
-		for(var entry in val) {
-			console.log(entry);
-			console.log(entry['Content']);
-			var s = entry['Content'];
-			
-			entry['Content'] = new Buffer(s, 'base64').toString('ascii');
-		}
-		
+		console.log(val);
+//		for(var entry in val) {
+//			console.log(entry);
+//			console.log(entry['Content']);
+//			var s = entry['Content'];
+//			
+//			entry['Content'] = new Buffer(s, 'base64').toString('ascii');
+//		}
+//		
 		res.render('index', { title: 'Public Channel' , entries : val });
 	}
 };

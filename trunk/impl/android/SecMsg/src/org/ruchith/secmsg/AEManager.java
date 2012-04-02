@@ -62,7 +62,7 @@ public class AEManager {
 			} catch (Exception e) {
 				Log.e(TAG, e.getMessage());
 			}
-			
+			c.close();
 		} else {
 			//install
 			install();
@@ -97,5 +97,11 @@ public class AEManager {
 	
 	public int getPubChannelIndex() {
 		return this.pubChannelIndex;
+	}
+	
+	
+	public void reload() {
+		//An inefficient short cut to reload the public channel index
+		loadConfiguration(); 
 	}
 }

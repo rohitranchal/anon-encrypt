@@ -68,7 +68,7 @@ public class PublicChannel {
 	 */
 	public ArrayNode pullAll() {
 		try {
-			int index = AEManager.getInstance().getPubChannelIndex();
+			int index = AEManager.getInstance().getPubChannelIndex() + 1;
 			HttpGet req = new HttpGet();
 			req.setURI(new URI(PUBCHANNEL_PULL_URL + index));
 			HttpResponse resp = client.execute(req);

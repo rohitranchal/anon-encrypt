@@ -9,7 +9,10 @@ exports.index = function(req, res){
 		
 		//Replace content with base 64 decoded data
 		for(var entry in val) {
+			console.log(entry);
+			console.log(entry['Content']);
 			var s = entry['Content'];
+			
 			entry['Content'] = new Buffer(s, 'base64').toString('ascii');
 		}
 		

@@ -6,6 +6,8 @@
     <string name="menu_request_updates">Request Updates</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_params">Parameters</string>
+    <string name="menu_add_direct_msg">Add Direct Message</string>
+    
     
     <string name="toast_refresh_done">Data Refresh Complete</string>
     
@@ -24,6 +26,9 @@
     
     <string name="req_update_button_ok">OK</string>
     <string name="req_update_dialog_title">Request Update</string>
-	
+    
+	<string name="contact_no_message">[EMPTY]</string>
+    
     <string name="ex_no_such_contact">No such contact</string>
+    
 </resources>

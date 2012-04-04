@@ -232,6 +232,19 @@ public class DBAdapter {
 						+ "'", null, null, null, null);
 	}
 	
+	public Cursor getMessageById(long id) {
+		String sql = "SELECT " + KEY_CONTACT_ID + " FROM "
+				+ DATABASE_TABLE_CONTACT + " WHERE " + KEY_ROWID + " = " + id;
+		Cursor c = mDb.rawQuery(sql, null);
+		c.moveToFirst();
+		String name = c.getString(c.getColumnIndex(KEY_CONTACT_ID));
+		c.close();
+		
+		return mDb.query(DATABASE_TABLE_MESSAGE,
+				new String[] { KEY_MESSAGE }, KEY_CONTACT_ID + "='" + name
+						+ "'", null, null, null, null);
+	}
+	
 	/**
 	 * Adding a message
 	 * @param name

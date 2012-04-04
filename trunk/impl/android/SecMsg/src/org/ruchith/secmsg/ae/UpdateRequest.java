@@ -29,7 +29,7 @@ public class UpdateRequest {
 	public UpdateRequest(ObjectNode on) {
 		this.contactDgst = on.get("contact_dgst").getTextValue();
 		this.salt = on.get("salt").getTextValue();
-		this.randId = on.get("randId").getTextValue();
+		this.randId = new String(Base64.decode(on.get("randId").getTextValue()));
 	}
 	
 	public ObjectNode serializeJSON() {

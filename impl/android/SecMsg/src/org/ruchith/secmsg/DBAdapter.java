@@ -282,4 +282,17 @@ public class DBAdapter {
 		
 		return mDb.insert(DATABASE_TABLE_MESSAGE, null, values);
 	}
+	
+	public String getTempPrivKey(String reqId) {
+		Cursor c = mDb.query(DATABASE_TABLE_REQ_INFO,
+				new String[] { KEY_TMP_KEY }, KEY_REQUEST_ID+ "='" + reqId
+						+ "'", null, null, null, null);
+		c.moveToFirst();
+		String ret = null;
+		if(!c.isAfterLast()) {
+			 ret = c.getString(c.getColumnIndex(KEY_TMP_KEY));
+		}
+		c.close();
+		return ret;
+	}
 }

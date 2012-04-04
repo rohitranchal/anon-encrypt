@@ -14,9 +14,9 @@ public class UpdateResponse {
 	private String encryptedKey;
 	
 	public UpdateResponse(ObjectNode on) {
-		this.replyTo = new String(Base64.decode(on.get("reply_to").getTextValue()));
+		this.replyTo = on.get("reply_to").getTextValue();
 		this.encryptedData = on.get("encrypted_data").getTextValue();
-		this.encryptedKey = on.get("encrypted_key").getTextValue();
+		this.encryptedKey = new String(Base64.decode(on.get("encrypted_key").getTextValue()));
 	}
 	
 	public UpdateResponse(String replyTo, String cipherData, String encryptedKey) {
@@ -31,7 +31,7 @@ public class UpdateResponse {
 		ObjectNode on = (ObjectNode) rootNode;
 		
 		on.put("type",  TYPE);
-		on.put("reply_to", new String(Base64.encode(this.replyTo.getBytes())));
+		on.put("reply_to", this.replyTo);
 		on.put("encrypted_data", this.encryptedData);
 		on.put("encrypted_key", new String(Base64.encode(this.encryptedKey.getBytes())));
 	

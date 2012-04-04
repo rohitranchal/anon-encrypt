@@ -29,7 +29,7 @@ public class UpdateRequest {
 	public UpdateRequest(ObjectNode on) {
 		this.contactDgst = on.get("contact_dgst").getTextValue();
 		this.salt = on.get("salt").getTextValue();
-		this.randId = new String(Base64.decode(on.get("randId").getTextValue()));
+		this.randId = on.get("randId").getTextValue();
 	}
 	
 	public ObjectNode serializeJSON() {
@@ -51,7 +51,7 @@ public class UpdateRequest {
 		on.put("type",  TYPE);
 		on.put("contact_dgst",  dgstValB64);
 		on.put("salt",  this.salt);
-		on.put("randId", new String(Base64.encode(this.randId.getBytes())));
+		on.put("randId", this.randId);
 		
 		return on;
 	}

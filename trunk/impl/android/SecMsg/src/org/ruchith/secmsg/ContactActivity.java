@@ -105,4 +105,10 @@ public class ContactActivity extends Activity {
 		}
 		return null;
 	}
+	
+	@Override
+	public void finish() {
+		db.close();
+		super.finish();
+	}
 }

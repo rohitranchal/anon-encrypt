@@ -3,6 +3,7 @@ package org.ruchith.secmsg;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +16,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
@@ -22,6 +24,7 @@ import org.ruchith.ae.base.AECipherText;
 import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.AEPrivateKey;
 import org.ruchith.ae.base.ContactKeyGen;
+import org.ruchith.ae.base.Decrypt;
 import org.ruchith.ae.base.Encrypt;
 import org.ruchith.ae.base.TextEncoder;
 import org.ruchith.secmsg.ae.PublicChannel;
@@ -90,18 +93,22 @@ public class DataRequestManager {
 			keyGen.init(id, privKey, params);
 
 			Element randId = keyGen.genRandomID();
+			
+			//Temp private key
 			AEPrivateKey randPrivKey = keyGen.getTmpPrivKey(randId);
 
-			//Get temp pub key
+			//Temp public key
 			Element tmpPubKey = keyGen.getTmpPubKey(randId);
+			String pubKeyVal = new String(Base64.encode(tmpPubKey.toBytes()));
 			
-			// Store temp key
+			// Store temp private key
 			String salt = UUID.randomUUID().toString();
-			db.addRequestInfo(tmpPubKey.toString(), contact, salt, 
-					randPrivKey.serializeJSON().toString());
+			String privKeyVal = randPrivKey.serializeJSON().toString();
+			Log.d(TAG, "PRIV_KEY_VAL" + privKeyVal);
+			db.addRequestInfo(pubKeyVal, contact, salt, 
+					privKeyVal);
 
-			UpdateRequest ur = new UpdateRequest(contact, salt,
-					tmpPubKey.toString());
+			UpdateRequest ur = new UpdateRequest(contact, salt, pubKeyVal);
 
 			String publish = ur.serializeJSON().toString();
 
@@ -138,7 +145,9 @@ public class DataRequestManager {
 				if(type.equals(UpdateRequest.TYPE)) {
 					UpdateRequest tmpReq = new UpdateRequest(on);
 					UpdateResponse resp = processIncomingUpdateRequest(tmpReq);
-					this.pubChannel.publish(resp.serializeJSON().toString());
+					if(resp != null) {
+						this.pubChannel.publish(resp.serializeJSON().toString());
+					}
 				} else if(type.equals(UpdateResponse.TYPE)) {
 					UpdateResponse tmpRes = new UpdateResponse(on);
 					processIncomingUpdateResponse(tmpRes);
@@ -186,6 +195,7 @@ public class DataRequestManager {
 			SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
 			Cipher cipher = Cipher.getInstance("AES");
 			cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+			cipher.update(msg.getBytes());
 			byte[] encData = cipher.doFinal();
 			String encDataVal = new String(Base64.encode(encData));
 
@@ -200,7 +210,7 @@ public class DataRequestManager {
 			Element[] encoded = encoder.encode(keyb64);
 
 			Element pubKey = params.getPairing().getG1().newElement();
-			pubKey.setFromBytes(randId.getBytes());
+			pubKey.setFromBytes(Base64.decode(randId));
 			pubKey = pubKey.getImmutable();
 
 			Encrypt encrypt = new Encrypt();
@@ -208,7 +218,7 @@ public class DataRequestManager {
 			AECipherText encKey = encrypt.doEncrypt(encoded, pubKey);
 
 			String encryptedKeyVal = encKey.serializeJSON().toString();
-			UpdateResponse resp = new UpdateResponse(pubKey.toString(),
+			UpdateResponse resp = new UpdateResponse(randId,
 					encDataVal, encryptedKeyVal);
 
 			return resp;
@@ -219,7 +229,45 @@ public class DataRequestManager {
 	}
 	
 	private void processIncomingUpdateResponse(UpdateResponse ur) {
-		//TODO
+		try {
+			String replyTo = ur.getReplyTo();
+			String privKeyVal = db.getTempPrivKey(replyTo);
+			if(privKeyVal != null) {
+				ObjectMapper mapper = new ObjectMapper();
+				ObjectNode on = (ObjectNode)mapper.readTree(privKeyVal.getBytes());
+				
+				AEParameters params = AEManager.getInstance().getParameters();
+				Pairing pairing = params.getPairing();
+				
+				AEPrivateKey tmpPriv = new AEPrivateKey(on, pairing);
+				Log.d(TAG, "PRIV_KEY_VAL" + tmpPriv.serializeJSON().toString());
+				
+				Decrypt decrypt = new Decrypt();
+				decrypt.init(params);
+				
+				ArrayNode an = (ArrayNode)mapper.readTree(ur.getEncryptedKey());
+				AECipherText ct = new AECipherText(an, pairing);
+				
+				Element[] result = decrypt.doDecrypt(ct.getBlocks(), tmpPriv);
+				
+				TextEncoder encoder = new TextEncoder();
+				encoder.init(params);
+				
+				String keyValB64 = new String(encoder.decode(result));
+				byte[] symmKey = Base64.decode(keyValB64);
+				
+				SecretKeySpec keySpec = new SecretKeySpec(symmKey, "AES");
+				Cipher cipher = Cipher.getInstance("AES");
+				cipher.init(Cipher.DECRYPT_MODE, keySpec);
+				cipher.update(Base64.decode(ur.getCipherData()));
+				byte[] plainText = cipher.doFinal();
+				String msg = new String(plainText);
+				Log.i(TAG, "PLAIN TEXT : " + plainText);
+			}
+		} catch (Exception e) {
+			Log.e(TAG, e.getMessage());
+		}
+
 	}
 	
 	

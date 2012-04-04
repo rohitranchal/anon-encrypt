@@ -77,7 +77,7 @@ public class PublicChannel {
 			ObjectMapper mapper = new ObjectMapper();
 			return (ArrayNode) mapper.readTree(new InputStreamReader(content));
 		} catch (Exception e) {
-			Log.i(TAG, e.getMessage());
+			Log.e(TAG, e.getClass().getName() + ":" + e.getMessage());
 			return null;
 		}
 	}

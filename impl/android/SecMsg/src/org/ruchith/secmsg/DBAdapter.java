@@ -227,11 +227,23 @@ public class DBAdapter {
 	 * @return
 	 */
 	public Cursor getMessage(String name) {
-//		
-//		String sql = "SELECT MAX(" + KEY_MESSAGE_COUNT + ") AS max_id FROM mytable";
-//		return mDb.query(DATABASE_TABLE_MESSAGE,
-//				new String[] { KEY_MESSAGE}, KEY_CONTACT_ID + "='" 
-//						+ name + "'", null, null, null, null);		
-		return null;//TODO
+		return mDb.query(DATABASE_TABLE_MESSAGE,
+				new String[] { KEY_MESSAGE }, KEY_CONTACT_ID + "='" + name
+						+ "'", null, null, null, null);
+	}
+	
+	/**
+	 * Adding a message
+	 * @param name
+	 * @param message
+	 * @return
+	 */
+	public long setMessage(String name, String message) {
+		ContentValues values = new ContentValues();
+		values.put(KEY_MESSAGE, message );
+		values.put(KEY_CONTACT_ID, name);
+		values.put(KEY_MESSAGE_COUNT, 1);
+		
+		return mDb.insert(DATABASE_TABLE_MESSAGE, null, values);
 	}
 }

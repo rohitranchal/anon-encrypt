@@ -110,6 +110,9 @@ public class DataRequestManager {
 		try {
 			//Get all new content
 			ArrayNode an = this.pubChannel.pullAll();
+			if(an == null) {
+				return;
+			}
 			
 			for(int i = 0; i < an.size(); i++) {
 				ObjectNode contentNode = (ObjectNode) an.get(i);
@@ -148,6 +151,8 @@ public class DataRequestManager {
 		if(contact != null) {
 			Log.i(TAG, "Contact found : " + contact);
 			//Send Response
+			//We store one message per contact for now and we will send that message out
+			db.getMessage(contact);
 			
 		}
 	}

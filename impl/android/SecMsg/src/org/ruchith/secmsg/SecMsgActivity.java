@@ -23,6 +23,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -94,6 +95,13 @@ public class SecMsgActivity extends ListActivity {
     	return super.onMenuItemSelected(featureId, item);
     }
 	
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		super.onListItemClick(l, v, position, id);
+		Intent i = new Intent(this, ContactActivity.class);
+		i.putExtra(DBAdapter.KEY_ROWID, id);
+		startActivity(i);
+	}
 	
 	@Override
 	protected Dialog onCreateDialog(int id) {

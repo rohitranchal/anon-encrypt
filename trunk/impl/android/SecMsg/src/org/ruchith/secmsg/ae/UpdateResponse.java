@@ -32,8 +32,8 @@ public class UpdateResponse {
 		
 		on.put("type",  TYPE);
 		on.put("reply_to", new String(Base64.encode(this.replyTo.getBytes())));
-		on.put("encrypted_data", new String(Base64.encode(this.encryptedData.getBytes())));
-		on.put("encrypted_key", this.encryptedKey);
+		on.put("encrypted_data", this.encryptedData);
+		on.put("encrypted_key", new String(Base64.encode(this.encryptedKey.getBytes())));
 	
 		return on;
 	}

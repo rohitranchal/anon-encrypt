@@ -226,10 +226,29 @@ public class DBAdapter {
 	 * @param name
 	 * @return
 	 */
-	public Cursor getMessage(String name) {
-		return mDb.query(DATABASE_TABLE_MESSAGE,
+	public String getMessage(String name) {
+		Cursor c =  mDb.query(DATABASE_TABLE_MESSAGE,
 				new String[] { KEY_MESSAGE }, KEY_CONTACT_ID + "='" + name
 						+ "'", null, null, null, null);
+		c.moveToFirst();
+		String val = null;
+		if(!c.isAfterLast()) {
+			val = c.getString(c.getColumnIndex(DBAdapter.KEY_MESSAGE));
+		}
+		c.close();
+		return val;
+		
+	}
+	
+	public String getContactById(long id) {
+		String sql = "SELECT " + KEY_CONTACT_ID + " FROM "
+				+ DATABASE_TABLE_CONTACT + " WHERE " + KEY_ROWID + " = " + id;
+		Cursor c = mDb.rawQuery(sql, null);
+		c.moveToFirst();
+		String name = c.getString(c.getColumnIndex(KEY_CONTACT_ID));
+		c.close();
+		
+		return name;
 	}
 	
 	public Cursor getMessageById(long id) {
@@ -252,6 +271,10 @@ public class DBAdapter {
 	 * @return
 	 */
 	public long setMessage(String name, String message) {
+		
+		//To maintain only one message in the table per contact FOR NOW!
+		mDb.delete(DATABASE_TABLE_MESSAGE, KEY_CONTACT_ID + " = ?" , new String[]{name});
+		
 		ContentValues values = new ContentValues();
 		values.put(KEY_MESSAGE, message );
 		values.put(KEY_CONTACT_ID, name);

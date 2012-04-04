@@ -9,6 +9,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.UUID;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+
 import org.bouncycastle.util.encoders.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
@@ -16,6 +19,8 @@ import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.AEPrivateKey;
 import org.ruchith.ae.base.ContactKeyGen;
+import org.ruchith.ae.base.Encrypt;
+import org.ruchith.ae.base.TextEncoder;
 import org.ruchith.secmsg.ae.PublicChannel;
 import org.ruchith.secmsg.ae.UpdateRequest;
 import org.ruchith.secmsg.ae.UpdateResponse;
@@ -89,8 +94,11 @@ public class DataRequestManager {
 			db.addRequestInfo(randId.toString(), contact, salt, 
 					randPrivKey.serializeJSON().toString());
 
+			//Get temp pub key
+			Element tmpPubKey = keyGen.getTmpPubKey(randId);
+			
 			UpdateRequest ur = new UpdateRequest(contact, salt,
-					randId.toString());
+					tmpPubKey.toString());
 
 			String publish = ur.serializeJSON().toString();
 
@@ -152,8 +160,49 @@ public class DataRequestManager {
 			Log.i(TAG, "Contact found : " + contact);
 			//Send Response
 			//We store one message per contact for now and we will send that message out
-			db.getMessage(contact);
+			String msg = db.getMessage(contact);
+			if(msg != null) {
+				//Create update response
+				UpdateResponse resp = createUpdateResponse(ur.getRandId(), msg);
+			}
 			
+		}
+	}
+	
+	private UpdateResponse createUpdateResponse(String randId, String msg) {
+		try {
+			//Create random AES-256 KEY
+			KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+			keyGen.init(256);
+			SecretKey key = keyGen.generateKey();
+			
+			//Encrypt data
+			
+			
+			//Encrypt key
+			
+			AEManager aeMan = AEManager.getInstance();
+			AEParameters params = aeMan.getParameters();
+			
+			byte[] keyBytes = key.getEncoded();
+			String keyb64 = new String(Base64.encode(keyBytes));
+			
+			TextEncoder encoder = new TextEncoder();
+			encoder.init(params);
+			Element[] encoded = encoder.encode(keyb64);
+			
+			Element pubKey = params.getPairing().getG1().newElement();
+			
+			
+			Encrypt encrypt = new Encrypt();
+			encrypt.init(params);
+			
+			UpdateResponse resp = new UpdateResponse(null, null , null);
+			
+			return resp;
+		} catch (Exception e) {
+			Log.e(TAG, e.getMessage());
+			return null;
 		}
 	}
 	

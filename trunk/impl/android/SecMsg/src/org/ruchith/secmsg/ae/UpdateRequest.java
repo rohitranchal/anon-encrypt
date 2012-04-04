@@ -51,7 +51,7 @@ public class UpdateRequest {
 		on.put("type",  TYPE);
 		on.put("contact_dgst",  dgstValB64);
 		on.put("salt",  this.salt);
-		on.put("randId", this.randId);
+		on.put("randId", new String(Base64.encode(this.randId.getBytes())));
 		
 		return on;
 	}

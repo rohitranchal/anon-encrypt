@@ -9,13 +9,16 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.UUID;
 
+import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
+import org.ruchith.ae.base.AECipherText;
 import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.AEPrivateKey;
 import org.ruchith.ae.base.ContactKeyGen;
@@ -89,14 +92,14 @@ public class DataRequestManager {
 			Element randId = keyGen.genRandomID();
 			AEPrivateKey randPrivKey = keyGen.getTmpPrivKey(randId);
 
-			// Store temp key
-			String salt = UUID.randomUUID().toString();
-			db.addRequestInfo(randId.toString(), contact, salt, 
-					randPrivKey.serializeJSON().toString());
-
 			//Get temp pub key
 			Element tmpPubKey = keyGen.getTmpPubKey(randId);
 			
+			// Store temp key
+			String salt = UUID.randomUUID().toString();
+			db.addRequestInfo(tmpPubKey.toString(), contact, salt, 
+					randPrivKey.serializeJSON().toString());
+
 			UpdateRequest ur = new UpdateRequest(contact, salt,
 					tmpPubKey.toString());
 
@@ -134,7 +137,8 @@ public class DataRequestManager {
 				
 				if(type.equals(UpdateRequest.TYPE)) {
 					UpdateRequest tmpReq = new UpdateRequest(on);
-					processIncomingUpdateRequest(tmpReq);
+					UpdateResponse resp = processIncomingUpdateRequest(tmpReq);
+					this.pubChannel.publish(resp.serializeJSON().toString());
 				} else if(type.equals(UpdateResponse.TYPE)) {
 					UpdateResponse tmpRes = new UpdateResponse(on);
 					processIncomingUpdateResponse(tmpRes);
@@ -152,7 +156,7 @@ public class DataRequestManager {
 
 	}
 
-	private void processIncomingUpdateRequest(UpdateRequest ur) {
+	private UpdateResponse processIncomingUpdateRequest(UpdateRequest ur) {
 		String b64Dgst = ur.getContactDgst();
 		String salt = ur.getSalt();
 		String contact = getContact(b64Dgst, salt);
@@ -163,42 +167,50 @@ public class DataRequestManager {
 			String msg = db.getMessage(contact);
 			if(msg != null) {
 				//Create update response
-				UpdateResponse resp = createUpdateResponse(ur.getRandId(), msg);
+				return createUpdateResponse(ur.getRandId(), msg);
 			}
 			
 		}
+		return null;
 	}
 	
 	private UpdateResponse createUpdateResponse(String randId, String msg) {
 		try {
-			//Create random AES-256 KEY
+			// Create random AES-256 KEY
 			KeyGenerator keyGen = KeyGenerator.getInstance("AES");
 			keyGen.init(256);
 			SecretKey key = keyGen.generateKey();
-			
-			//Encrypt data
-			
-			
-			//Encrypt key
-			
+			byte[] keyBytes = key.getEncoded();
+
+			// Encrypt data
+			SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
+			Cipher cipher = Cipher.getInstance("AES");
+			cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+			byte[] encData = cipher.doFinal();
+			String encDataVal = new String(Base64.encode(encData));
+
+			// Encrypt key
 			AEManager aeMan = AEManager.getInstance();
 			AEParameters params = aeMan.getParameters();
-			
-			byte[] keyBytes = key.getEncoded();
+
 			String keyb64 = new String(Base64.encode(keyBytes));
-			
+
 			TextEncoder encoder = new TextEncoder();
 			encoder.init(params);
 			Element[] encoded = encoder.encode(keyb64);
-			
+
 			Element pubKey = params.getPairing().getG1().newElement();
-			
-			
+			pubKey.setFromBytes(randId.getBytes());
+			pubKey = pubKey.getImmutable();
+
 			Encrypt encrypt = new Encrypt();
 			encrypt.init(params);
-			
-			UpdateResponse resp = new UpdateResponse(null, null , null);
-			
+			AECipherText encKey = encrypt.doEncrypt(encoded, pubKey);
+
+			String encryptedKeyVal = encKey.serializeJSON().toString();
+			UpdateResponse resp = new UpdateResponse(pubKey.toString(),
+					encDataVal, encryptedKeyVal);
+
 			return resp;
 		} catch (Exception e) {
 			Log.e(TAG, e.getMessage());

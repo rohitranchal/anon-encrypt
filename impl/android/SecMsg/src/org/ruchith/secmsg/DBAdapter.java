@@ -263,11 +263,14 @@ public class DBAdapter {
 				new String[] { KEY_MESSAGE }, KEY_CONTACT_ID + "='" + name
 						+ "'", null, null, null, null);
 	}
-	
+
 	/**
 	 * Adding a message
+	 * 
 	 * @param name
+	 *            Contact identifier.
 	 * @param message
+	 *            Message value
 	 * @return
 	 */
 	public long setMessage(String name, String message) {
@@ -283,6 +286,13 @@ public class DBAdapter {
 		return mDb.insert(DATABASE_TABLE_MESSAGE, null, values);
 	}
 	
+	/**
+	 * Obtain the private key related to this request.
+	 * 
+	 * @param reqId
+	 *            Request identifier.
+	 * @return Private key value if exists, null otherwise.
+	 */
 	public String getTempPrivKey(String reqId) {
 		Cursor c = mDb.query(DATABASE_TABLE_REQ_INFO,
 				new String[] { KEY_TMP_KEY }, KEY_REQUEST_ID+ "='" + reqId
@@ -296,6 +306,13 @@ public class DBAdapter {
 		return ret;
 	}
 	
+	/**
+	 * Obtain the contact related to this request.
+	 * 
+	 * @param reqId
+	 *            Request identifier.
+	 * @return Contact identifier if it exists, null otherwise.
+	 */
 	public String getContactID(String reqId) {
 		Cursor c = mDb.query(DATABASE_TABLE_REQ_INFO,
 				new String[] { KEY_CONTACT_ID }, KEY_REQUEST_ID+ "='" + reqId

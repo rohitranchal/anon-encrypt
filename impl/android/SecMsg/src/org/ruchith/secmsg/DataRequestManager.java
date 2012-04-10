@@ -3,7 +3,6 @@ package org.ruchith.secmsg;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +15,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
@@ -62,6 +60,11 @@ public class DataRequestManager {
 
 	}
 
+	/**
+	 * Generate and publish an update request for the given contact.
+	 * @param contact Identifier of the contact.
+	 * @return true upon success, false otherwise.
+	 */
 	public boolean request(String contact) {
 		try {
 			// Get private key of contact
@@ -123,6 +126,9 @@ public class DataRequestManager {
 		}
 	}
 	
+	/**
+	 * Update with the latest set of messages from the public channel.
+	 */
 	public void refresh() {
 		
 		int index = -1;
@@ -167,6 +173,12 @@ public class DataRequestManager {
 
 	}
 
+	/**
+	 * Process the given {@link UpdateRequest} instance.
+	 * @param ur An {@link UpdateRequest} instance.
+	 * @return If the related contact is in the current contact list, then
+	 * an {@link UpdateResponse} instance. If not, null.
+	 */
 	private UpdateResponse processIncomingUpdateRequest(UpdateRequest ur) {
 		String b64Dgst = ur.getContactDgst();
 		String salt = ur.getSalt();
@@ -185,6 +197,16 @@ public class DataRequestManager {
 		return null;
 	}
 	
+	/**
+	 * Generate update response. This will create a symmetric key and encrypt
+	 * this symmetric key using the provided random key.
+	 * 
+	 * @param randId
+	 *            The id to use for encryption of the key.
+	 * @param msg
+	 *            Message to be encrypted with the symmetric key
+	 * @return An {@link UpdateResponse} instance.
+	 */
 	private UpdateResponse createUpdateResponse(String randId, String msg) {
 		try {
 			// Create random AES-256 KEY
@@ -231,7 +253,14 @@ public class DataRequestManager {
 			return null;
 		}
 	}
-	
+
+	/**
+	 * Process the given {@link UpdateResponse} instance and save the decrypted
+	 * message.
+	 * 
+	 * @param ur
+	 *            {@link UpdateResponse} instance with encrypted data.
+	 */
 	private void processIncomingUpdateResponse(UpdateResponse ur) {
 		try {
 			String replyTo = ur.getReplyTo();
@@ -281,7 +310,17 @@ public class DataRequestManager {
 
 	}
 	
-	
+	/**
+	 * Obtain the contact name if it exists in the current list of contacts in
+	 * the database.
+	 * 
+	 * @param dgstVal
+	 *            The salted hash value of the contact name.
+	 * @param salt
+	 *            Salt value.
+	 * @return The value of the contact name if the contact exists in the
+	 *         database. If not null.
+	 */
 	private String getContact(String dgstVal, String salt) {
 		//Get the list of contacts I have
 

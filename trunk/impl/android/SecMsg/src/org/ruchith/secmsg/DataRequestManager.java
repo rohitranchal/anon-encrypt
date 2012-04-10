@@ -188,28 +188,29 @@ public class DataRequestManager {
 	private UpdateResponse createUpdateResponse(String randId, String msg) {
 		try {
 			// Create random AES-256 KEY
-//			KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-//			keyGen.init(256);
-//			SecretKey key = keyGen.generateKey();
-//			byte[] keyBytes = key.getEncoded();
-//
-//			// Encrypt data
-//			SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
-//			Cipher cipher = Cipher.getInstance("AES");
-//			cipher.init(Cipher.ENCRYPT_MODE, keySpec);
-//			cipher.update(msg.getBytes());
-//			byte[] encData = cipher.doFinal();
-//			String encDataVal = new String(Base64.encode(encData));
+			KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+			keyGen.init(256);
+			SecretKey key = keyGen.generateKey();
+			byte[] keyBytes = key.getEncoded();
+
+			// Encrypt data
+			SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
+			Cipher cipher = Cipher.getInstance("AES");
+			cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+			cipher.update(msg.getBytes());
+			byte[] encData = cipher.doFinal();
+			String encDataVal = new String(Base64.encode(encData));
 
 			// Encrypt key
 			AEManager aeMan = AEManager.getInstance();
 			AEParameters params = aeMan.getParameters();
 
-//			String keyb64 = new String(Base64.encode(keyBytes));
-//
+			String keyb64 = new String(Base64.encode(keyBytes));
+			Log.d(TAG, "SYMM_KEY: " + keyb64);
+
 			TextEncoder encoder = new TextEncoder();
 			encoder.init(params);
-			Element[] encoded = encoder.encode(msg);
+			Element[] encoded = encoder.encode(keyb64);
 
 			Element pubKey = params.getPairing().getG1().newElement();
 			pubKey.setFromBytes(Base64.decode(randId));
@@ -222,7 +223,7 @@ public class DataRequestManager {
 
 			String encryptedKeyVal = encKey.serializeJSON().toString();
 			UpdateResponse resp = new UpdateResponse(randId,
-					"testing", encryptedKeyVal);
+					encDataVal, encryptedKeyVal);
 
 			return resp;
 		} catch (Exception e) {
@@ -257,16 +258,19 @@ public class DataRequestManager {
 				encoder.init(params);
 				
 				String keyValB64 = new String(encoder.decode(result));
-				Log.i(TAG, "PLAIN : " + keyValB64);
-//				byte[] symmKey = Base64.decode(keyValB64);
-//				
-//				SecretKeySpec keySpec = new SecretKeySpec(symmKey, "AES");
-//				Cipher cipher = Cipher.getInstance("AES");
-//				cipher.init(Cipher.DECRYPT_MODE, keySpec);
-//				cipher.update(Base64.decode(ur.getCipherData()));
-//				byte[] plainText = cipher.doFinal();
-//				String msg = new String(plainText);
-//				Log.i(TAG, "PLAIN TEXT : " + plainText);
+				Log.i(TAG, "SYMM_KEY: " + keyValB64.trim());
+				byte[] symmKey = Base64.decode(keyValB64);
+				byte[] symmKeyCopy = new byte[32];
+				System.arraycopy(symmKey, 0, symmKeyCopy, 0, 32);
+				
+				
+				SecretKeySpec keySpec = new SecretKeySpec(symmKeyCopy, "AES");
+				Cipher cipher = Cipher.getInstance("AES");
+				cipher.init(Cipher.DECRYPT_MODE, keySpec);
+				cipher.update(Base64.decode(ur.getCipherData()));
+				byte[] plainText = cipher.doFinal();
+				String msg = new String(plainText);
+				Log.i(TAG, "PLAIN TEXT : " + msg);
 			}
 		} catch (Exception e) {
 			Log.e(TAG, e.getMessage());

@@ -197,7 +197,7 @@ public class DataRequestManager {
 			SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
 			Cipher cipher = Cipher.getInstance("AES");
 			cipher.init(Cipher.ENCRYPT_MODE, keySpec);
-			cipher.update(msg.getBytes());
+			cipher.update(("R: " + msg).getBytes());
 			byte[] encData = cipher.doFinal();
 			String encDataVal = new String(Base64.encode(encData));
 
@@ -270,7 +270,10 @@ public class DataRequestManager {
 				cipher.update(Base64.decode(ur.getCipherData()));
 				byte[] plainText = cipher.doFinal();
 				String msg = new String(plainText);
-				Log.i(TAG, "PLAIN TEXT : " + msg);
+				
+				//Save the message
+				String name = db.getContactID(replyTo);
+				db.setMessage(name, msg);
 			}
 		} catch (Exception e) {
 			Log.e(TAG, e.getMessage());

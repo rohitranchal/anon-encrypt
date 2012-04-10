@@ -295,4 +295,17 @@ public class DBAdapter {
 		c.close();
 		return ret;
 	}
+	
+	public String getContactID(String reqId) {
+		Cursor c = mDb.query(DATABASE_TABLE_REQ_INFO,
+				new String[] { KEY_CONTACT_ID }, KEY_REQUEST_ID+ "='" + reqId
+						+ "'", null, null, null, null);
+		c.moveToFirst();
+		String ret = null;
+		if(!c.isAfterLast()) {
+			 ret = c.getString(c.getColumnIndex(KEY_CONTACT_ID));
+		}
+		c.close();
+		return ret;
+	}
 }

@@ -16,6 +16,14 @@ import org.ruchith.secmsg.AEManager;
 
 import android.util.Log;
 
+/**
+ * Public channel implementation. This implementation communicates with a nodejs
+ * simple web application.
+ * http://anon-encrypt.googlecode.com/svn/trunk/impl/pubchannel/server/
+ * 
+ * @author ruchith
+ * 
+ */
 public class PublicChannel {
 
 	private static final String TAG = "PublicChannel";
@@ -33,6 +41,7 @@ public class PublicChannel {
 	
 	/**
 	 * Create an instance of the channel.
+	 * 
 	 * @return The singleton instance of the public channel.
 	 */
 	public static PublicChannel getInstance() {
@@ -44,9 +53,10 @@ public class PublicChannel {
 	}
 
 	/**
-	 * Publish the given message.
-	 * Content will be base 64 encoded.
-	 * @param message Content to be published
+	 * Publish the given message. Content will be base 64 encoded.
+	 * 
+	 * @param message
+	 *            Content to be published
 	 * @return Success or failure.
 	 */
 	public boolean publish(String message) {
@@ -64,6 +74,7 @@ public class PublicChannel {
 	
 	/**
 	 * Return all new entries that are available.
+	 * 
 	 * @return A JSON {@link ObjectNode} instance with the results.
 	 */
 	public ArrayNode pullAll() {

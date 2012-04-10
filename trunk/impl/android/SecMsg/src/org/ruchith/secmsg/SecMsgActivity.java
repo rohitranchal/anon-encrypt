@@ -4,6 +4,7 @@ import it.unisa.dia.gas.jpbc.Element;
 
 import java.net.URLEncoder;
 
+import org.bouncycastle.util.encoders.Base64;
 import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.AEPrivateKey;
 import org.ruchith.ae.base.RootKeyGen;
@@ -131,7 +132,7 @@ public class SecMsgActivity extends ListActivity {
 					
 //					String contactPrivData = Base64.encodeToString(pivDataVal.getBytes(), Base64.URL_SAFE);
 					
-					mDbHelper.addContact(val, id1.toString(), r.toString());
+					mDbHelper.addContact(val, new String(Base64.encode(id1.toBytes())), r.toString()); //TODO 
 					fillData();
 					
 					

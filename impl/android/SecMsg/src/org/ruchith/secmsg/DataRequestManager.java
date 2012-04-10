@@ -88,7 +88,8 @@ public class DataRequestManager {
 
 			// Generate temp key
 			Element id = pairing.getZr().newElement();
-			id.setFromBytes(idStr.getBytes());
+			id.setFromBytes(Base64.decode(idStr));
+			id = id.getImmutable();
 			ContactKeyGen keyGen = new ContactKeyGen();
 			keyGen.init(id, privKey, params);
 
@@ -98,7 +99,8 @@ public class DataRequestManager {
 			AEPrivateKey randPrivKey = keyGen.getTmpPrivKey(randId);
 
 			//Temp public key
-			Element tmpPubKey = keyGen.getTmpPubKey(randId);
+			Element tmpPubKey = params.getH1().powZn(id).mul(params.getH2().powZn(randId));
+			Log.d(TAG, "PUB_KEY_VAL" + tmpPubKey.toString());
 			String pubKeyVal = new String(Base64.encode(tmpPubKey.toBytes()));
 			
 			// Store temp private key
@@ -186,32 +188,33 @@ public class DataRequestManager {
 	private UpdateResponse createUpdateResponse(String randId, String msg) {
 		try {
 			// Create random AES-256 KEY
-			KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-			keyGen.init(256);
-			SecretKey key = keyGen.generateKey();
-			byte[] keyBytes = key.getEncoded();
-
-			// Encrypt data
-			SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
-			Cipher cipher = Cipher.getInstance("AES");
-			cipher.init(Cipher.ENCRYPT_MODE, keySpec);
-			cipher.update(msg.getBytes());
-			byte[] encData = cipher.doFinal();
-			String encDataVal = new String(Base64.encode(encData));
+//			KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+//			keyGen.init(256);
+//			SecretKey key = keyGen.generateKey();
+//			byte[] keyBytes = key.getEncoded();
+//
+//			// Encrypt data
+//			SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
+//			Cipher cipher = Cipher.getInstance("AES");
+//			cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+//			cipher.update(msg.getBytes());
+//			byte[] encData = cipher.doFinal();
+//			String encDataVal = new String(Base64.encode(encData));
 
 			// Encrypt key
 			AEManager aeMan = AEManager.getInstance();
 			AEParameters params = aeMan.getParameters();
 
-			String keyb64 = new String(Base64.encode(keyBytes));
-
+//			String keyb64 = new String(Base64.encode(keyBytes));
+//
 			TextEncoder encoder = new TextEncoder();
 			encoder.init(params);
-			Element[] encoded = encoder.encode(keyb64);
+			Element[] encoded = encoder.encode(msg);
 
 			Element pubKey = params.getPairing().getG1().newElement();
 			pubKey.setFromBytes(Base64.decode(randId));
 			pubKey = pubKey.getImmutable();
+			Log.d(TAG, "PUB_KEY_VAL" + pubKey.toString());
 
 			Encrypt encrypt = new Encrypt();
 			encrypt.init(params);
@@ -219,7 +222,7 @@ public class DataRequestManager {
 
 			String encryptedKeyVal = encKey.serializeJSON().toString();
 			UpdateResponse resp = new UpdateResponse(randId,
-					encDataVal, encryptedKeyVal);
+					"testing", encryptedKeyVal);
 
 			return resp;
 		} catch (Exception e) {
@@ -254,15 +257,16 @@ public class DataRequestManager {
 				encoder.init(params);
 				
 				String keyValB64 = new String(encoder.decode(result));
-				byte[] symmKey = Base64.decode(keyValB64);
-				
-				SecretKeySpec keySpec = new SecretKeySpec(symmKey, "AES");
-				Cipher cipher = Cipher.getInstance("AES");
-				cipher.init(Cipher.DECRYPT_MODE, keySpec);
-				cipher.update(Base64.decode(ur.getCipherData()));
-				byte[] plainText = cipher.doFinal();
-				String msg = new String(plainText);
-				Log.i(TAG, "PLAIN TEXT : " + plainText);
+				Log.i(TAG, "PLAIN : " + keyValB64);
+//				byte[] symmKey = Base64.decode(keyValB64);
+//				
+//				SecretKeySpec keySpec = new SecretKeySpec(symmKey, "AES");
+//				Cipher cipher = Cipher.getInstance("AES");
+//				cipher.init(Cipher.DECRYPT_MODE, keySpec);
+//				cipher.update(Base64.decode(ur.getCipherData()));
+//				byte[] plainText = cipher.doFinal();
+//				String msg = new String(plainText);
+//				Log.i(TAG, "PLAIN TEXT : " + plainText);
 			}
 		} catch (Exception e) {
 			Log.e(TAG, e.getMessage());

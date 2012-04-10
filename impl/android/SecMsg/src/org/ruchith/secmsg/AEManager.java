@@ -84,6 +84,7 @@ public class AEManager {
 		String mkVal = new String(Base64.encode(this.masterKey.toBytes()));
 		
 		this.mDbHelper.addConfig(paramVal, mkVal);
+		Log.i(TAG, "INSTALLED!");
 		
 	}
 	

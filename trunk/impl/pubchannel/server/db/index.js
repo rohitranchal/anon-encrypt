@@ -3,7 +3,7 @@ var TEST_DATABASE = 'nodejs_mysql_test';
 var TEST_TABLE = 'test';
 var client = mysql.createClient({
   user: 'root',
-  password: 'ooJ5woos',
+  password: 'testing',
 });
 
 client.query('USE pubchannel');

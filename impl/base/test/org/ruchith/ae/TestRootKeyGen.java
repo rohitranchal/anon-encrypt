@@ -13,7 +13,7 @@ import org.ruchith.ae.base.RootKeyGen;
 public class TestRootKeyGen extends TestCase {
 
 	public void testGenKey() throws Exception {
-		CurveParams curveParams = (CurveParams) new TypeA1CurveGenerator(4, 32)
+		CurveParams curveParams = (CurveParams) new TypeA1CurveGenerator(4, 128)
 				.generate();
 
 		AEParameterGenerator paramGen = new AEParameterGenerator();

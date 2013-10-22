@@ -1,10 +1,8 @@
 package org.ruchith.ae.base;
 
-import java.util.ArrayList;
-
 import it.unisa.dia.gas.jpbc.Element;
-import it.unisa.dia.gas.jpbc.Pairing;
-import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
+
+import java.util.ArrayList;
 
 /**
  * This is the private key generation API used by a owner of the parameters when
@@ -31,6 +29,21 @@ public class RootKeyGen {
 
 		Element h1 = this.params.getH1();
 		Element h1I1 = h1.powZn(id);
+
+		return genAnonKey(h1I1, masterKey, r);
+	}
+	
+	/**
+	 * This is the case where the remote identity is blinded.
+	 *  
+	 * @param anonId
+	 * @param masterKey
+	 * @param r
+	 * @return
+	 */
+	public AEPrivateKey genAnonKey(Element anonId, Element masterKey, Element r) {
+
+		Element h1I1 = anonId;
 
 		Element g3 = this.params.getG3();
 		Element tmp1 = h1I1.mul(g3);

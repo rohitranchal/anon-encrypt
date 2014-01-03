@@ -101,6 +101,11 @@ public class Peer {
 		msgs.add(message);
 	}
 	
+	/**
+	 * Generate a request for data.
+	 * @param user 
+	 * @return
+	 */
 	public MessageRequest generateRequest(String user) {
 		ContactPrivateData cpd = privData.get(user);
 		
@@ -123,6 +128,11 @@ public class Peer {
 		return new MessageRequest(user, tmpPubKeyStr);
 	}
 	
+	/**
+	 * Generate a response for a request.
+	 * @param req
+	 * @return
+	 */
 	public MessageResponse generateResponse(MessageRequest req) {
 		String user = req.getUser();
 		//If there are no messages from the user there's no point of looking
@@ -157,6 +167,11 @@ public class Peer {
 		return null;
 	}
 	
+	/**
+	 * Process an incoming response.
+	 * @param resp
+	 * @return
+	 */
 	public String processResponse(MessageResponse resp) {
 		String user = resp.getUser();
 

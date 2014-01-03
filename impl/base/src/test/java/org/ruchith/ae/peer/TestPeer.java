@@ -28,11 +28,14 @@ public class TestPeer extends TestCase {
 		Peer bob = new Peer();
 		bob.registerContact("p", bobPrivData);
 		
-		alice.addDirectMessage("p", "Attack");
+		String origMsg = "Attack";
+		alice.addDirectMessage("p", origMsg);
 
 		MessageRequest req = bob.generateRequest("p");
 		
-		System.out.println(req.serializeJSON());
-
+		MessageResponse resp = alice.generateResponse(req);
+		
+		String outputMsg = bob.processResponse(resp);
+		assertEquals(origMsg, outputMsg);
 	}
 }

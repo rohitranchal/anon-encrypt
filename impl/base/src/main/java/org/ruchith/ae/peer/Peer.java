@@ -9,11 +9,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.ruchith.ae.base.AECipherText;
 import org.ruchith.ae.base.AEParameterGenerator;
 import org.ruchith.ae.base.AEParameters;
 import org.ruchith.ae.base.AEPrivateKey;
 import org.ruchith.ae.base.ContactKeyGen;
+import org.ruchith.ae.base.Decrypt;
+import org.ruchith.ae.base.Encrypt;
 import org.ruchith.ae.base.RootKeyGen;
+import org.ruchith.ae.base.TextEncoder;
 
 /**
  * Completely in-memory implementation
@@ -29,7 +33,7 @@ public class Peer {
 	private HashMap<String, ContactPrivateData> privData = new HashMap<>();
 	private HashMap<String, ArrayList<String>> messages = new HashMap<>();
 	
-	private HashMap<String, HashMap<Element, AEPrivateKey>> tmpKeyList = new HashMap<>(); 
+	private HashMap<String, HashMap<String, AEPrivateKey>> tmpKeyList = new HashMap<>(); 
 	
 	public Peer() {
 		CurveParams curveParams = (CurveParams) new TypeA1CurveGenerator(4, 32)
@@ -103,17 +107,79 @@ public class Peer {
 		Element rndId = keyGen.genRandomID();
 		AEPrivateKey privKey = keyGen.getTmpPrivKey(rndId);
 		Element tmpPubKey = keyGen.getTmpPubKey(rndId);
-
-		//Store private key
-		HashMap<Element, AEPrivateKey> tmpKeyMap = this.tmpKeyList.get(user);
-		if(tmpKeyMap == null) {
-			tmpKeyMap = new HashMap<Element, AEPrivateKey>();
-		}
-		tmpKeyMap.put(tmpPubKey, privKey);
-		
 		String tmpPubKeyStr = new String(Base64.encode(tmpPubKey.toBytes()));
 		
+		//Store private key
+		HashMap<String, AEPrivateKey> tmpKeyMap = this.tmpKeyList.get(user);
+		if(tmpKeyMap == null) {
+			tmpKeyMap = new HashMap<String, AEPrivateKey>();
+			this.tmpKeyList.put(user, tmpKeyMap);
+		}
+		tmpKeyMap.put(tmpPubKeyStr, privKey);
+		
 		return new MessageRequest(user, tmpPubKeyStr);
+	}
+	
+	public MessageResponse generateResponse(MessageRequest req) {
+		String user = req.getUser();
+		//If there are no messages from the user there's no point of looking
+		//any further
+		if(messages.containsKey(user)) { 
+			//This is definitely there
+			ContactPrivateData cpd = privData.get(user);
+			AEParameters contactParams = cpd.getParams();
+			
+			String tmpPubKey = req.getTmpPubKey();
+			Element idElem = contactParams.getPairing().getG1().newElement();
+			idElem.setFromBytes(Base64.decode(tmpPubKey));
+			idElem = idElem.getImmutable();
+			
+			//Last msg form user
+			ArrayList<String> msgList = messages.get(user);
+			String msg = msgList.get(msgList.size()-1);
+			
+			TextEncoder encoder = new TextEncoder();
+			encoder.init(contactParams);
+			Element[] msgElems = encoder.encode(msg);
+			
+			// Encrypt the msg
+			Encrypt encrypt = new Encrypt();
+			encrypt.init(contactParams);
+
+			AECipherText cipherText = encrypt.doEncrypt(msgElems, idElem);
+
+			MessageResponse resp = new MessageResponse(user, tmpPubKey, cipherText);
+			return resp;
+		}
+		return null;
+	}
+	
+	public String processResponse(MessageResponse resp) {
+		String user = resp.getUser();
+
+		HashMap<String, AEPrivateKey> pkMap = this.tmpKeyList.get(user);
+		if(pkMap != null) {
+			String tmpPubKey = resp.getTmpPubKey();
+			AEPrivateKey tmpKey = pkMap.get(tmpPubKey);
+			if(tmpKey != null) {
+				ContactPrivateData cpd = this.privData.get(user);
+				AEParameters contactParams = cpd.getParams();
+				
+				AECipherText ct = resp.getCipherText();
+				
+				//Decrypt
+				Decrypt decrypt = new Decrypt();
+				decrypt.init(contactParams);
+				Element[] plainElems = decrypt.doDecrypt(ct.getBlocks(), tmpKey);
+				TextEncoder encoder = new TextEncoder();
+				encoder.init(contactParams);
+				byte[] decoded = encoder.decode(plainElems);
+				
+				String msg = new String(decoded).trim();
+				return msg;
+			}
+		}
+		return null;
 	}
 	
 }

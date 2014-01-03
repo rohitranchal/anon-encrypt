@@ -26,6 +26,7 @@ import org.ruchith.ae.base.TextEncoder;
  */
 public class Peer {
 
+	private String name;
 	private AEParameters params;
 	private Element masterKey;
 	
@@ -35,7 +36,9 @@ public class Peer {
 	
 	private HashMap<String, HashMap<String, AEPrivateKey>> tmpKeyList = new HashMap<>(); 
 	
-	public Peer() {
+	public Peer(String name) {
+		this.name = name;
+		
 		CurveParams curveParams = (CurveParams) new TypeA1CurveGenerator(4, 32)
 				.generate();
 		AEParameterGenerator paramGen = new AEParameterGenerator();
@@ -180,6 +183,10 @@ public class Peer {
 			}
 		}
 		return null;
+	}
+
+	public String getName() {
+		return name;
 	}
 	
 }

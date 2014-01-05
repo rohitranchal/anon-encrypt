@@ -1,0 +1,7 @@
+{
+"name" : "Charlie",
+"actions" : [
+	{"action": "add_contact", "parameters":  {"name" : "Alice"}},
+	{"action": "add_contact", "parameters":  {"name" : "Issac"}}
+	]
+}

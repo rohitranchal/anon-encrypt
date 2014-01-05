@@ -33,7 +33,7 @@ var peer = new Peer(name);
 var process_action = function(val) {
 	if(typeof val.parameters != 'undefined') {
 		if(val.action == 'add_contact') {
-			console.log('Creating contact ' + val.parameters.name);
+			console.log('['  + name + '] Creating contact ' + val.parameters.name);
 			peer.createContactStr(val.parameters.name, function(err, result) {
 				var priv_data = JSON.parse(result);
 				//Send this to the contact

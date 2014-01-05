@@ -1,0 +1,3 @@
+node app.js 8001 ./config/alice.json &
+node app.js 8002 ./config/bob.json &
+node app.js 8003 ./config/charlie.json &

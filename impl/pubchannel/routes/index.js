@@ -32,6 +32,11 @@ exports.add_direct_message = function(req, res) {
 	res.send('OK');
 }
 
+
+exports.get_all_direct_messages = function(req, res) {
+	res.send(direct_messages);
+}
+
 exports.get_all_direct_messages_for = function(req, res) {
 	var user = req.query.user;
 	var results = new Array();

@@ -36,6 +36,7 @@ app.get('/get_all_messages_after', routes.get_all_messages_after);
 
 app.post('/direct_message', routes.add_direct_message);
 app.get('/get_direct_messages', routes.get_all_direct_messages_for);
+app.get('/get_all_direct_messages', routes.get_all_direct_messages);
 
 
 http.createServer(app).listen(app.get('port'), function(){

@@ -1,29 +1,14 @@
-var mysql      = require('mysql');
-var connection = mysql.createConnection({
-	host     : 'localhost',
-	user     : 'root',
-	password : '',
-	database : 'pubchannel',
-	multipleStatements: true
-});
-connection.connect();
+var data = new Array();
 
 exports.get_all_messages = function(req, res) {
-	var sql = 'SELECT * FROM Message';
-	connection.query(sql, function(err, rows, fields) {
-		if (err) throw err;
-		res.send(rows);
-	});
-}
+	res.send(data);
+};
 
 exports.get_all_messages_after = function(req, res) {
 	var msg_id = req.query.msg_id;
-	var sql = 'SELECT * FROM Message WHERE id > ' + msg_id;
-	connection.query(sql, function(err, rows, fields) {
-		if (err) throw err;
-		res.send(rows);
-	});
-}
+	var tmp = data.slice(msg_id);
+	res.send(tmp);
+};
 
 exports.add_message = function(req, res) {
 	var msg = req.query.msg;
@@ -31,8 +16,11 @@ exports.add_message = function(req, res) {
 		msg = req.body.msg;
 	}
 
-	connection.query("INSERT INTO Message(data) VALUES ('" + msg + "')", function(err, rows, fields) {
-		if (err) throw err;
-		res.send('OK');
-	});
-}
+	if(typeof msg != 'undefined') {
+		var ts = new Date().getTime();
+		tmp_data = {"data" : msg, "timestamp" : ts};
+		data[data.length] = tmp_data;
+	}
+	
+	res.send('OK');
+};

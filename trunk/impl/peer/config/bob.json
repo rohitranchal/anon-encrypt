@@ -1,0 +1,10 @@
+{
+"name" : "Bob",
+"actions" : [
+	{"action": "add_contact", "parameters":  {"name" : "Alice"}},
+	{"action": "add_contact", "parameters":  {"name" : "Charlie"}},
+	{"action": "add_contact", "parameters":  {"name" : "Nancy"}},
+	{"action": "add_contact", "parameters":  {"name" : "John"}},
+	{"action": "add_contact", "parameters":  {"name" : "David"}}
+	]
+}

@@ -5,10 +5,17 @@ import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
 import org.ruchith.ae.base.AECipherText;
 import org.ruchith.ae.base.AEParameterGenerator;
 import org.ruchith.ae.base.AEParameters;
@@ -34,7 +41,7 @@ public class Peer {
 	private HashMap<String, ContactPrivateData> privData = new HashMap<>();
 	private HashMap<String, ArrayList<String>> messages = new HashMap<>();
 	
-	private HashMap<String, HashMap<String, AEPrivateKey>> tmpKeyList = new HashMap<>(); 
+	private HashMap<String, HashMap<String, AEPrivateKey>> tmpKeyList = new HashMap<>();
 	
 	public Peer(String name) {
 		this.name = name;
@@ -74,7 +81,10 @@ public class Peer {
 		
 		return new ContactPrivateData(id1, contactKey, params);
 	}
-
+	
+	public String createContactStr(String name) {
+		return this.createContact(name).serializeJSON().toString();
+	}
 
 	/**
 	 * Add information provided by a remote contact.
@@ -85,6 +95,16 @@ public class Peer {
 		this.privData.put(name, privateData);
 	}
 
+	public void registerContactStr(String name, String privData) {
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			ObjectNode newOn = (ObjectNode)mapper.readTree(privData);
+			this.registerContact(name, new ContactPrivateData(newOn));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Add a message directly received from a peer.
@@ -128,6 +148,10 @@ public class Peer {
 		return new MessageRequest(user, tmpPubKeyStr);
 	}
 	
+	public String generateRequestStr(String user) {
+		return this.generateRequest(user).serializeJSON().toString();
+	}
+	
 	/**
 	 * Generate a response for a request.
 	 * @param req
@@ -167,6 +191,19 @@ public class Peer {
 		return null;
 	}
 	
+	public String generateResponseStr(String req) {
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			ObjectNode newOn = (ObjectNode)mapper.readTree(req);
+			MessageResponse resp = this.generateResponse(new MessageRequest(newOn));
+			return resp.serializeJSON().toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+        
+	}
+	
 	/**
 	 * Process an incoming response.
 	 * @param resp
@@ -198,6 +235,33 @@ public class Peer {
 			}
 		}
 		return null;
+	}
+	
+	public String[] getContactList() {
+		String[] names = this.contacts.keySet().toArray(new String[this.contacts.size()]);
+		return names;
+	}
+	
+	public String getContacts() {
+		ObjectMapper mapper = new ObjectMapper();
+		ArrayNode root = mapper.createArrayNode();
+		
+		Iterator<String> contactIterator= this.contacts.keySet().iterator();
+		while (contactIterator.hasNext()) {
+			String contact = contactIterator.next();
+			
+			ObjectNode tmp = mapper.createObjectNode();
+			ContactPrivateData tmpPrivData = this.privData.get(contact);
+			
+			tmp.put("name", contact);
+			if(tmpPrivData != null) {
+				tmp.put("priv_data", tmpPrivData.serializeJSON().toString());
+				;
+			}
+			root.add(tmp);
+		}
+		
+		return root.toString();
 	}
 
 	public String getName() {

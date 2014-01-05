@@ -21,6 +21,8 @@ app.use(express.urlencoded());
 app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
+app.use(express.urlencoded());
 
 // development only
 if ('development' == app.get('env')) {
@@ -31,6 +33,9 @@ app.get('/', routes.get_all_messages);
 app.get('/add_message', routes.add_message);
 app.post('/add_message', routes.add_message);
 app.get('/get_all_messages_after', routes.get_all_messages_after);
+
+app.post('/direct_message', routes.add_direct_message);
+app.get('/get_direct_messages', routes.get_all_direct_messages_for);
 
 
 http.createServer(app).listen(app.get('port'), function(){

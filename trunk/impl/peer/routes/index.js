@@ -1,5 +1,6 @@
 var java = require("java");
 var fs = require("fs");
+var request = require("request");
 var Q = require("q");
 
 //Java dependancies
@@ -17,15 +18,32 @@ java.classpath.push(jars_dir + "jpbc-crypto-1.1.0.jar");
 java.classpath.push(jars_dir + "jpbc-plaf-1.1.0.jar");
 java.classpath.push(jars_dir + "../base-1.0-SNAPSHOT.jar");
 
-var configData = fs.readFileSync('./config.json').toString();
-var config = JSON.parse(configData);
+var config_file = './config.json';
+
+config_file = process.argv[3];
+
+
+var config_data = fs.readFileSync(config_file).toString();
+var config = JSON.parse(config_data);
+var name = config.name;
 
 var Peer = java.import('org.ruchith.ae.peer.Peer');
-var peer = new Peer(config.name);
+var peer = new Peer(name);
 
 var process_action = function(val) {
 	if(typeof val.parameters != 'undefined') {
-		console.log(val);
+		if(val.action == 'add_contact') {
+			console.log('Creating contact ' + val.parameters.name);
+			peer.createContactStr(val.parameters.name, function(err, result) {
+				var priv_data = JSON.parse(result);
+				//Send this to the contact
+				var post_data = {"from" : name, 
+								"to" : val.parameters.name,
+								"priv_data" : priv_data};
+
+				request.post('http://localhost:5000/direct_message', {form:{msg:post_data}});
+			});
+		}
 		return 1;
 	}
 	return 0;
@@ -41,6 +59,20 @@ exports.start = function(req, res) {
 	res.send('OK');
 };
 
-exports.index = function(req, res){
+exports.index = function(req, res) {
   res.render('index', { title: 'Express' });
 };
+
+
+exports.contacts = function(req, res) {
+	peer.getContactList(function(err, results) {
+		res.send(results);
+	});
+}
+
+exports.process_pub_data = function(data) {
+	if(data.length > 0) {
+		console.log(data);		
+	}
+
+}

@@ -35,23 +35,6 @@ app.get('/contacts', routes.contacts);
 
 app.get('/start', routes.start);
 
-var msg_index = 0;
-var pubchannel_update_interval = 5000;
-//Thread to read the public channel
-setInterval(function() {
-	request('http://localhost:5000/get_all_messages_after?msg_id=' + msg_index, function (error, response, data) {
-		if (!error && response.statusCode == 200) {
-			//Convert to JSON
-			j_data = JSON.parse(data);
-			
-			//Update message index
-			msg_index += j_data.length;
-			routes.process_pub_data(j_data);
-		}
-	});
-}, pubchannel_update_interval);
-
-
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

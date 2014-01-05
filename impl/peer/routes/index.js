@@ -63,16 +63,60 @@ exports.index = function(req, res) {
   res.render('index', { title: 'Express' });
 };
 
-
 exports.contacts = function(req, res) {
-	peer.getContactList(function(err, results) {
-		res.send(results);
+	peer.getContacts(function(err, results) {
+		res.send(JSON.parse(results));
 	});
-}
+};
 
-exports.process_pub_data = function(data) {
-	if(data.length > 0) {
-		console.log(data);		
-	}
 
-}
+
+var msg_index = 0;
+var pubchannel_update_interval = 5000;
+
+//Thread to read the public channel general messages
+setInterval(function() {
+	request('http://localhost:5000/get_all_messages_after?msg_id=' + msg_index, function (error, response, data) {
+		if (!error && response.statusCode == 200) {
+			//Convert to JSON
+			j_data = JSON.parse(data);
+			
+			//Update message index
+			msg_index += j_data.length;
+			if(j_data.length > 0) {
+				console.log(j_data);
+			}
+		}
+	});
+}, pubchannel_update_interval);
+
+
+//Thread to read the public channel personal messages
+var priv_msg_index = 0;
+setInterval(function() {
+	request('http://localhost:5000/get_direct_messages?user=' + name + '&msg_id=' + priv_msg_index, function (error, response, data) {
+		if (!error && response.statusCode == 200) {
+			//Convert to JSON
+			j_data = JSON.parse(data);
+			
+			//Update message index
+			priv_msg_index += j_data.length;
+			if(j_data.length > 0) {
+				for(var i in j_data) {
+					var msg = j_data[i];
+					if(typeof msg.priv_data != 'undefined') {
+						//Private data from a peer
+						peer.registerContactStr(msg.from, JSON.stringify(msg.priv_data), function(err, result) {
+							if(!err) {
+								console.log('DONE');
+							} else {
+								console.log(err);
+							}
+						});
+					}
+				}
+			}
+		}
+	});
+}, pubchannel_update_interval);
+

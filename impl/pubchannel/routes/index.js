@@ -39,6 +39,8 @@ exports.get_all_direct_messages = function(req, res) {
 
 exports.get_all_direct_messages_for = function(req, res) {
 	var user = req.query.user;
+	var msg_id = req.query.msg_id;
+
 	var results = new Array();
 
 	//Select messages for user
@@ -49,5 +51,6 @@ exports.get_all_direct_messages_for = function(req, res) {
 		}
 	}
 
+	results = results.slice(msg_id);
 	res.send(results);
 }

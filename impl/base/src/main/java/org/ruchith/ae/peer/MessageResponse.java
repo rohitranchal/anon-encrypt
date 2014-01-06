@@ -13,32 +13,33 @@ public class MessageResponse {
 	
 	private String user;
 	private String tmpPubKey;
-	private AECipherText cipherText;
+	private ArrayNode cipherText;
 	
-	public MessageResponse(String user, String tmpPubKey, AECipherText cipherText) {
+	public MessageResponse(String user, String tmpPubKey, ArrayNode cipherText) {
 		this.user = user;
 		this.tmpPubKey = tmpPubKey;
 		this.cipherText = cipherText;
 	}
 	
-	public MessageResponse(ObjectNode on, Pairing pairing) {
+	public MessageResponse(ObjectNode on) {
 		TextNode uTn = (TextNode) on.get("user");
 		this.user = uTn.getTextValue();
 		
 		TextNode pkTn = (TextNode) on.get("tmpPubKey");
 		this.tmpPubKey = pkTn.getTextValue();
 		
-		ArrayNode ctTn = (ArrayNode) on.get("cipherText");
-		this.cipherText = new AECipherText(ctTn, pairing);
+		ArrayNode ctTn = 
+		this.cipherText = (ArrayNode) on.get("cipherText"); 
 	}
 	
 	public ObjectNode serializeJSON() {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode rootNode = mapper.createObjectNode();
 		ObjectNode on = (ObjectNode) rootNode;
+		on.put("type", "data_response");
 		on.put("user", this.user);
 		on.put("tmpPubKey", this.tmpPubKey);
-		on.put("cipherText", this.cipherText.serializeJSON());
+		on.put("cipherText", this.cipherText);
 		return on;
 	}
 
@@ -46,7 +47,7 @@ public class MessageResponse {
 		return tmpPubKey;
 	}
 
-	public AECipherText getCipherText() {
+	public ArrayNode getCipherText() {
 		return cipherText;
 	}
 

@@ -57,7 +57,7 @@ var process_action = function(val) {
 					console.log(err);	
 				} else {
 					var data_req = JSON.parse(result);
-					request.post('http://localhost:5000/add_message', {form:{msg:data_req}});	
+					request.post('http://localhost:5000/add_message', {form:{msg:data_req}});
 				}
 				
 			});
@@ -98,7 +98,7 @@ exports.contacts = function(req, res) {
 
 
 var msg_index = 0;
-var pubchannel_update_interval = 5000;
+var pubchannel_update_interval = 3000;
 
 //Thread to read the public channel general messages
 setInterval(function() {
@@ -110,8 +110,31 @@ setInterval(function() {
 			//Update message index
 			msg_index += j_data.length;
 			if(j_data.length > 0) {
-				console.log('['  + name + '] PUB CHANNEL ' + data);
-				//console.log(j_data);
+				// console.log('['  + name + '] PUB CHANNEL ' + data);
+				for(i in j_data) {
+					var tmp_data = JSON.stringify(j_data[i].data);
+					if(j_data[i].data.type == 'data_request') {
+						peer.generateResponseStr(tmp_data, function(err, result) {
+							if(!err) {
+								console.log(result);
+								var resp = JSON.parse(result);
+								request.post('http://localhost:5000/add_message', {form:{msg:resp}});
+							} else {
+								console.log(err);
+							}
+						});
+					} else if(j_data[i].data.type == 'data_response') {
+						console.log('RESPONSE:' + tmp_data);
+						peer.processResponseStr(tmp_data, function(err, result) {
+							if(!err) {
+								console.log(result);
+							} else {
+								console.log(err);
+							}
+						});
+					}
+					
+				}
 
 			}
 		}

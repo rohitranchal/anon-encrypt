@@ -159,6 +159,13 @@ public class Peer {
 	 */
 	public MessageResponse generateResponse(MessageRequest req) {
 		String user = req.getUser();
+		
+		//Check whether this is on of my requests
+		HashMap<String, AEPrivateKey> tmpKeyMap = this.tmpKeyList.get(user);
+		if(tmpKeyMap != null && tmpKeyMap.containsKey(req.getTmpPubKey())) {
+			return null;
+		}
+		
 		//If there are no messages from the user there's no point of looking
 		//any further
 		if(messages.containsKey(user)) { 
@@ -184,12 +191,28 @@ public class Peer {
 
 			AECipherText cipherText = encrypt.doEncrypt(msgElems, idElem);
 
-			MessageResponse resp = new MessageResponse(user, tmpPubKey, cipherText);
+			MessageResponse resp = new MessageResponse(user, tmpPubKey, cipherText.serializeJSON());
 			return resp;
 		}
 		return null;
 	}
 
+	public String generateResponseStr(String reqStr) {
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			ObjectNode newOn = (ObjectNode)mapper.readTree(reqStr);
+			MessageRequest req = new MessageRequest(newOn);
+			MessageResponse resp = this.generateResponse(req);
+			if(resp != null) {
+				return resp.serializeJSON().toString();
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	private String getLastMesssageOfContact(String user) {
 		ArrayList<String> msgList = messages.get(user);
 		if(msgList != null) {
@@ -199,20 +222,7 @@ public class Peer {
 			return null;
 		}
 	}
-	
-	public String generateResponseStr(String req) {
-		try {
-			ObjectMapper mapper = new ObjectMapper();
-			ObjectNode newOn = (ObjectNode)mapper.readTree(req);
-			MessageResponse resp = this.generateResponse(new MessageRequest(newOn));
-			return resp.serializeJSON().toString();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-        
-	}
-	
+
 	/**
 	 * Process an incoming response.
 	 * @param resp
@@ -220,7 +230,7 @@ public class Peer {
 	 */
 	public String processResponse(MessageResponse resp) {
 		String user = resp.getUser();
-
+		
 		HashMap<String, AEPrivateKey> pkMap = this.tmpKeyList.get(user);
 		if(pkMap != null) {
 			String tmpPubKey = resp.getTmpPubKey();
@@ -228,8 +238,7 @@ public class Peer {
 			if(tmpKey != null) {
 				ContactPrivateData cpd = this.privData.get(user);
 				AEParameters contactParams = cpd.getParams();
-				
-				AECipherText ct = resp.getCipherText();
+				AECipherText ct = new AECipherText(resp.getCipherText(), contactParams.getPairing());
 				
 				//Decrypt
 				Decrypt decrypt = new Decrypt();
@@ -240,8 +249,22 @@ public class Peer {
 				byte[] decoded = encoder.decode(plainElems);
 				
 				String msg = new String(decoded).trim();
+				this.addDirectMessage(user, msg);
 				return msg;
 			}
+		}
+		return null;
+	}
+	
+	public String processResponseStr(String respStr) {
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			ObjectNode newOn = (ObjectNode)mapper.readTree(respStr);
+			MessageResponse resp = new MessageResponse(newOn);
+			return this.processResponse(resp);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return null;
 	}

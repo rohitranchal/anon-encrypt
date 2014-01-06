@@ -1,0 +1,8 @@
+{
+"name" : "Alice",
+"actions" : [
+	{"action": "add_contact", "parameters":  {"name" : "Bob"}},
+	{"action": "add_contact", "parameters":  {"name" : "Charlie"}},
+	{"action": "direct_message", "parameters":  {"to" : "Bob", "message" : "Attack at dawn"}}
+	]
+}

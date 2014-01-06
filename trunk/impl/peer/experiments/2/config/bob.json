@@ -1,0 +1,8 @@
+{
+"name" : "Bob",
+"lie" : true,
+"actions" : [
+	{"action": "add_contact", "parameters":  {"name" : "Alice"}},
+	{"action": "add_contact", "parameters":  {"name" : "Tommy"}}
+	]
+}

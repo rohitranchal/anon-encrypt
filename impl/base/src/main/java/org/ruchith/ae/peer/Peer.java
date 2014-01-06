@@ -5,14 +5,11 @@ import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
@@ -34,6 +31,7 @@ import org.ruchith.ae.base.TextEncoder;
 public class Peer {
 
 	private String name;
+	private boolean lie;
 	private AEParameters params;
 	private Element masterKey;
 	
@@ -43,8 +41,9 @@ public class Peer {
 	
 	private HashMap<String, HashMap<String, AEPrivateKey>> tmpKeyList = new HashMap<>();
 	
-	public Peer(String name) {
+	public Peer(String name, boolean lie) {
 		this.name = name;
+		this.lie = lie;
 		
 		CurveParams curveParams = (CurveParams) new TypeA1CurveGenerator(4, 32)
 				.generate();
@@ -158,43 +157,46 @@ public class Peer {
 	 * @return
 	 */
 	public MessageResponse generateResponse(MessageRequest req) {
+		String msg = "";
 		String user = req.getUser();
-		
-		//Check whether this is on of my requests
-		HashMap<String, AEPrivateKey> tmpKeyMap = this.tmpKeyList.get(user);
-		if(tmpKeyMap != null && tmpKeyMap.containsKey(req.getTmpPubKey())) {
-			return null;
+		if(lie) {
+			//Lie
+			msg = "BlahBlah";
+		} else {
+			if(messages.containsKey(user)) {
+				//Check whether this is on of my requests
+				HashMap<String, AEPrivateKey> tmpKeyMap = this.tmpKeyList.get(user);
+				if(tmpKeyMap != null && tmpKeyMap.containsKey(req.getTmpPubKey())) {
+					return null;
+				}
+				msg = getLastMesssageOfContact(user);
+			} else {//If we don't have a message
+				return null;
+			}
 		}
+	
+		//Encrypt msg and send response
+		ContactPrivateData cpd = privData.get(user);
+		AEParameters contactParams = cpd.getParams();
 		
-		//If there are no messages from the user there's no point of looking
-		//any further
-		if(messages.containsKey(user)) { 
-			//This is definitely there
-			ContactPrivateData cpd = privData.get(user);
-			AEParameters contactParams = cpd.getParams();
-			
-			String tmpPubKey = req.getTmpPubKey();
-			Element idElem = contactParams.getPairing().getG1().newElement();
-			idElem.setFromBytes(Base64.decode(tmpPubKey));
-			idElem = idElem.getImmutable();
-			
-			//Last msg form user
-			String msg = getLastMesssageOfContact(user);
-			
-			TextEncoder encoder = new TextEncoder();
-			encoder.init(contactParams);
-			Element[] msgElems = encoder.encode(msg);
-			
-			// Encrypt the msg
-			Encrypt encrypt = new Encrypt();
-			encrypt.init(contactParams);
+		String tmpPubKey = req.getTmpPubKey();
+		Element idElem = contactParams.getPairing().getG1().newElement();
+		idElem.setFromBytes(Base64.decode(tmpPubKey));
+		idElem = idElem.getImmutable();
+		
+		
+		TextEncoder encoder = new TextEncoder();
+		encoder.init(contactParams);
+		Element[] msgElems = encoder.encode(msg);
+		
+		// Encrypt the msg
+		Encrypt encrypt = new Encrypt();
+		encrypt.init(contactParams);
 
-			AECipherText cipherText = encrypt.doEncrypt(msgElems, idElem);
+		AECipherText cipherText = encrypt.doEncrypt(msgElems, idElem);
 
-			MessageResponse resp = new MessageResponse(user, tmpPubKey, cipherText.serializeJSON());
-			return resp;
-		}
-		return null;
+		MessageResponse resp = new MessageResponse(user, tmpPubKey, cipherText.serializeJSON());
+		return resp;
 	}
 
 	public String generateResponseStr(String reqStr) {

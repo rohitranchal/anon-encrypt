@@ -9,7 +9,7 @@ import org.codehaus.jackson.node.ObjectNode;
 public class TestPeer extends TestCase {
 
 	public void testCreateContact() {
-		Peer p = new Peer("Bob");
+		Peer p = new Peer("Bob", false);
 		ContactPrivateData privData = p.createContact("alice");
 		ObjectNode out = privData.serializeJSON();
 		ContactPrivateData tmpPrivateData = new ContactPrivateData(out);
@@ -20,14 +20,14 @@ public class TestPeer extends TestCase {
 	}
 	
 	public void testTwoPeers() {
-		Peer p = new Peer("p");
+		Peer p = new Peer("p", false);
 		
 		ContactPrivateData alicePrivData = p.createContact("alice");
-		Peer alice = new Peer("alice");
+		Peer alice = new Peer("alice", false);
 		alice.registerContact("p", alicePrivData);
 
 		ContactPrivateData bobPrivData = p.createContact("bob");
-		Peer bob = new Peer("bob");
+		Peer bob = new Peer("bob", false);
 		bob.registerContact("p", bobPrivData);
 		
 		String origMsg = "Attack";
@@ -47,16 +47,45 @@ public class TestPeer extends TestCase {
 		assertEquals(origMsg, outputMsg);
 	}
 	
+	public void testTwoPeersWithOneLying() {
+		Peer p = new Peer("p", false);
+		
+		ContactPrivateData alicePrivData = p.createContact("alice");
+		Peer alice = new Peer("alice", true);
+		alice.registerContact("p", alicePrivData);
+
+		ContactPrivateData bobPrivData = p.createContact("bob");
+		Peer bob = new Peer("bob", false);
+		bob.registerContact("p", bobPrivData);
+		
+		String origMsg = "Attack";
+		alice.addDirectMessage("p", origMsg);
+
+		MessageRequest req = bob.generateRequest("p");
+		ObjectNode on = req.serializeJSON();
+		
+		req = new MessageRequest(on);
+		
+		MessageResponse resp = alice.generateResponse(req);
+		
+		on = resp.serializeJSON();
+		resp = new MessageResponse(on);
+				
+		String outputMsg = bob.processResponse(resp);
+		assertNotSame(origMsg, outputMsg);
+	}
+	
+	
 	public void test10Peers() {
 		
-		Peer p = new Peer("p");
+		Peer p = new Peer("p", false);
 		
 		ArrayList<Peer> contacts = new ArrayList<Peer>();
 		
 		for(int i = 0; i < 10; i++) {
 			ContactPrivateData tmpPrivData = p.createContact("alice");
 			
-			Peer tmp = new Peer("contact" + i);
+			Peer tmp = new Peer("contact" + i, false);
 			tmp.registerContact("p", tmpPrivData);
 			contacts.add(tmp);
 		}

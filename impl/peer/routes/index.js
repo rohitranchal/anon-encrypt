@@ -28,6 +28,7 @@ var config = JSON.parse(config_data);
 var name = config.name;
 var lie = (typeof config.lie != 'undefined' && config.lie);
 
+console.log('[' + name + '] : LIE ' + lie);
 
 var Peer = java.import('org.ruchith.ae.peer.Peer');
 var peer = new Peer(name, lie);
@@ -167,7 +168,7 @@ setInterval(function() {
 							}
 						});
 					} else if(typeof msg.msg != 'undefined') {
-						console.log(msg);
+						// console.log(msg);
 						//Direct message from a peer
 						peer.addDirectMessage(msg.from, msg.msg, function(err, result) {
 							if(!err) {

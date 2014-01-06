@@ -1,0 +1,10 @@
+node app.js 8001 ./experiments/2/config/alice.json &
+node app.js 8002 ./experiments/2/config/bob.json &
+sleep 1
+curl http://localhost:8001/start &
+curl http://localhost:8002/start &
+sleep 4
+curl http://localhost:8001/stop &
+node app.js 8003 ./experiments/2/config/charlie.json &
+sleep 4
+curl http://localhost:8003/start &

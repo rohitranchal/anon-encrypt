@@ -77,6 +77,12 @@ exports.start = function(req, res) {
 	res.send('OK');
 };
 
+exports.stop_peer = function(req, res) {
+	console.log('['  + name + '] STOP');
+	res.send('OK');
+	process.exit();
+}
+
 exports.index = function(req, res) {
   res.render('index', { title: 'Express' });
 };
@@ -106,6 +112,7 @@ setInterval(function() {
 			if(j_data.length > 0) {
 				console.log('['  + name + '] PUB CHANNEL ' + data);
 				//console.log(j_data);
+
 			}
 		}
 	});

@@ -41,7 +41,7 @@ public class TestPeer extends TestCase {
 		MessageResponse resp = alice.generateResponse(req);
 		
 		on = resp.serializeJSON();
-		resp = new MessageResponse(on, bobPrivData.getParams().getPairing());
+		resp = new MessageResponse(on);
 				
 		String outputMsg = bob.processResponse(resp);
 		assertEquals(origMsg, outputMsg);

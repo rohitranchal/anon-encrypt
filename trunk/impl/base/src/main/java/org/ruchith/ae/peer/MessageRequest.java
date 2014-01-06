@@ -36,6 +36,7 @@ public class MessageRequest {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode rootNode = mapper.createObjectNode();
 		ObjectNode on = (ObjectNode) rootNode;
+		on.put("type", "data_request");
 		on.put("user", this.user);
 		on.put("tmpPubKey", this.tmpPubKey);
 		return on;

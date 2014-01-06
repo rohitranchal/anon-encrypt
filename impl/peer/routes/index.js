@@ -26,9 +26,11 @@ config_file = process.argv[3];
 var config_data = fs.readFileSync(config_file).toString();
 var config = JSON.parse(config_data);
 var name = config.name;
+var lie = (typeof config.lie != 'undefined' && config.lie);
+
 
 var Peer = java.import('org.ruchith.ae.peer.Peer');
-var peer = new Peer(name);
+var peer = new Peer(name, lie);
 
 var process_action = function(val) {
 	if(typeof val.parameters != 'undefined') {

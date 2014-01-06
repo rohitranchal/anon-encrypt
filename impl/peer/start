@@ -4,6 +4,7 @@ sleep 1
 curl http://localhost:8001/start
 curl http://localhost:8002/start
 sleep 10
+curl http://localhost:8001/stop
 node app.js 8003 ./experiments/1/config/charlie.json &
 sleep 10
 curl http://localhost:8003/start

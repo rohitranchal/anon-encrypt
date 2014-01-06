@@ -31,9 +31,8 @@ if ('development' == app.get('env')) {
 
 app.get('/', routes.index);
 app.get('/contacts', routes.contacts);
-
-
 app.get('/start', routes.start);
+app.get('/stop', routes.stop_peer);
 
 
 http.createServer(app).listen(app.get('port'), function(){

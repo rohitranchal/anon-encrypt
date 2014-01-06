@@ -28,7 +28,6 @@ public class MessageResponse {
 		TextNode pkTn = (TextNode) on.get("tmpPubKey");
 		this.tmpPubKey = pkTn.getTextValue();
 		
-		ArrayNode ctTn = 
 		this.cipherText = (ArrayNode) on.get("cipherText"); 
 	}
 	

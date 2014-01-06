@@ -3,9 +3,6 @@
 "actions" : [
 	{"action": "add_contact", "parameters":  {"name" : "Bob"}},
 	{"action": "add_contact", "parameters":  {"name" : "Charlie"}},
-	{"action": "add_contact", "parameters":  {"name" : "Nancy"}},
-	{"action": "add_contact", "parameters":  {"name" : "John"}},
-	{"action": "add_contact", "parameters":  {"name" : "David"}},
 	{"action": "direct_message", "parameters":  {"to" : "Bob", "message" : "Attack at dawn"}}
 	]
 }

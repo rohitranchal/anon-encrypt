@@ -172,8 +172,7 @@ public class Peer {
 			idElem = idElem.getImmutable();
 			
 			//Last msg form user
-			ArrayList<String> msgList = messages.get(user);
-			String msg = msgList.get(msgList.size()-1);
+			String msg = getLastMesssageOfContact(user);
 			
 			TextEncoder encoder = new TextEncoder();
 			encoder.init(contactParams);
@@ -189,6 +188,16 @@ public class Peer {
 			return resp;
 		}
 		return null;
+	}
+
+	private String getLastMesssageOfContact(String user) {
+		ArrayList<String> msgList = messages.get(user);
+		if(msgList != null) {
+			String msg = msgList.get(msgList.size()-1);
+			return msg;
+		} else {
+			return null;
+		}
 	}
 	
 	public String generateResponseStr(String req) {
@@ -256,7 +265,10 @@ public class Peer {
 			tmp.put("name", contact);
 			if(tmpPrivData != null) {
 				tmp.put("priv_data", tmpPrivData.serializeJSON().toString());
-				;
+			}
+			String lstMsg = this.getLastMesssageOfContact(contact);
+			if(lstMsg != null) {
+				tmp.put("last_message", lstMsg);
 			}
 			root.add(tmp);
 		}

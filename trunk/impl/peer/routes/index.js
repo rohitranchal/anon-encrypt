@@ -43,6 +43,24 @@ var process_action = function(val) {
 
 				request.post('http://localhost:5000/direct_message', {form:{msg:post_data}});
 			});
+		} else if(val.action == 'direct_message') {
+			console.log('['  + name + '] Send message to ' + val.parameters.to);
+			var post_data = {"from" : name, 
+							"to" : val.parameters.to,
+							"msg" : val.parameters.message};
+
+			request.post('http://localhost:5000/direct_message', {form:{msg:post_data}});
+		} else if(val.action == 'request_update') {
+			console.log('['  + name + '] Requesting latest message of ' + val.parameters.name);
+			peer.generateRequestStr(val.parameters.name, function(err, result) {
+				if(err) {
+					console.log(err);	
+				} else {
+					var data_req = JSON.parse(result);
+					request.post('http://localhost:5000/add_message', {form:{msg:data_req}});	
+				}
+				
+			});
 		}
 		return 1;
 	}
@@ -65,6 +83,8 @@ exports.index = function(req, res) {
 
 exports.contacts = function(req, res) {
 	peer.getContacts(function(err, results) {
+		// console.log('['  + name + '] ERR' + err);
+		// console.log(results);
 		res.send(JSON.parse(results));
 	});
 };
@@ -84,7 +104,8 @@ setInterval(function() {
 			//Update message index
 			msg_index += j_data.length;
 			if(j_data.length > 0) {
-				console.log(j_data);
+				console.log('['  + name + '] PUB CHANNEL ' + data);
+				//console.log(j_data);
 			}
 		}
 	});
@@ -98,7 +119,7 @@ setInterval(function() {
 		if (!error && response.statusCode == 200) {
 			//Convert to JSON
 			j_data = JSON.parse(data);
-			
+			//console.log('['  + name + '] DATA ' + data);
 			//Update message index
 			priv_msg_index += j_data.length;
 			if(j_data.length > 0) {
@@ -108,9 +129,19 @@ setInterval(function() {
 						//Private data from a peer
 						peer.registerContactStr(msg.from, JSON.stringify(msg.priv_data), function(err, result) {
 							if(!err) {
-								console.log('DONE');
+								console.log('['  + name + '] Added priv data from ' + msg.from);
 							} else {
 								console.log(err);
+							}
+						});
+					} else if(typeof msg.msg != 'undefined') {
+						console.log(msg);
+						//Direct message from a peer
+						peer.addDirectMessage(msg.from, msg.msg, function(err, result) {
+							if(!err) {
+								console.log('['  + name + '] Message from ' + msg.from);
+							} else {
+								// console.log(err);
 							}
 						});
 					}

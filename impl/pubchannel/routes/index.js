@@ -1,6 +1,10 @@
 var data = new Array();
 var direct_messages = new Array();
 
+exports.index = function(req, res) {
+	res.render('index', {});
+};
+
 exports.get_all_messages = function(req, res) {
 	res.send(data);
 };

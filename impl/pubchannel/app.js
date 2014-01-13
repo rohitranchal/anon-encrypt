@@ -29,7 +29,8 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', routes.get_all_messages);
+app.get('/', routes.index);
+app.get('/all', routes.get_all_messages);
 app.get('/add_message', routes.add_message);
 app.post('/add_message', routes.add_message);
 app.get('/get_all_messages_after', routes.get_all_messages_after);

@@ -5,6 +5,27 @@ exports.index = function(req, res) {
 	res.render('index', {});
 };
 
+exports.status = function(req, res) {
+
+	var scn = new Array();	
+
+	var peers = new Array();
+	peers[peers.length] = {name: 'Alice', host: 'localhost:8001'};
+	peers[peers.length] = {name: 'Bob', host: 'localhost:8002'};
+	peers[peers.length] = {name: 'Charlie', host: 'localhost:8003'};
+
+	scn[0] = {name: 'Basic Message Exchange', peers: peers};
+
+	var peers = new Array();
+	peers[peers.length] = {name: 'Alice', host: 'localhost:8001'};
+	peers[peers.length] = {name: 'Bob', host: 'localhost:8002'};
+	peers[peers.length] = {name: 'Charlie', host: 'localhost:8003'};
+
+	scn[1] = {name: 'Message Exchange with Lying Peer', peers: peers};
+
+	res.render('status', {scenarios: scn});
+};
+
 exports.get_all_messages = function(req, res) {
 	res.send(data);
 };

@@ -30,6 +30,7 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
+app.get('/status', routes.status);
 app.get('/all', routes.get_all_messages);
 app.get('/add_message', routes.add_message);
 app.post('/add_message', routes.add_message);

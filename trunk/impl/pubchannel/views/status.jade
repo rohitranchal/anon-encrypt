@@ -1,0 +1,24 @@
+html(lang="en")
+	include header
+	body
+		include nav
+		div(class="container")
+			div(class="panel panel-default text-center")
+				for scenario in scenarios
+					div(class="panel-heading text-center")
+						h3=scenario.name
+					div(class="panel-body text-center")
+						div(class="row")
+							for peer in scenario.peers
+								div(class="col-md-3")
+									div(class="panel panel-info")
+										div(class="panel-heading text-center")
+											h4=peer.name
+										div(class="panel-body")
+											div(class="row")
+												div(class="col-md-6")
+													a(href='/get_direct_messages?user=' + peer.name) Direct Messages
+												div(class="col-md-2")
+													button(class="btn btn-xs btn-default", type="button", id='start_' + peer.host) Start
+												div(class="col-md-2")
+													button(class="btn btn-xs btn-default", type="button", id='stop_' + peer.host) Stop

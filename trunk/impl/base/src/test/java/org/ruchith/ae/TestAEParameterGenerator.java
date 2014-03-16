@@ -1,5 +1,8 @@
 package org.ruchith.ae;
 
+import java.math.BigInteger;
+
+import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
 import junit.framework.TestCase;
@@ -21,7 +24,6 @@ public class TestAEParameterGenerator extends TestCase {
                AEParameters params = paramGen.generateParameters();
 
                ObjectNode on = params.serializeJSON();
-               System.out.println(on);
                
                ObjectMapper mapper = new ObjectMapper();
                ObjectNode newOn = (ObjectNode)mapper.readTree(on.toString());
@@ -36,5 +38,14 @@ public class TestAEParameterGenerator extends TestCase {
                assertEquals(params.getH1(), newParams.getH1());
                assertEquals(params.getH2(), newParams.getH2());
                assertEquals(params.getH3(), newParams.getH3());
+               
+               //Generator check
+               Element tmpG = params.getG();
+               BigInteger order = params.getPairing().getG1().getOrder();
+               Element mul = tmpG.mul(order);
+               //g * order == identity
+               assertTrue(mul.isZero());
+               //g == g * (order + 1)
+               assertEquals(tmpG, mul.add(tmpG));
        }
 }

@@ -161,7 +161,7 @@ public class Peer {
 		String user = req.getUser();
 		if(lie) {
 			//Lie
-			msg = "BlahBlah";
+			msg = "lie:BlahBlah";
 		} else {
 			if(messages.containsKey(user)) {
 				//Check whether this is on of my requests

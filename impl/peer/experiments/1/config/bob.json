@@ -1,7 +1,6 @@
 {
 "name" : "Bob",
 "actions" : [
-	{"action": "add_contact", "parameters":  {"name" : "Alice"}},
-	{"action": "add_contact", "parameters":  {"name" : "Tommy"}}
+	{"action": "add_contact", "parameters":  {"name" : "Alice"}}
 	]
 }

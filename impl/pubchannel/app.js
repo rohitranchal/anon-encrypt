@@ -35,6 +35,8 @@ app.get('/all', routes.get_all_messages);
 app.get('/add_message', routes.add_message);
 app.post('/add_message', routes.add_message);
 app.get('/get_all_messages_after', routes.get_all_messages_after);
+app.get('/get_message_index_of_peer', routes.get_message_index_of_peer);
+app.get('/set_message_index_of_peer', routes.set_message_index_of_peer);
 
 app.post('/direct_message', routes.add_direct_message);
 app.get('/get_direct_messages', routes.get_all_direct_messages_for);

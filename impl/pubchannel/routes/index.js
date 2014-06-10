@@ -52,6 +52,18 @@ exports.add_message = function(req, res) {
 	}
 
 	if(typeof msg != 'undefined') {
+
+		//Handle confirmatiom messages
+		if(msg.type == 'data_request_confirmation') {
+			//Look for the request message and close it
+			for(var i = 0; i < data.length; i++) {
+				if(data[i].data.type == 'data_request' && data[i].data.tmpPubKey == msg.tmpPubKey) {
+					data.status = 'closed';
+					console.log('Closed : ' + msg.tmpPubKey);
+				}
+			}
+		}
+
 		var ts = new Date().getTime();
 		tmp_data = {"data" : msg, "timestamp" : ts, "status" : "live"};
 		data[data.length] = tmp_data;

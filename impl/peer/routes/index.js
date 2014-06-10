@@ -130,12 +130,16 @@ setInterval(function() {
 							});
 						} else if(j_data[i].data.type == 'data_response') {
 							console.log('RESPONSE:' + tmp_data);
+							var tmpPubKey = j_data[i].data.tmpPubKey;
 							peer.processResponseStr(tmp_data, function(err, result) {
 								if(!err && result != null) {
 									console.log(result);
 									if(result.indexOf("lie:") == -1) {
 										//This replaces signature verification
 										console.log('NOT A LIE');
+										//Send confirmation
+										var conf = {"type" : "data_request_confirmation", "tmpPubKey" : tmpPubKey}
+										request.post('http://localhost:5000/add_message', {form:{msg:conf}});
 									} else {
 										console.log('LIE RECEIVED!!!');
 									}

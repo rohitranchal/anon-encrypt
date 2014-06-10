@@ -1,5 +1,6 @@
 var data = new Array();
 var direct_messages = new Array();
+var msg_index = new Array();
 var ttl = 5000;
 
 exports.index = function(req, res) {
@@ -71,6 +72,40 @@ exports.add_message = function(req, res) {
 	
 	res.send('OK');
 };
+
+exports.get_message_index_of_peer = function(req, res) {
+
+	var user = req.query.user;
+
+	var user_obj = {};
+	for(var i = 0; i < msg_index.length; i++) {
+		if(msg_index[i].user == user) {
+			user_obj = msg_index[i];
+		}
+	}
+
+	res.send(user_obj);
+}
+
+exports.set_message_index_of_peer = function(req, res) {
+	var user = req.query.user;
+	var ind = req.query.ind;
+	var user_obj_ind = -1;
+	for(var i = 0; i < msg_index.length; i++) {
+		console.log(msg_index[i].user);
+		if(msg_index[i].user == user) {
+			user_obj_ind = i;
+		}
+	}
+
+	if(user_obj == null) {
+		var user_obj = {"user" : user, "index" : ind};
+		msg_index[msg_index.length] = user_obj;
+	} else {
+		msg_index[user_obj_ind].index = ind;
+	}
+	res.send('OK');
+}
 
 exports.add_direct_message = function(req, res) {	
 	var msg = req.body.msg;

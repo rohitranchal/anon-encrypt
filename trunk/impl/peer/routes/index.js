@@ -115,28 +115,38 @@ setInterval(function() {
 			if(j_data.length > 0) {
 				// console.log('['  + name + '] PUB CHANNEL ' + data);
 				for(i in j_data) {
-					var tmp_data = JSON.stringify(j_data[i].data);
-					if(j_data[i].data.type == 'data_request') {
-						peer.generateResponseStr(tmp_data, function(err, result) {
-							if(!err) {
-								console.log(result);
-								var resp = JSON.parse(result);
-								request.post('http://localhost:5000/add_message', {form:{msg:resp}});
-							} else {
-								console.log(err);
-							}
-						});
-					} else if(j_data[i].data.type == 'data_response') {
-						console.log('RESPONSE:' + tmp_data);
-						peer.processResponseStr(tmp_data, function(err, result) {
-							if(!err) {
-								console.log(result);
-							} else {
-								console.log(err);
-							}
-						});
+					//Ignore expired or closed messages
+					if(j_data[i].status != 'expired' && j_data[i].status != 'closed') {
+						var tmp_data = JSON.stringify(j_data[i].data);
+						if(j_data[i].data.type == 'data_request') {
+							peer.generateResponseStr(tmp_data, function(err, result) {
+								if(!err) {
+									console.log(result);
+									var resp = JSON.parse(result);
+									request.post('http://localhost:5000/add_message', {form:{msg:resp}});
+								} else {
+									console.log(err);
+								}
+							});
+						} else if(j_data[i].data.type == 'data_response') {
+							console.log('RESPONSE:' + tmp_data);
+							peer.processResponseStr(tmp_data, function(err, result) {
+								if(!err && result != null) {
+									console.log(result);
+									if(result.indexOf("lie:") == -1) {
+										//This replaces signature verification
+										console.log('NOT A LIE');
+									} else {
+										console.log('LIE RECEIVED!!!');
+									}
+								} else {
+									console.log(err);
+								}
+							});
+						}
+					} else {
+						console.log('expired message ' + i);
 					}
-					
 				}
 
 			}

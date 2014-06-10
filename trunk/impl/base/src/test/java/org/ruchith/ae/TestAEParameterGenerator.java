@@ -43,9 +43,16 @@ public class TestAEParameterGenerator extends TestCase {
                Element tmpG = params.getG();
                BigInteger order = params.getPairing().getG1().getOrder();
                Element mul = tmpG.mul(order);
+               
                //g * order == identity
                assertTrue(mul.isZero());
                //g == g * (order + 1)
                assertEquals(tmpG, mul.add(tmpG));
+               
+               //Checking the use of multiplicative API
+               Element e = params.getPairing().getZr().newElement();
+               e.set(order);
+               mul = tmpG.powZn(e);
+               assertTrue(mul.isZero());
        }
 }

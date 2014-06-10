@@ -1,5 +1,6 @@
 var data = new Array();
 var direct_messages = new Array();
+var ttl = 5000;
 
 exports.index = function(req, res) {
 	res.render('index', {});
@@ -33,6 +34,14 @@ exports.get_all_messages = function(req, res) {
 exports.get_all_messages_after = function(req, res) {
 	var msg_id = req.query.msg_id;
 	var tmp = data.slice(msg_id);
+
+	var now = new Date().getTime();
+	var limit = now - ttl;
+	for(var i = 0; i< tmp.length; i++) {
+		if(tmp[i].timestamp < limit) {
+			tmp[i].status = 'expired';
+		}
+	}
 	res.send(tmp);
 };
 
@@ -44,7 +53,7 @@ exports.add_message = function(req, res) {
 
 	if(typeof msg != 'undefined') {
 		var ts = new Date().getTime();
-		tmp_data = {"data" : msg, "timestamp" : ts};
+		tmp_data = {"data" : msg, "timestamp" : ts, "status" : "live"};
 		data[data.length] = tmp_data;
 	}
 	

@@ -1,10 +1,16 @@
-node app.js 8001 ./experiments/1/config/alice.json &
-node app.js 8002 ./experiments/1/config/bob.json &
+node app.js 8001 Alice &
 sleep 1
-curl http://localhost:8001/start &
-curl http://localhost:8002/start &
-sleep 4
+curl "http://localhost:8001/action?action=add_contact&name=Bob"
+curl "http://localhost:8001/action?action=add_contact&name=Charlie"
+curl "http://localhost:8001/action?action=direct_message&to=Bob&message=Attack_at_dawn"
+
+node app.js 8002 Bob &
+sleep 1
+curl "http://localhost:8002/action?action=add_contact&name=Alice"
+
 curl http://localhost:8001/stop &
-node app.js 8003 ./experiments/1/config/charlie.json &
-sleep 4
-curl http://localhost:8003/start &
+sleep 1
+
+node app.js 8003 Charlie &
+sleep 1
+curl "http://localhost:8003/action?action=add_contact&name=Alice"

@@ -86,9 +86,9 @@ exports.do_action = function(req, res) {
 
 
 var msg_index = 0;
-var pubchannel_update_interval = 3000;
+var pubchannel_update_interval = 2000;
 
-
+var request_skip = 3;
 
 //Thread to read the public channel general messages
 setInterval(function() {
@@ -102,6 +102,8 @@ setInterval(function() {
 			console.log('['  + name + '] msg index ' + msg_index);
 			if(j_data.length > 0) {
 				// console.log('['  + name + '] PUB CHANNEL ' + data);
+
+				var incoming_request_count = 0;
 				for(i in j_data) {
 					//Ignore expired or closed messages
 					if(j_data[i].status != 'expired' && j_data[i].status != 'closed') {
@@ -111,15 +113,23 @@ setInterval(function() {
 
 							//If this is not one of my requests
 							if(my_pub_keys.indexOf(j_data[i].data.tmpPubKey) == -1) {
-								peer.generateResponseStr(tmp_data, function(err, result) {
-									if(!err) {
-										console.log('['  + name + '] Sending ' + result);
-										var resp = JSON.parse(result);
-										request.post('http://localhost:5000/add_message', {form:{msg:resp}});
-									} else {
-										console.log(err);
-									}
-								});
+
+								if((incoming_request_count % request_skip) == 0) {
+									peer.generateResponseStr(tmp_data, function(err, result) {
+										if(!err) {
+											if(result != null) {
+												console.log('['  + name + '] Sending ' + result);
+												var resp = JSON.parse(result);
+												request.post('http://localhost:5000/add_message', {form:{msg:resp}});
+											}
+										} else {
+											console.log('['  + name + '] ERROR 1 ' + err);
+										}
+									});
+								}
+
+								incoming_request_count++;
+
 							}
 							
 						} else if(j_data[i].data.type == 'data_response') {
@@ -131,7 +141,6 @@ setInterval(function() {
 							if(my_pub_keys.indexOf(tmpPubKey) != -1) {
 								peer.processResponseStr(tmp_data, function(err, result) {
 									if(!err && result != null) {
-										console.log(result);
 										if(result.indexOf("lie:") == -1) {
 											//This replaces signature verification
 											console.log('['  + name + ']NOT A LIE');
@@ -149,7 +158,7 @@ setInterval(function() {
 											console.log('['  + name + ']LIE RECEIVED!!!');
 										}
 									} else {
-										console.log(err);
+										console.log('['  + name + '] ERROR 2 ' + err);
 									}
 								});
 							}
@@ -163,7 +172,7 @@ setInterval(function() {
 			}
 		}
 	});
-}, pubchannel_update_interval*3);
+}, pubchannel_update_interval);
 
 
 //Thread to read the public channel personal messages
@@ -185,7 +194,7 @@ setInterval(function() {
 							if(!err) {
 								console.log('['  + name + '] Added priv data from ' + msg.from);
 							} else {
-								console.log(err);
+								console.log('['  + name + '] ERROR 3 ' + err);
 							}
 						});
 					} else if(typeof msg.msg != 'undefined') {
@@ -230,15 +239,15 @@ setInterval(function() {
 						console.log('['  + name + '] generating request');
 						//Make request for data
 						peer.generateRequestStr(data.user, function(err, result) {
-							if(err) {
-								console.log(err);	
-							} else {
+							if(!err) {
 								var data_req = JSON.parse(result);
 
 								//Store the pub key
 								my_pub_keys[my_pub_keys.length] = data_req.tmpPubKey;
 
 								request.post('http://localhost:5000/add_message', {form:{msg:data_req}});
+							} else {
+								console.log('['  + name + '] ERROR 4 ' + err);	
 							}
 							
 						});

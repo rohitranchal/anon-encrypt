@@ -1,0 +1,33 @@
+node app.js 8001 Alice &
+sleep 1
+curl "http://localhost:8001/action?action=add_contact&name=Bob1"
+curl "http://localhost:8001/action?action=add_contact&name=Bob2"
+curl "http://localhost:8001/action?action=add_contact&name=Charlie1"
+curl "http://localhost:8001/action?action=add_contact&name=Charlie2"
+curl "http://localhost:8001/action?action=add_contact&name=Charlie3"
+curl "http://localhost:8001/action?action=add_contact&name=Charlie4"
+curl "http://localhost:8001/action?action=direct_message&to=Bob1&message=Attack_at_dawn"
+curl "http://localhost:8001/action?action=direct_message&to=Bob2&message=Attack_at_dawn"
+
+node app.js 8002 Bob1 lie &
+sleep 1
+curl "http://localhost:8002/action?action=add_contact&name=Alice"
+
+node app.js 8003 Bob2 &
+sleep 1
+curl "http://localhost:8002/action?action=add_contact&name=Alice"
+
+
+curl http://localhost:8001/stop &
+sleep 1
+
+node app.js 8004 Charlie1 &
+node app.js 8005 Charlie2 &
+node app.js 8006 Charlie3 &
+node app.js 8007 Charlie4 &
+sleep 2
+curl "http://localhost:8004/action?action=add_contact&name=Alice"
+curl "http://localhost:8005/action?action=add_contact&name=Alice"
+curl "http://localhost:8006/action?action=add_contact&name=Alice"
+curl "http://localhost:8007/action?action=add_contact&name=Alice"
+

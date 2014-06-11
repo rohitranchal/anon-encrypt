@@ -18,15 +18,9 @@ java.classpath.push(jars_dir + "jpbc-crypto-1.1.0.jar");
 java.classpath.push(jars_dir + "jpbc-plaf-1.1.0.jar");
 java.classpath.push(jars_dir + "../base-1.0-SNAPSHOT.jar");
 
-var config_file = './config.json';
 
-config_file = process.argv[3];
-
-
-var config_data = fs.readFileSync(config_file).toString();
-var config = JSON.parse(config_data);
-var name = config.name;
-var lie = (typeof config.lie != 'undefined' && config.lie);
+var name = process.argv[3];
+var lie = process.argv.length == 5;
 var msg_count = 0;
 var contacts = new Array();
 var my_pub_keys = new Array();
@@ -36,62 +30,7 @@ console.log('[' + name + '] : LIE ' + lie);
 var Peer = java.import('org.ruchith.ae.peer.Peer');
 var peer = new Peer(name, lie);
 
-var process_action = function(val) {
-	if(typeof val.parameters != 'undefined') {
-		if(val.action == 'add_contact') {
-			console.log('['  + name + '] Creating contact ' + val.parameters.name);
-			peer.createContactStr(val.parameters.name, function(err, result) {
-				var priv_data = JSON.parse(result);
-				//Send this to the contact
-				var post_data = {"from" : name, 
-								"to" : val.parameters.name,
-								"priv_data" : priv_data};
 
-				contacts[contacts.length] = {"name" : val.parameters.name, "msg_index" : 0, "available" : 0};
-
-				request.post('http://localhost:5000/direct_message', {form:{msg:post_data}});
-			});
-		} else if(val.action == 'direct_message') {
-			console.log('['  + name + '] Send message to ' + val.parameters.to);
-			var post_data = {"from" : name, 
-							"to" : val.parameters.to,
-							"msg" : val.parameters.message};
-
-			request.post('http://localhost:5000/direct_message', {form:{msg:post_data}});
-
-			msg_count++;
-
-			request('http://localhost:5000/set_message_index_of_peer?user=' + name + '&ind=' + msg_count, function (error, response, body) {
-				// console.log(body);
-			});
-		} 
-		// else if(val.action == 'request_update') {
-		// 	console.log('['  + name + '] Requesting latest message of ' + val.parameters.name);
-
-		// 	peer.generateRequestStr(val.parameters.name, function(err, result) {
-		// 		if(err) {
-		// 			console.log(err);	
-		// 		} else {
-		// 			var data_req = JSON.parse(result);
-		// 			request.post('http://localhost:5000/add_message', {form:{msg:data_req}});
-		// 		}
-				
-		// 	});
-		// }
-		return 1;
-	}
-	return 0;
-};
-
-var actions = config.actions;
-
-exports.start = function(req, res) {
-	actions.reduce(function (previous, item) {
-		return Q(process_action(previous))
-			.then(process_action(item));
-	});
-	res.send('OK');
-};
 
 exports.stop_peer = function(req, res) {
 	console.log('['  + name + '] STOP');
@@ -111,10 +50,45 @@ exports.contacts = function(req, res) {
 	});
 };
 
+exports.do_action = function(req, res) {
+	var action = req.query.action;
+
+	if(action == 'add_contact') {
+			console.log('['  + name + '] Creating contact ' + req.query.name);
+			peer.createContactStr(req.query.name, function(err, result) {
+				var priv_data = JSON.parse(result);
+				//Send this to the contact
+				var post_data = {"from" : name, 
+								"to" : req.query.name,
+								"priv_data" : priv_data};
+
+				contacts[contacts.length] = {"name" : req.query.name, "msg_index" : 0, "available" : 0};
+
+				request.post('http://localhost:5000/direct_message', {form:{msg:post_data}});
+			});
+		} else if(action == 'direct_message') {
+			console.log('['  + name + '] Send message to ' + req.query.to);
+			var post_data = {"from" : name, 
+							"to" : req.query.to,
+							"msg" : req.query.message};
+
+			request.post('http://localhost:5000/direct_message', {form:{msg:post_data}});
+
+			msg_count++;
+
+			request('http://localhost:5000/set_message_index_of_peer?user=' + name + '&ind=' + msg_count, function (error, response, body) {
+				// console.log(body);
+			});
+		}
+		res.send('OK');
+};
+
 
 
 var msg_index = 0;
 var pubchannel_update_interval = 3000;
+
+
 
 //Thread to read the public channel general messages
 setInterval(function() {
@@ -160,7 +134,7 @@ setInterval(function() {
 										console.log(result);
 										if(result.indexOf("lie:") == -1) {
 											//This replaces signature verification
-											console.log('NOT A LIE');
+											console.log('['  + name + ']NOT A LIE');
 											//Send confirmation
 											var conf = {"type" : "data_request_confirmation", "tmpPubKey" : tmpPubKey}
 											request.post('http://localhost:5000/add_message', {form:{msg:conf}});
@@ -172,7 +146,7 @@ setInterval(function() {
 											}
 
 										} else {
-											console.log('LIE RECEIVED!!!');
+											console.log('['  + name + ']LIE RECEIVED!!!');
 										}
 									} else {
 										console.log(err);
@@ -189,7 +163,7 @@ setInterval(function() {
 			}
 		}
 	});
-}, pubchannel_update_interval);
+}, pubchannel_update_interval*3);
 
 
 //Thread to read the public channel personal messages
@@ -217,6 +191,14 @@ setInterval(function() {
 					} else if(typeof msg.msg != 'undefined') {
 						// console.log(msg);
 						//Direct message from a peer
+
+						for(var x = 0; x < contacts.length; x++) {
+							if(contacts[x].name == msg.from) {
+								console.log('['  + name + '] Seting ' + msg.from + '  data index');
+								contacts[x].msg_index = 9999;
+							}
+						}
+
 						peer.addDirectMessage(msg.from, msg.msg, function(err, result) {
 							if(!err) {
 								console.log('['  + name + '] Message from ' + msg.from);
@@ -235,6 +217,7 @@ setInterval(function() {
 //If there is a new message then ask for it
 setInterval(function() {
 	for(var i = 0; i< contacts.length; i++) {
+		console.log('['  + name + '] checking status of ' + contacts[i].name);
 		request('http://localhost:5000/get_message_index_of_peer?user=' + contacts[i].name, function (error, response, data) {
 			if (!error && response.statusCode == 200) {
 				data = JSON.parse(data);
@@ -244,7 +227,7 @@ setInterval(function() {
 
 					if(contacts[j].name == data.user && contacts[j].msg_index < data.index) {
 						contacts[j].available = data.index;
-						console.log("generating request")
+						console.log('['  + name + '] generating request');
 						//Make request for data
 						peer.generateRequestStr(data.user, function(err, result) {
 							if(err) {

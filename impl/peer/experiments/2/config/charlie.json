@@ -1,7 +1,3 @@
 {
-"name" : "Charlie",
-"actions" : [
-	{"action": "add_contact", "parameters":  {"name" : "Alice"}},
-	{"action": "request_update", "parameters":  {"name" : "Alice"}}
-	]
+"name" : "Charlie"
 }

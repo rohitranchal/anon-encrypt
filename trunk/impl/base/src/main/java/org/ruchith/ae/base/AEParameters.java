@@ -131,11 +131,11 @@ public class AEParameters implements CipherParameters {
 		this.g3 = g3;
 	}
 
-	void setH1(Element h1) {
+	public void setH1(Element h1) {
 		this.h1 = h1;
 	}
 
-	void setH2(Element h2) {
+	public void setH2(Element h2) {
 		this.h2 = h2;
 	}
 

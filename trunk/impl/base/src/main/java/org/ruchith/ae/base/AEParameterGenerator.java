@@ -42,6 +42,32 @@ public class AEParameterGenerator {
 		return params;
 	}
 
+	public AEParameters generateParameters(AEParameters from) {
+		
+		AEParameters params = new AEParameters(from);
+		
+		this.pairing = from.getPairing();
+		
+		Field group1 = params.getPairing().getG1();
+		Element g = group1.newRandomElement().getImmutable();
+		params.setG(g);
+		
+		this.alpha = params.getPairing().getZr().newRandomElement().getImmutable();
+		Element g1 = g.powZn(this.alpha);
+		params.setG1(g1);
+		
+		Element g2 = group1.newRandomElement().getImmutable();
+		params.setG2(g2);
+		params.setG3(group1.newRandomElement().getImmutable());
+		params.setH1(group1.newRandomElement().getImmutable());
+		params.setH2(group1.newRandomElement().getImmutable());
+		params.setH3(group1.newRandomElement().getImmutable());
+		
+		this.mk = g2.powZn(this.alpha).getImmutable();
+		
+		return params;
+	}
+	
 	public Element getMasterKey() {
 		return this.mk;
 	}

@@ -83,6 +83,12 @@ public class AEParameters implements CipherParameters {
 		this.pairing = PairingFactory.getPairing(this.curveParams);
 	}
 
+	
+	public AEParameters(AEParameters params) {
+		this.curveParams = params.getCurveParams();
+		this.pairing = params.getPairing();
+	}
+	
 	public CurveParams getCurveParams() {
 		return curveParams;
 	}

@@ -61,6 +61,10 @@ public class AEPrivateKey {
 		return c1;
 	}
 
+	public void setC1(Element c1) {
+		this.c1 = c1;
+	}
+
 	public Element getC2() {
 		return c2;
 	}

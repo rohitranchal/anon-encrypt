@@ -5,11 +5,13 @@ import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.plaf.jpbc.pairing.CurveParams;
 import it.unisa.dia.gas.plaf.jpbc.pairing.a1.TypeA1CurveGenerator;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
@@ -322,5 +324,39 @@ public class Peer {
 		}
 		
 		return rk.getPublicInfo(idRndMap).serializeJSON().toString();
+	}
+	
+	
+	public String processReKeyInformation(String user, String rkiVal) {
+		System.out.println(rkiVal);
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			ObjectNode newOn = (ObjectNode)mapper.readTree(rkiVal);
+			System.out.println(user);
+			ContactPrivateData contactPrivateData = this.privData.get(user);
+			if(contactPrivateData != null) {
+				ReKeyInformation rki = new ReKeyInformation(newOn, contactPrivateData.getParams().getPairing());
+				Element rnd = rki.getRnd();
+				Element id = contactPrivateData.getId();
+				Element key = rnd.powZn(id);
+				String keyVal = new String(Base64.encode(key.toBytes()));
+				Element c1 = rki.getNewC1map().get(keyVal);
+				
+				if(c1 != null) {
+					contactPrivateData.getKey().setC1(c1);
+					this.privData.put(user, contactPrivateData);
+					return "UPDATED";
+				} else {
+					return "REMOVED";
+				}
+			} else {
+				return "CONTACT_NOT_FOUND";
+			}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "ERROR";
 	}
 }

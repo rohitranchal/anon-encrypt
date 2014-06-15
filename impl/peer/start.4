@@ -8,9 +8,10 @@ node app.js 8002 Bob &
 sleep 1
 curl "http://localhost:8002/action?action=add_contact&name=Alice"
 
-curl http://localhost:8001/stop &
-sleep 1
-
 node app.js 8003 Charlie &
 sleep 1
 curl "http://localhost:8003/action?action=add_contact&name=Alice"
+
+sleep 20
+curl "http://localhost:8001/action?action=remove_contact&contact=Charlie"
+sleep 1

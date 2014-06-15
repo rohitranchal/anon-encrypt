@@ -57,9 +57,10 @@ public class ReKeyInformation {
 		ArrayNode contacts = (ArrayNode)on.get("contacts");
 		for(int i = 0; i < contacts.size(); i++) {
 			ObjectNode c = (ObjectNode)contacts.get(i);
-			String id = on.get("id").getTextValue();
+			System.out.println("Contact node : " + c);
+			String id = c.get("id").getTextValue();
 			Element c1 = group1.newElement();
-			c1.setFromBytes(Base64.decode(on.get("c1").getTextValue()));
+			c1.setFromBytes(Base64.decode(c.get("c1").getTextValue()));
 			this.newC1map.put(id, c1);
 		}
 	}

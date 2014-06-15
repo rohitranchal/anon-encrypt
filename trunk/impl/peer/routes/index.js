@@ -79,6 +79,20 @@ exports.do_action = function(req, res) {
 			request('http://localhost:5000/set_message_index_of_peer?user=' + name + '&ind=' + msg_count, function (error, response, body) {
 				// console.log(body);
 			});
+		} else if(action == 'remove_contact') {
+			console.log('['  + name + '] Remove contact ' + req.query.contact);
+			
+			var contact_ind = contacts.indexOf(req.query.contact);
+			contacts.splice(contact_ind, 1);
+
+			peer.removeContact(req.query.contact, function(err, result) {
+				//Remove and send re-key information to pub channel
+				var post_data = {"from" : name,
+								"type" : "re-key",
+								"msg" : result};
+
+				request.post('http://localhost:5000/add_message', {form:{msg:post_data}});
+			});
 		}
 		res.send('OK');
 };
@@ -143,7 +157,7 @@ setInterval(function() {
 									if(!err && result != null) {
 										if(result.indexOf("lie:") == -1) {
 											//This replaces signature verification
-											console.log('['  + name + ']NOT A LIE');
+											console.log('['  + name + '] NOT A LIE : ' + result);
 											//Send confirmation
 											var conf = {"type" : "data_request_confirmation", "tmpPubKey" : tmpPubKey}
 											request.post('http://localhost:5000/add_message', {form:{msg:conf}});
@@ -162,7 +176,17 @@ setInterval(function() {
 									}
 								});
 							}
-
+						} else if(j_data[i].data.type == 're-key') {
+							var tmp_rk_user = j_data[i].data.from;
+							var tmp_msg = j_data[i].data.msg;
+							if(name != tmp_rk_user) {
+								peer.processReKeyInformation(tmp_rk_user, tmp_msg, function(err, result) {
+									console.log('['  + name + '] Processed re-key from ' + tmp_rk_user + ' : ' + result)
+								});
+							}
+							
+						} else {
+							//console.log('['  + name + '] UNKOWN MESSAGE' + data);
 						}
 					} else {
 						console.log('expired message ' + i);
@@ -236,7 +260,7 @@ setInterval(function() {
 
 					if(contacts[j].name == data.user && contacts[j].msg_index < data.index) {
 						contacts[j].available = data.index;
-						console.log('['  + name + '] generating request');
+						console.log('['  + name + '] generating request for ' + data.user);
 						//Make request for data
 						peer.generateRequestStr(data.user, function(err, result) {
 							if(!err) {

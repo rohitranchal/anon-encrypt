@@ -1,7 +1,8 @@
 node app.js 8001 Alice &
 sleep 1
 curl "http://localhost:8001/action?action=add_contact&name=Bob"
-curl "http://localhost:8001/action?action=add_contact&name=Charlie"
+curl "http://localhost:8001/action?action=add_contact&name=Charlie1"
+curl "http://localhost:8001/action?action=add_contact&name=Charlie2"
 curl "http://localhost:8001/action?action=direct_message&to=Bob&message=ATTACK_AT_DAWN"
 
 node app.js 8002 Bob &
@@ -11,6 +12,9 @@ curl "http://localhost:8002/action?action=add_contact&name=Alice"
 curl http://localhost:8001/stop &
 sleep 1
 
-node app.js 8003 Charlie &
+node app.js 8003 Charlie1 &
 sleep 1
 curl "http://localhost:8003/action?action=add_contact&name=Alice"
+node app.js 8004 Charlie2 &
+sleep 1
+curl "http://localhost:8004/action?action=add_contact&name=Alice"

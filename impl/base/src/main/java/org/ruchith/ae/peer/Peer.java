@@ -344,6 +344,8 @@ public class Peer {
 				
 				if(c1 != null) {
 					contactPrivateData.getKey().setC1(c1);
+					contactPrivateData.getParams().setG1(rki.getG1());
+					this.privData.remove(user);
 					this.privData.put(user, contactPrivateData);
 					return "UPDATED";
 				} else {

@@ -328,11 +328,9 @@ public class Peer {
 	
 	
 	public String processReKeyInformation(String user, String rkiVal) {
-		System.out.println(rkiVal);
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			ObjectNode newOn = (ObjectNode)mapper.readTree(rkiVal);
-			System.out.println(user);
 			ContactPrivateData contactPrivateData = this.privData.get(user);
 			if(contactPrivateData != null) {
 				ReKeyInformation rki = new ReKeyInformation(newOn, contactPrivateData.getParams().getPairing());

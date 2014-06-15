@@ -14,4 +14,15 @@ curl "http://localhost:8003/action?action=add_contact&name=Alice"
 
 sleep 20
 curl "http://localhost:8001/action?action=remove_contact&contact=Charlie"
+sleep 20
+
+curl "http://localhost:8001/action?action=direct_message&to=Bob&message=ATTACK_AT_DAWN_2"
 sleep 1
+curl "http://localhost:8001/action?action=add_contact&name=Charlie2"
+sleep 1
+
+
+node app.js 8004 Charlie2 &
+sleep 1
+curl "http://localhost:8004/action?action=add_contact&name=Alice"
+

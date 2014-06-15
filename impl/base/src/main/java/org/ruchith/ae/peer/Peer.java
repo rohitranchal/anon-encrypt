@@ -20,6 +20,8 @@ import org.ruchith.ae.base.AEPrivateKey;
 import org.ruchith.ae.base.ContactKeyGen;
 import org.ruchith.ae.base.Decrypt;
 import org.ruchith.ae.base.Encrypt;
+import org.ruchith.ae.base.ReKey;
+import org.ruchith.ae.base.ReKeyInformation;
 import org.ruchith.ae.base.RootKeyGen;
 import org.ruchith.ae.base.TextEncoder;
 
@@ -305,4 +307,20 @@ public class Peer {
 		return name;
 	}
 	
+	public String removeContact(String name) {
+		//Remove user from the list of contacts
+		this.contacts.remove(name);
+		this.privData.remove(name);
+		
+		//Generate re-key information
+		ReKey rk = new ReKey(this.params);
+		rk.update();
+		this.masterKey = rk.getMk();
+		HashMap<Element, Element> idRndMap = new HashMap<Element, Element>();
+		for(Contact c: this.contacts.values()) {
+			idRndMap.put(c.getId(), c.getR());
+		}
+		
+		return rk.getPublicInfo(idRndMap).serializeJSON().toString();
+	}
 }

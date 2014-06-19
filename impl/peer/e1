@@ -1,0 +1,26 @@
+node app.js 8001 Alice &
+
+sleep 1
+
+curl "http://localhost:8001/action?action=add_contact&name=Bob"
+for i in {100..110}; 
+do 
+	curl "http://localhost:8001/action?action=add_contact&name=C$i"
+done
+
+curl "http://localhost:8001/action?action=direct_message&to=Bob&message=ATTACK_AT_DAWN"
+sleep 1
+
+curl http://localhost:8001/stop &
+
+node app.js 8002 Bob &
+sleep 1
+curl "http://localhost:8002/action?action=add_contact&name=Alice"
+sleep 5
+
+for i in {100..110}; 
+do 
+	node app.js 8$i C$i &
+	sleep 2
+	curl "http://localhost:8$i/action?action=add_contact&name=Alice"
+done

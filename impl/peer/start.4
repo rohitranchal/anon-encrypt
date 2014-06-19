@@ -1,28 +1,40 @@
+#Start the main peer
 node app.js 8001 Alice &
+
+#Wait for startup
 sleep 1
+
+#Add two contacts
 curl "http://localhost:8001/action?action=add_contact&name=Bob"
 curl "http://localhost:8001/action?action=add_contact&name=Charlie"
+
+#Send a message to Bob
 curl "http://localhost:8001/action?action=direct_message&to=Bob&message=ATTACK_AT_DAWN"
 
+#Start Bob and add Alice as a contact
 node app.js 8002 Bob &
 sleep 1
 curl "http://localhost:8002/action?action=add_contact&name=Alice"
 
+#Start Charlie and add Alice as a contact
 node app.js 8003 Charlie &
 sleep 1
 curl "http://localhost:8003/action?action=add_contact&name=Alice"
+sleep 2
 
-sleep 20
+#Alice: Remove Charlie
 curl "http://localhost:8001/action?action=remove_contact&contact=Charlie"
-sleep 20
+sleep 1
 
+#Alice: Send new update to Bob
 curl "http://localhost:8001/action?action=direct_message&to=Bob&message=ATTACK_AT_DAWN_2"
 sleep 1
-curl "http://localhost:8001/action?action=add_contact&name=Charlie2"
+
+#Alice: Add David
+curl "http://localhost:8001/action?action=add_contact&name=David"
 sleep 1
 
-
-node app.js 8004 Charlie2 &
+#Start David
+node app.js 8004 David &
 sleep 1
 curl "http://localhost:8004/action?action=add_contact&name=Alice"
-

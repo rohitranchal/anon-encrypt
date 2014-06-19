@@ -3,6 +3,7 @@ var fs = require("fs");
 var request = require("request");
 var Q = require("q");
 
+var data_recived = 0;
 //Java dependancies
 var jars_dir = "/Users/ruchith/Documents/research/anon-encrypt/trunk/impl/base/target/lib/";
 java.classpath.push(jars_dir + "bcprov-jdk16-1.46.jar");
@@ -97,107 +98,7 @@ exports.do_action = function(req, res) {
 		res.send('OK');
 };
 
-
-
-var msg_index = 0;
-var pubchannel_update_interval = 2000;
-
-var request_skip = 3;
-
-//Thread to read the public channel general messages
-setInterval(function() {
-	request('http://localhost:5000/get_all_messages_after?msg_id=' + msg_index, function (error, response, data) {
-		if (!error && response.statusCode == 200) {
-			//Convert to JSON
-			j_data = JSON.parse(data);
-			
-			//Update message index
-			msg_index += j_data.length;
-			console.log('['  + name + '] msg index ' + msg_index);
-			if(j_data.length > 0) {
-				// console.log('['  + name + '] PUB CHANNEL ' + data);
-
-				var incoming_request_count = 0;
-				for(i in j_data) {
-					//Ignore expired or closed messages
-					if(j_data[i].status != 'expired' && j_data[i].status != 'closed') {
-
-						var tmp_data = JSON.stringify(j_data[i].data);
-						if(j_data[i].data.type == 'data_request') {
-
-							//If this is not one of my requests
-							if(my_pub_keys.indexOf(j_data[i].data.tmpPubKey) == -1) {
-
-								if((incoming_request_count % request_skip) == 0) {
-									peer.generateResponseStr(tmp_data, function(err, result) {
-										if(!err) {
-											if(result != null) {
-												console.log('['  + name + '] Sending ' + result);
-												var resp = JSON.parse(result);
-												request.post('http://localhost:5000/add_message', {form:{msg:resp}});
-											}
-										} else {
-											console.log('['  + name + '] ERROR 1 ' + err);
-										}
-									});
-								}
-
-								incoming_request_count++;
-
-							}
-							
-						} else if(j_data[i].data.type == 'data_response') {
-							//console.log('RESPONSE:' + tmp_data);
-							var tmpPubKey = j_data[i].data.tmpPubKey;
-							var tmpUser = j_data[i].data.user;
-
-							//If I asked for this
-							if(my_pub_keys.indexOf(tmpPubKey) != -1) {
-								peer.processResponseStr(tmp_data, function(err, result) {
-									if(!err && result != null) {
-										if(result.indexOf("lie:") == -1) {
-											//This replaces signature verification
-											console.log('['  + name + '] NOT A LIE : ' + result);
-											//Send confirmation
-											var conf = {"type" : "data_request_confirmation", "tmpPubKey" : tmpPubKey}
-											request.post('http://localhost:5000/add_message', {form:{msg:conf}});
-
-											for(var x = 0; x < contacts.length; x++) {
-												if(contacts[x].name == tmpUser) {
-													contacts[x].msg_index = contacts[x].available;
-												}
-											}
-
-										} else {
-											console.log('['  + name + ']LIE RECEIVED!!!');
-										}
-									} else {
-										console.log('['  + name + '] ERROR 2 ' + err);
-									}
-								});
-							}
-						} else if(j_data[i].data.type == 're-key') {
-							var tmp_rk_user = j_data[i].data.from;
-							var tmp_msg = j_data[i].data.msg;
-							if(name != tmp_rk_user) {
-								peer.processReKeyInformation(tmp_rk_user, tmp_msg, function(err, result) {
-									console.log('['  + name + '] Processed re-key from ' + tmp_rk_user + ' : ' + result)
-								});
-							}
-							
-						} else {
-							//console.log('['  + name + '] UNKOWN MESSAGE' + data);
-						}
-					} else {
-						console.log('expired message ' + i);
-					}
-				}
-
-			}
-		}
-	});
-}, pubchannel_update_interval);
-
+var pubchannel_update_interval = 1000;
 
 //Thread to read the public channel personal messages
 var priv_msg_index = 0;
@@ -216,7 +117,7 @@ setInterval(function() {
 						//Private data from a peer
 						peer.registerContactStr(msg.from, JSON.stringify(msg.priv_data), function(err, result) {
 							if(!err) {
-								console.log('['  + name + '] Added priv data from ' + msg.from);
+								console.log('['  + name + '] Added priv data from ' + result);
 							} else {
 								console.log('['  + name + '] ERROR 3 ' + err);
 							}
@@ -232,6 +133,7 @@ setInterval(function() {
 							}
 						}
 
+						data_recived = 1;
 						peer.addDirectMessage(msg.from, msg.msg, function(err, result) {
 							if(!err) {
 								console.log('['  + name + '] Message from ' + msg.from);
@@ -246,11 +148,136 @@ setInterval(function() {
 	});
 }, pubchannel_update_interval);
 
+
+var msg_index = 0;
+
+
+// var request_skip = Math.ceil(Math.random() * 10);
+var request_skip = 10;
+// console.log('['  + name + '] SKIP ' + request_skip);
+var confirmed_keys = new Array();
+
+//Thread to read the public channel general messages
+setInterval(function() {
+	request('http://localhost:5000/get_all_messages_after?msg_id=' + msg_index, function (error, response, data) {
+		if (!error && response.statusCode == 200) {
+			//Convert to JSON
+			j_data = JSON.parse(data);
+			
+			//Update message index
+			msg_index += j_data.length;
+			// console.log('['  + name + '] msg index ' + msg_index);
+			if(j_data.length > 0) {
+				// console.log('['  + name + '] PUB CHANNEL ' + data);
+
+				var incoming_request_count = 0;
+				for(i in j_data) {
+					//Ignore expired or closed messages
+					if(j_data[i].status != 'expired' && j_data[i].status != 'closed') {
+
+						var tmp_data = JSON.stringify(j_data[i].data);
+						if(j_data[i].data.type == 'data_request') {
+
+							//If this is not one of my requests
+							if(my_pub_keys.indexOf(j_data[i].data.tmpPubKey) == -1) {
+
+								// if((incoming_request_count % request_skip) == 0) {
+									peer.generateResponseStr(tmp_data, function(err, result) {
+										if(!err) {
+											if(result != null) {
+												// console.log('['  + name + '] Sending response');
+												var resp = JSON.parse(result);
+												request.post('http://localhost:5000/add_message', {form:{msg:resp}});
+											}
+										} else {
+											console.log('['  + name + '] ERROR 1 ' + err);
+										}
+									});
+								// } else {
+								//	console.log('['  + name + '] Skip ' + incoming_request_count + ' ' + (incoming_request_count % request_skip));
+								// }
+
+								incoming_request_count++;
+
+							}
+							
+						} else if(j_data[i].data.type == 'data_response') {
+							//console.log('RESPONSE:' + tmp_data);
+							var tmpPubKey = j_data[i].data.tmpPubKey;
+							var tmpUser = j_data[i].data.user;
+
+
+							//If I asked for this
+							// console.log('['  + name + '] ' + confirmed_keys);
+
+							if(my_pub_keys.indexOf(tmpPubKey) != -1 && confirmed_keys.indexOf(tmpPubKey) == -1) {
+								if(data_recived == 0) {
+
+									confirmed_keys[confirmed_keys.length] = tmpPubKey;
+									console.log('['  + name + '] processing : ' + tmpPubKey + ' DATA : ' + data_recived);
+									peer.processResponseStr(tmp_data, function(err, result) {
+										if(!err && result != null) {
+											var r = JSON.parse(result);
+											result = r.plainText;
+											// console.log('['  + name + ']' + result);
+											if(data_recived == 0) {//If another iteraction of the loop processed a previous response
+												if(result.indexOf("A") == 0) {
+													data_recived = 1;
+													//This replaces signature verification
+													console.log('['  + name + '] NOT A LIE : ' + result);
+													//Send confirmation
+													console.log('['  + name + '] confirm : ' + r.tmpPubKey);
+													var conf = {"type" : "data_request_confirmation", "tmpPubKey" : r.tmpPubKey}
+													request.post('http://localhost:5000/add_message', {form:{msg:conf}});
+
+													for(var x = 0; x < contacts.length; x++) {
+														if(contacts[x].name == r.user) {
+															contacts[x].msg_index = contacts[x].available;
+														}
+													}
+
+												} else {
+													console.log('['  + name + ']LIE RECEIVED!!!');
+												}
+											}
+										} else {
+											console.log('['  + name + '] ERROR 2 ' + err);
+										}
+									});
+								} else {
+									console.log('['  + name + '] Skipped : ' + tmpPubKey + ' DATA : ' + data_recived);
+								}
+							}
+						} else if(j_data[i].data.type == 're-key') {
+							var tmp_rk_user = j_data[i].data.from;
+							var tmp_msg = j_data[i].data.msg;
+							if(name != tmp_rk_user) {
+								peer.processReKeyInformation(tmp_rk_user, tmp_msg, function(err, result) {
+									console.log('['  + name + '] Processed re-key from ' + tmp_rk_user + ' : ' + result)
+								});
+							}
+							
+						} else {
+							//console.log('['  + name + '] UNKOWN MESSAGE' + data);
+						}
+					} else {
+						//console.log('expired message ' + i);
+					}
+				}
+
+			}
+		}
+	});
+}, pubchannel_update_interval*3);
+
+
+
+
 //Periodically check for updates of contacts 
 //If there is a new message then ask for it
 setInterval(function() {
 	for(var i = 0; i< contacts.length; i++) {
-		console.log('['  + name + '] checking status of ' + contacts[i].name);
+		// console.log('['  + name + '] checking status of ' + contacts[i].name);
 		request('http://localhost:5000/get_message_index_of_peer?user=' + contacts[i].name, function (error, response, data) {
 			if (!error && response.statusCode == 200) {
 				data = JSON.parse(data);
@@ -260,12 +287,12 @@ setInterval(function() {
 
 					if(contacts[j].name == data.user && contacts[j].msg_index < data.index) {
 						contacts[j].available = data.index;
-						console.log('['  + name + '] generating request for ' + data.user);
+						// console.log('['  + name + '] generating request for ' + data.user + " : " + data.index + " : " + contacts[j].msg_index);
 						//Make request for data
 						peer.generateRequestStr(data.user, function(err, result) {
 							if(!err) {
 								var data_req = JSON.parse(result);
-
+								console.log('['  + name + '] generating request for ' + data.user + " : "  + result);
 								//Store the pub key
 								my_pub_keys[my_pub_keys.length] = data_req.tmpPubKey;
 
@@ -281,4 +308,4 @@ setInterval(function() {
 		});
 	}
 
-}, pubchannel_update_interval * 4);
+}, pubchannel_update_interval * 3);

@@ -5,6 +5,7 @@ var ttl = 5000;
 var req_count = 0;
 var resp_count = 0;
 var conf_count = 0;
+var closed_reqs = new Array();
 
 exports.index = function(req, res) {
 	res.render('index', {});
@@ -50,6 +51,9 @@ exports.get_all_messages_after = function(req, res) {
 		if(tmp[i].timestamp < limit) {
 			tmp[i].status = 'expired';
 		}
+		if(closed_reqs.indexOf(tmp[i].data.tmpPubKey) != -1) {
+			tmp[i].status = 'closed';
+		}
 	}
 	res.send(tmp);
 };
@@ -64,13 +68,8 @@ exports.add_message = function(req, res) {
 
 		//Handle confirmatiom messages
 		if(msg.type == 'data_request_confirmation') {
-			//Look for the request message and close it
-			for(var i = 0; i < data.length; i++) {
-				if(data[i].data.type == 'data_request' && data[i].data.tmpPubKey == msg.tmpPubKey) {
-					data[i].status = 'closed';
-					console.log('Closed : ' + msg.tmpPubKey);
-				}
-			}
+			closed_reqs[closed_reqs.length] = msg.tmpPubKey;
+			console.log('Closed : ' + msg.tmpPubKey);
 			conf_count++;
 		} else if (msg.type == 'data_request') {
 			req_count++;

@@ -2,9 +2,17 @@ var data = new Array();
 var direct_messages = new Array();
 var msg_index = new Array();
 var ttl = 5000;
+var req_count = 0;
+var resp_count = 0;
+var conf_count = 0;
 
 exports.index = function(req, res) {
 	res.render('index', {});
+};
+
+
+exports.msg_count = function(req, res) {
+	res.send({'total_messages' : data.length, 'direct_messages' : direct_messages.length, 'req_count' : req_count, 'resp_count': resp_count, 'conf_count': conf_count});
 };
 
 exports.status = function(req, res) {
@@ -59,10 +67,15 @@ exports.add_message = function(req, res) {
 			//Look for the request message and close it
 			for(var i = 0; i < data.length; i++) {
 				if(data[i].data.type == 'data_request' && data[i].data.tmpPubKey == msg.tmpPubKey) {
-					data.status = 'closed';
+					data[i].status = 'closed';
 					console.log('Closed : ' + msg.tmpPubKey);
 				}
 			}
+			conf_count++;
+		} else if (msg.type == 'data_request') {
+			req_count++;
+		} else if (msg.type == 'data_response') {
+			resp_count++;
 		}
 
 		var ts = new Date().getTime();

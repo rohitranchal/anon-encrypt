@@ -3,7 +3,7 @@ node app.js 8001 Alice &
 sleep 1
 
 curl "http://localhost:8001/action?action=add_contact&name=Bob"
-for i in {100..110}; 
+for i in {101..120}; 
 do 
 	curl "http://localhost:8001/action?action=add_contact&name=C$i"
 done
@@ -18,7 +18,7 @@ sleep 1
 curl "http://localhost:8002/action?action=add_contact&name=Alice"
 sleep 5
 
-for i in {100..110}; 
+for i in {101..120}; 
 do 
 	node app.js 8$i C$i &
 	sleep 2

@@ -151,14 +151,25 @@ setInterval(function() {
 
 var msg_index = 0;
 
-
-// var request_skip = Math.ceil(Math.random() * 10);
-var request_skip = 10;
 // console.log('['  + name + '] SKIP ' + request_skip);
 var confirmed_keys = new Array();
 
-//Thread to read the public channel general messages
-setInterval(function() {
+
+var read_pub_channel_loop = function() {
+	// var t = pubchannel_update_interval*3;
+	var t = Math.random() * 10000;
+
+	//console.log('['  + name + '] DELAY ' + t);
+	setTimeout(function() {
+		read_msg_index();
+		read_pub_channel();
+		read_pub_channel_loop(); //Start again after t
+	}, t);
+};
+
+read_pub_channel_loop();
+
+var read_pub_channel = function() {
 	request('http://localhost:5000/get_all_messages_after?msg_id=' + msg_index, function (error, response, data) {
 		if (!error && response.statusCode == 200) {
 			//Convert to JSON
@@ -181,7 +192,7 @@ setInterval(function() {
 							//If this is not one of my requests
 							if(my_pub_keys.indexOf(j_data[i].data.tmpPubKey) == -1) {
 
-								// if((incoming_request_count % request_skip) == 0) {
+								if(Math.random() > 0.5) { // Answer 50% of the time
 									peer.generateResponseStr(tmp_data, function(err, result) {
 										if(!err) {
 											if(result != null) {
@@ -193,9 +204,9 @@ setInterval(function() {
 											console.log('['  + name + '] ERROR 1 ' + err);
 										}
 									});
-								// } else {
-								//	console.log('['  + name + '] Skip ' + incoming_request_count + ' ' + (incoming_request_count % request_skip));
-								// }
+
+								}
+
 
 								incoming_request_count++;
 
@@ -245,7 +256,7 @@ setInterval(function() {
 										}
 									});
 								} else {
-									console.log('['  + name + '] Skipped : ' + tmpPubKey + ' DATA : ' + data_recived);
+									//console.log('['  + name + '] Skipped : ' + tmpPubKey + ' DATA : ' + data_recived);
 								}
 							}
 						} else if(j_data[i].data.type == 're-key') {
@@ -268,14 +279,13 @@ setInterval(function() {
 			}
 		}
 	});
-}, pubchannel_update_interval*3);
-
+};
 
 
 
 //Periodically check for updates of contacts 
 //If there is a new message then ask for it
-setInterval(function() {
+var read_msg_index = function() {
 	for(var i = 0; i< contacts.length; i++) {
 		// console.log('['  + name + '] checking status of ' + contacts[i].name);
 		request('http://localhost:5000/get_message_index_of_peer?user=' + contacts[i].name, function (error, response, data) {
@@ -308,4 +318,4 @@ setInterval(function() {
 		});
 	}
 
-}, pubchannel_update_interval * 3);
+};
